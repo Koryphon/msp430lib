@@ -1,0 +1,70 @@
+The USB API was modified from its original form to be compatible with the current directory
+structure and to work with the GCC compiler. Below is a list of modifications made:
+
+----------------------------------------------------------------------------------------------------
+Update #include statements
+----------------------------------------------------------------------------------------------------
+Most files need to be updated:
+    from:
+        #include <descriptors.h>
+    to:
+        #include <USB_Config/descriptors.h
+        
+USB_API/USB_Common/usb.c
+    from:
+        #include <HAL_UCS.h>
+        #include <HAL_TLV.h>
+    to:
+        #include <HAL_TI/HAL_UCS.h>
+        #include <HAL_TI/HAL_TLV.h>
+
+USB_API/USB_Common/device.c
+    #include <msp430_xc.h>
+
+----------------------------------------------------------------------------------------------------
+Modify the Descriptor tool to output the preferred style ISR
+----------------------------------------------------------------------------------------------------
+USB_config/MSP430_USB_Descriptor_Tool/plugins/com.ti.msp430.usb.descriptortool_3.11.0.00.jar/com/ti/msp430/usb/descriptortool/descriptors/Master.class
+Search for "#pragma" and replace it with the ISR macro.
+    
+----------------------------------------------------------------------------------------------------
+dma.c
+----------------------------------------------------------------------------------------------------
+Replace the defines up-top to include GCC:
+
+#ifdef __REGISTER_MODEL__
+    /* for IAR */
+    #if __REGISTER_MODEL__ == __REGISTER_MODEL_REG20__
+        #define __DMA_ACCESS_REG__ (void __data20 *)
+    #else
+        #define __DMA_ACCESS_REG__ (unsigned short)
+    #endif
+#else
+    #if defined(__GNUC__) && defined(__MSP430__)
+        /* for GCC */
+        #define __DMA_ACCESS_REG__ (uintptr_t)
+    #else
+        /* for CCS */
+        #define __DMA_ACCESS_REG__ (__SFR_FARPTR)(unsigned long)
+    #endif
+#endif
+
+----------------------------------------------------------------------------------------------------
+usb.c
+----------------------------------------------------------------------------------------------------
+Include extern statements for GCC at @ line ~240
+from:
+    #ifdef __TI_COMPILER_VERSION__
+to:
+    #if defined(__TI_COMPILER_VERSION__) || (defined(__GNUC__) && defined(__MSP430__))
+
+Unused variable "i" on line 665. removed to silence warning.
+
+----------------------------------------------------------------------------------------------------
+msp430USB.cmd
+----------------------------------------------------------------------------------------------------
+This linker script is actually already (almost) compatible with GCC!
+
+Remove any C++ style comments (//)
+
+Make sure all '=' have space to either side of them.
