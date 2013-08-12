@@ -359,51 +359,51 @@ void button_SetupPort(uint8_t en_mask, uint8_t inverted_mask, uint8_t port)
     if (port == 1) {
 #if BUTTON_PORT1 == 1
         // Initialize Port1
-        P1DIR &= ~en; // set to inputs
-        P1OUT |= (en & inverted); // active low pullups
-        P1OUT &= ~(en & ~inverted); // active high pulldowns
+        P1DIR &= ~en_mask; // set to inputs
+        P1OUT |= (en_mask & inverted_mask); // active low pullups
+        P1OUT &= ~(en_mask & ~inverted_mask); // active high pulldowns
 #if defined(P1REN)
-        P1REN |= en; // Enable pullup & pulldowns
+        P1REN |= en_mask; // Enable pullup & pulldowns
 #endif
 
-        P1IES &= ~(en & ~inverted); // first edge. L->H
-        P1IES |= (en & inverted); // first edge. H->L
+        P1IES &= ~(en_mask & ~inverted_mask); // first edge. L->H
+        P1IES |= (en_mask & inverted_mask); // first edge. H->L
 
         // Populate button object
-        buttonP1_obj.en = en;
-        buttonP1_obj.inverted = inverted;
+        buttonP1_obj.en = en_mask;
+        buttonP1_obj.inverted = inverted_mask;
         buttonP1_obj.hit_up = 0;
         buttonP1_obj.hit_down = 0;
         buttonP1_obj.pending_hold = 0;
 
-        P1IFG &= ~en; // clear any flags that would cause an interrupt
+        P1IFG &= ~en_mask; // clear any flags that would cause an interrupt
         // Enable Port Interrupts
-        P1IE = en;
+        P1IE = en_mask;
 #endif
     }
     else {
 #if BUTTON_PORT2 == 1
         // Initialize Port2
-        P2DIR &= ~en; // set to inputs
-        P2OUT |= (en & inverted); // active low pullups
-        P2OUT &= ~(en & ~inverted); // active high pulldowns
+        P2DIR &= ~en_mask; // set to inputs
+        P2OUT |= (en_mask & inverted_mask); // active low pullups
+        P2OUT &= ~(en_mask & ~inverted_mask); // active high pulldowns
 #if defined(P2REN)
-        P2REN |= en; // Enable pullup & pulldowns
+        P2REN |= en_mask; // Enable pullup & pulldowns
 #endif
 
-        P2IES &= ~(en & ~inverted); // first edge. L->H
-        P2IES |= (en & inverted); // first edge. H->L
+        P2IES &= ~(en_mask & ~inverted_mask); // first edge. L->H
+        P2IES |= (en_mask & inverted_mask); // first edge. H->L
 
         // Populate button object
-        buttonP2_obj.en = en;
-        buttonP2_obj.inverted = inverted;
+        buttonP2_obj.en = en_mask;
+        buttonP2_obj.inverted = inverted_mask;
         buttonP2_obj.hit_up = 0;
         buttonP2_obj.hit_down = 0;
         buttonP2_obj.pending_hold = 0;
 
-        P2IFG &= ~en; // clear any flags that would cause an interrupt
+        P2IFG &= ~en_mask; // clear any flags that would cause an interrupt
         // Enable Port Interrupts
-        P2IE = en;
+        P2IE = en_mask;
 #endif
     }
 }

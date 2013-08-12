@@ -1,0 +1,54 @@
+Notes to organize TO-DOs, already-dones, maintainences...
+
+
+Under windows, everything saved on shared partition:
+
+    1. Download original ms430lib
+        http://mykyta.info/a/embedded/msp430/index.html
+
+    2. Create a personal git repository
+        https://github.com/gbkhorn/msp430lib
+
+    3. Commit original code
+
+    4. Git clone
+
+    5. Create local private branch
+    gbkhorn_test_1
+
+    6. Download AStyle binary, create AStyle config  file
+        but don't apply.
+        http://astyle.sourceforge.net/
+
+    7. Commit AStyle binary and configuration file.
+
+    8. Download and install TI's IDE, CodeComposer
+        (Must register with TI. Must get 'permission')
+        Not sure if I want to use this tool.
+        Want to learn how msp430lib author dev cycle
+        Attempt a linux approach.
+
+Under Ubuntu 13.04
+
+    9. Install the msp packages
+        https://launchpad.net/ubuntu/oneiric/+search?text=msp430
+        sudo apt-get install msp430-libc mspdebug msp430mcu binutils-msp430 gcc-msp430 gdb-msp430
+
+    10. Install astyle
+	   http://astyle.sourceforge.net/
+	   sudo apt-get install astyle
+
+    11. Convert all lineends to Unix (friggin windows crlf, grr...)
+
+    12. Apply Astyle
+
+    13. Git add astyle files and changed files. Commit.
+
+    14. Build /msp430lib/examples/basic_example/
+
+    15. #14 Broke. button.c fix... will need to see what else needs to be sanity tested.
+
+    16. What is MSP430Flasher? Windows only application provided by TI? Annoying...
+    http://processors.wiki.ti.com/index.php/MSP430_Flasher_-_Command_Line_Programmer?DCMP=MSP430&HQS=Other+OT+msp430flasher
+     
+
