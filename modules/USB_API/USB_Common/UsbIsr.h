@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbIsr.h ========
  */
 #ifndef _ISR_H_
@@ -40,35 +40,35 @@ extern "C"
 {
 #endif
 
-/**
- * Handle incoming setup packet.
- * returns TRUE to keep CPU awake
- */
-BYTE SetupPacketInterruptHandler(VOID);
+    /**
+     * Handle incoming setup packet.
+     * returns TRUE to keep CPU awake
+     */
+    BYTE SetupPacketInterruptHandler(VOID);
 
-/**
- * Handle VBuss on signal.
- */
-VOID PWRVBUSonHandler(VOID);
+    /**
+     * Handle VBuss on signal.
+     */
+    VOID PWRVBUSonHandler(VOID);
 
-/**
- * Handle VBuss off signal.
- */
-VOID PWRVBUSoffHandler(VOID);
+    /**
+     * Handle VBuss off signal.
+     */
+    VOID PWRVBUSoffHandler(VOID);
 
-/**
- * Handle In-requests from control pipe.
- */
-VOID IEP0InterruptHandler(VOID);
+    /**
+     * Handle In-requests from control pipe.
+     */
+    VOID IEP0InterruptHandler(VOID);
 
-/**
- * Handle Out-requests from control pipe.
- */
-BYTE OEP0InterruptHandler(VOID);
+    /**
+     * Handle Out-requests from control pipe.
+     */
+    BYTE OEP0InterruptHandler(VOID);
 
-/*----------------------------------------------------------------------------+
- | End of header file                                                          |
- +----------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------+
+     | End of header file                                                          |
+     +----------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

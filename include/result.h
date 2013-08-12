@@ -3,8 +3,8 @@
 * \brief Defines some generic result codes
 * \author Alex Mykyta
 * \date 7/1/2011
-* 
-* This file includes some generic function responses that are used universally thoughout all of 
+*
+* This file includes some generic function responses that are used universally thoughout all of
 * the modules. See function-specific documentation for more detailed descriptions regarding the
 * responses.
 **/
@@ -12,7 +12,7 @@
 #ifndef RESULT_H_
 #define RESULT_H_
 
-typedef enum{
+typedef enum {
     RES_OK,            ///< Function executed successfully
     RES_FAIL,        ///< Function failed to execute properly
     RES_INVALID,    ///< Parameters returned are not valid

@@ -31,7 +31,7 @@
 * \author Steve Underwood
 * \author Modified by: Alex Mykyta
 * \date 7/11/2011
-* 
+*
 * This code currently allows for:
 *    - MSPGCC - the GNU tools for the MSP430
 *    - IAR Version 1 (old syntax)
@@ -53,17 +53,17 @@
 *        ADC12CTL0 |= ENC;
 *    }
 * \endcode
-* 
-* 
+*
+*
 **/
- 
+
 #ifndef _ISR_XC_H_
 #define _ISR_XC_H_
 
 ///\cond NODOC
 
 #ifndef __MSP430_XC_H__
-    #error Do not include this file directly. Include msp430_xc.h instead
+#error Do not include this file directly. Include msp430_xc.h instead
 #endif
 
 /* A tricky #define to stringify _Pragma parameters */
@@ -74,7 +74,7 @@
 // MSPGCC Compiler
 //==================================================================================================
 #if defined(__GNUC__)  &&  defined(__MSP430__)
-    /* This is the MSPGCC compiler */
+/* This is the MSPGCC compiler */
 #define _ISR(a,b)    void __attribute__((interrupt (a))) b(void)        // Edit by Alex Mykyta
 
 
@@ -82,7 +82,7 @@
 // IAR v1.xx Compiler
 //==================================================================================================
 #elif defined(__IAR_SYSTEMS_ICC__)  &&  (((__TID__ >> 8) & 0x7f) == 43)  &&  (__VER__ < 200)
-    /* This is V1.xx of the IAR compiler. */
+/* This is V1.xx of the IAR compiler. */
 #define _ISR(a,b) interrupt[a ## _VECTOR] void b(void)
 
 
@@ -90,7 +90,7 @@
 // IAR v2.xx or v3.xx Compiler
 //==================================================================================================
 #elif defined(__IAR_SYSTEMS_ICC__)  &&  (((__TID__ >> 8) & 0x7f) == 43)  &&  (__VER__ < 400)
-    /* This is V2.xx or V3.xx of the IAR compiler. */
+/* This is V2.xx or V3.xx of the IAR compiler. */
 #define _ISR(a,b) \
 __PRAGMA__(vector=a ##_VECTOR) \
 __interrupt void b(void)
@@ -100,7 +100,7 @@ __interrupt void b(void)
 // Rowley Crossworks Compiler
 //==================================================================================================
 #elif defined(__CROSSWORKS_MSP430)
-    /* This is the Rowley Crossworks compiler */
+/* This is the Rowley Crossworks compiler */
 #define _ISR(a,b) void b(void) __interrupt[a] // Edit by Alex Mykyta
 
 
@@ -108,14 +108,14 @@ __interrupt void b(void)
 // TI CCS Compiler
 //==================================================================================================
 #elif defined(__TI_COMPILER_VERSION__)
-    /* This is the Code Composer Studio compiler. */
+/* This is the Code Composer Studio compiler. */
 #define _ISR(a,b) EMIT_PRAGMA(vector=##a)\
         __interrupt void b (void)
 
-        
+
 //==================================================================================================
 #else
-    #error Compiler not supported.
+#error Compiler not supported.
 #endif
 
 //==================================================================================================

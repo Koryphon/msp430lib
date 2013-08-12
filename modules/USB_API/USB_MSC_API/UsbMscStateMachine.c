@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbMscStateMachine.c ========
  */
 /*File includes */
@@ -69,8 +69,8 @@ VOID Msc_ResetStateMachine (VOID)
     MscState.bUnitAttention = FALSE;
     MscState.bMscCbwFailed = FALSE;
     MscState.bMscResetRequired = FALSE;
-	MscState.stallEndpoint = FALSE;
-	MscState.stallAtEndofTx = FALSE;
+    MscState.stallEndpoint = FALSE;
+    MscState.stallAtEndofTx = FALSE;
 }
 
 //----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ VOID Msc_ResetStateMachine (VOID)
  * machine */
 BYTE USBMSC_poll ()
 {
-	WORD state;
+    WORD state;
     BYTE edbIndex;
     BYTE * pCT1;
     BYTE * pCT2;
@@ -88,17 +88,18 @@ BYTE USBMSC_poll ()
     pCT2 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
 
     //check if currently transmitting data..
-    if (MscReadControl.bReadProcessing == TRUE){
-    	state = usbDisableOutEndpointInterrupt(edbIndex);
+    if (MscReadControl.bReadProcessing == TRUE) {
+        state = usbDisableOutEndpointInterrupt(edbIndex);
         //atomic operation - disable interrupts
         if ((MscReadControl.dwBytesToSendLeft == 0) &&
-            (MscReadControl.lbaCount == 0)){
+            (MscReadControl.lbaCount == 0)) {
             //data is no more processing - clear flags..
             MscReadControl.bReadProcessing = FALSE;
             usbRestoreOutEndpointInterrupt(state);
-        } else {
+        }
+        else {
             if (!(tInputEndPointDescriptorBlock[edbIndex].bEPCNF &
-                  EPCNF_STALL)){                    //if it is not stalled - contiune communication
+                  EPCNF_STALL)) {                   //if it is not stalled - contiune communication
                 USBIEPIFG |= 1 << (edbIndex + 1);   //trigger IN interrupt to finish data tranmition
             }
             usbRestoreOutEndpointInterrupt(state);
@@ -106,59 +107,60 @@ BYTE USBMSC_poll ()
         }
     }
 
-    if (MscState.isMSCConfigured == FALSE){
+    if (MscState.isMSCConfigured == FALSE) {
         return (kUSBMSC_okToSleep);
     }
 
-    if (!MscState.bMscSendCsw){
-        if (MscState.bMscCbwReceived){
-            if (Scsi_Verify_CBW() == SUCCESS){
+    if (!MscState.bMscSendCsw) {
+        if (MscState.bMscCbwReceived) {
+            if (Scsi_Verify_CBW() == SUCCESS) {
                 //Successful reception of CBW
                 //Parse the CBW opcode and invoke the right command handler function
                 Scsi_Cmd_Parser(MSC0_INTFNUM);
                 MscState.bMscSendCsw = TRUE;
             }
             MscState.bMscCbwReceived = FALSE;       //CBW is performed!
-        } else {
+        }
+        else {
             return (kUSBMSC_okToSleep);
         }
         //check if any of out pipes has pending data and trigger interrupt
 
         if ((MscWriteControl.pCT1 != NULL)   &&
             ((*MscWriteControl.pCT1 & EPBCNT_NAK ) ||
-             (*MscWriteControl.pCT2 & EPBCNT_NAK ))){
+             (*MscWriteControl.pCT2 & EPBCNT_NAK ))) {
             USBOEPIFG |= 1 << (edbIndex + 1);       //trigger OUT interrupt again
             return (kUSBMSC_processBuffer);            //do not asleep, as data is coming in
             //and follow up data perform will be required.
         }
     }
 
-    if (MscState.bMscSendCsw){
-        if (MscState.bMcsCommandSupported == TRUE){
+    if (MscState.bMscSendCsw) {
+        if (MscState.bMcsCommandSupported == TRUE) {
             //watiting till transport is finished!
             if ((MscWriteControl.bWriteProcessing == FALSE) &&
                 (MscReadControl.bReadProcessing == FALSE) &&
-                (MscReadControl.lbaCount == 0)){
+                (MscReadControl.lbaCount == 0)) {
                 //Send CSW
                 if (MscState.stallAtEndofTx == TRUE) {
-                	if ((*pCT1 & EPBCNT_NAK) && (*pCT2 & EPBCNT_NAK)) {
-                		MscState.stallAtEndofTx = FALSE;
-                		usbStallInEndpoint(MSC0_INTFNUM);
-                	}
+                    if ((*pCT1 & EPBCNT_NAK) && (*pCT2 & EPBCNT_NAK)) {
+                        MscState.stallAtEndofTx = FALSE;
+                        usbStallInEndpoint(MSC0_INTFNUM);
+                    }
                 }
-                else if (SUCCESS == Scsi_Send_CSW(MSC0_INTFNUM)){
+                else if (SUCCESS == Scsi_Send_CSW(MSC0_INTFNUM)) {
                     MscState.bMscSendCsw = FALSE;
                     return (kUSBMSC_okToSleep);
                 }
-            }		
+            }
             else {
-            	MSCFromHostToBuffer();
+                MSCFromHostToBuffer();
             }
         }
     }
 
     return (kUSBMSC_processBuffer);                 //When MscState.bMcsCommandSupported = FALSE, bReadProcessing became true, and
-                                                    //bWriteProcessing = true.
+    //bWriteProcessing = true.
 }
 
 #endif //_MSC_

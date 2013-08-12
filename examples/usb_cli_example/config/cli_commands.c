@@ -9,23 +9,28 @@
 #include <usb_api.h>
 #include <string.h>
 
-void cli_puts(char *str){
-    USB_cdcSend(str,strlen(str),0,0);
+void cli_puts(char *str)
+{
+    USB_cdcSend(str, strlen(str), 0, 0);
 }
 
-void cli_putc(char chr){
-    USB_cdcSend(&chr,1,0,0);
+void cli_putc(char chr)
+{
+    USB_cdcSend(&chr, 1, 0, 0);
 }
 
-void cli_print_prompt(void){
+void cli_print_prompt(void)
+{
     cli_puts("\r\n>");
 }
 
-void cli_print_error(int error){
-    
+void cli_print_error(int error)
+{
+
 }
 
-void cli_print_notfound(char *strcmd){
+void cli_print_notfound(char *strcmd)
+{
     cli_puts("Command '");
     cli_puts(strcmd);
     cli_puts("' not found\r\n");
@@ -35,22 +40,25 @@ void cli_print_notfound(char *strcmd){
 // Custom Commands
 //==================================================================================================
 
-int cmdHello(uint16_t argc, char *argv[]){
+int cmdHello(uint16_t argc, char *argv[])
+{
     cli_puts("Hello World\r\n");
     return(0);
 }
 
 //--------------------------------------------------------------------------------------------------
-int cmdBye(uint16_t argc, char *argv[]){
+int cmdBye(uint16_t argc, char *argv[])
+{
     cli_puts("Goodbye!\r\n");
     return(0);
 }
 
 //--------------------------------------------------------------------------------------------------
-int cmdArgList(uint16_t argc, char *argv[]){
+int cmdArgList(uint16_t argc, char *argv[])
+{
     cli_puts("Argument List:\r\n");
     int i;
-    for(i=0;i<argc;i++){
+    for (i = 0; i < argc; i++) {
         cli_putc('[');
         cli_puts(argv[i]);
         cli_puts("]\r\n");

@@ -6,7 +6,7 @@
 /**
 * \file
 * \brief Configuration include file for \ref MOD_CLOCKSYS "Clock System"
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 ///\}
@@ -53,41 +53,41 @@
 //--------------------------------------------------------------------------------------------------
 // Manual Configuration: 1xx and 2xx devices
 //--------------------------------------------------------------------------------------------------
-    #define MANUAL_DCO_RSEL        0
-    #define MANUAL_DCO_DCO        0
-    #define MANUAL_DCO_MOD        0
+#define MANUAL_DCO_RSEL        0
+#define MANUAL_DCO_DCO        0
+#define MANUAL_DCO_MOD        0
 
 //--------------------------------------------------------------------------------------------------
 // Manual Configuration: 4xx devices
 //--------------------------------------------------------------------------------------------------
-    #define MANUAL_FLLPLUS_FLLD        1
-    //        0 = /1
-    //        1 = /2
-    //        2 = /4
-    //        3 = /8
-    
-    #define MANUAL_FLLPLUS_N        60
-    
+#define MANUAL_FLLPLUS_FLLD        1
+//        0 = /1
+//        1 = /2
+//        2 = /4
+//        3 = /8
+
+#define MANUAL_FLLPLUS_N        60
+
 //--------------------------------------------------------------------------------------------------
 // Manual Configuration: 5xx and 6xx devices
 //--------------------------------------------------------------------------------------------------
-    #define MANUAL_FLLREFDIV    1
-    //        0 = /1
-    //        1 = /2
-    //        2 = /4
-    //        3 = /8
-    //        4 = /12
-    //        5 = /16
+#define MANUAL_FLLREFDIV    1
+//        0 = /1
+//        1 = /2
+//        2 = /4
+//        3 = /8
+//        4 = /12
+//        5 = /16
 
-    #define MANUAL_FLLD        0
-    //        0 = /1
-    //        1 = /2
-    //        2 = /4
-    //        3 = /8
-    //        4 = /16
-    //        5 = /32
+#define MANUAL_FLLD        0
+//        0 = /1
+//        1 = /2
+//        2 = /4
+//        3 = /8
+//        4 = /16
+//        5 = /32
 
-    #define MANUAL_FLLN        60
+#define MANUAL_FLLN        60
 
 //==================================================================================================
 // Initial Conditions

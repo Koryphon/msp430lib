@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbMscReq.h ========
  */
 #ifndef _USB_MSC_REQ_H_
@@ -40,11 +40,11 @@ extern "C"
 {
 #endif
 
-/* MSC Class defined Request.Reset State-Machine and makes endpoints ready again*/
-BYTE USBMSC_reset(VOID);
+    /* MSC Class defined Request.Reset State-Machine and makes endpoints ready again*/
+    BYTE USBMSC_reset(VOID);
 
-/* MSC Class defined Request.Tells the host the number of supported logical units*/
-BYTE Get_MaxLUN(VOID);
+    /* MSC Class defined Request.Tells the host the number of supported logical units*/
+    BYTE Get_MaxLUN(VOID);
 
 #ifdef __cplusplus
 }

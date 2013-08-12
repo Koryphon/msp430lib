@@ -6,7 +6,7 @@
 /**
 * \file
 * \brief Configuration include file for \ref MOD_EVENT_QUEUE
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 #ifndef _EVENT_QUEUE_CONFIG_H_
@@ -25,6 +25,6 @@
 /// Maximum number of yielded event levels
 #define MAX_YIELD_DEPTH        2 ///< \hideinitializer
 
-///\}    
+///\}
 #endif
 ///\}

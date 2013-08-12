@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbMscScsi.h ========
  */
 #ifndef _UMSC_SCSI_H_
@@ -42,15 +42,15 @@ extern "C"
 {
 #endif
 
-/*Macros for CBW, CSW signatures */
+    /*Macros for CBW, CSW signatures */
 #define CBW_SIGNATURE 0x43425355u
 #define CSW_SIGNATURE 0x53425355u
 
-/*CBW, CSW length in bytes */
+    /*CBW, CSW length in bytes */
 #define CBW_LENGTH   31
 #define CSW_LENGTH   13
 
-/*SCSI Commands - Mandatory only implemented */
+    /*SCSI Commands - Mandatory only implemented */
 #define SCSI_TEST_UNIT_READY            0x00
 #define SCSI_REQUEST_SENSE          	0x03
 #define SCSI_INQUIRY                	0x12
@@ -78,7 +78,7 @@ extern "C"
 #define SCSI_SET_CD_SPEED						0xBB
 #define SCSI_READ_DISC_INFORMATION_LEN  		36
 
-/*SCSI Status codes. Used in CSW response */
+    /*SCSI Status codes. Used in CSW response */
 #define SCSI_PASSED           		0
 #define SCSI_FAILED           		1
 #define SCSI_PHASE_ERROR      		2
@@ -95,7 +95,7 @@ extern "C"
 #define kUSBMSC_RWWriteProtected    8
 
 
-/* Macros to indicate READ or WRITE operation */
+    /* Macros to indicate READ or WRITE operation */
 #define kUSBMSC_READ 1
 #define kUSBMSC_WRITE 2
 
@@ -104,7 +104,7 @@ extern "C"
 
 #define kUSBMSC_WRITE_PROTECTED 0x00
 
-/* Defines for MSC SCSI State-Machine */
+    /* Defines for MSC SCSI State-Machine */
 #define MSC_READY                   0x00
 #define MSC_COMMAND_TRANSPORT       0x01
 #define MSC_DATA_IN                 0x02
@@ -113,7 +113,7 @@ extern "C"
 #define MSC_DATA                    0x05
 #define MSC_WAIT4RESET              0x06
 
-/*Lengths of SCSI commands(in bytes) */
+    /*Lengths of SCSI commands(in bytes) */
 #define SCSI_SCSI_INQUIRY_CMD_LEN            36
 #define SCSI_READ_CAPACITY_CMD_LEN           8
 #define SCSI_MODE_SENSE_6_CMD_LEN            4
@@ -122,200 +122,200 @@ extern "C"
 #define SCSI_READ_FORMAT_CAPACITY_CMD_LEN    12
 #define SCSI_REPORT_LUNS_CMD_LEN             16
 
-/*----------------------------------------------------------------------------+
- | Type defines and structures                                                 |
- +----------------------------------------------------------------------------*/
-/*CBW Structure */
-typedef struct {
-    DWORD dCBWSignature;
-    DWORD dCBWTag;
-    DWORD dCBWDataTransferLength;
-    BYTE bmCBWFlags;
-    BYTE bCBWLUN;
-    BYTE bCBWCBLength;
-    BYTE CBWCB[16];
-} CBW, *pCBW;
+    /*----------------------------------------------------------------------------+
+     | Type defines and structures                                                 |
+     +----------------------------------------------------------------------------*/
+    /*CBW Structure */
+    typedef struct {
+        DWORD dCBWSignature;
+        DWORD dCBWTag;
+        DWORD dCBWDataTransferLength;
+        BYTE bmCBWFlags;
+        BYTE bCBWLUN;
+        BYTE bCBWCBLength;
+        BYTE CBWCB[16];
+    } CBW, *pCBW;
 
-/*CSW structure */
-typedef struct {
-    DWORD dCSWSignature;
-    DWORD dCSWTag;
-    DWORD dCSWDataResidue;
-    BYTE bCSWStatus;
-} CSW, *pCSW;
+    /*CSW structure */
+    typedef struct {
+        DWORD dCSWSignature;
+        DWORD dCSWTag;
+        DWORD dCSWDataResidue;
+        BYTE bCSWStatus;
+    } CSW, *pCSW;
 
-/*Request Response union(Required for Request sense command) */
-typedef struct {
-    BYTE ResponseCode : 7;
-    BYTE VALID : 1;
-    BYTE Obsolete;
-    BYTE SenseKey : 4;
-    BYTE Resv : 1;
-    BYTE ILI : 1;
-    BYTE EOM : 1;
-    BYTE FILEMARK : 1;
-    BYTE Information[4];
-    BYTE AddSenseLen;
-    BYTE CmdSpecificInfo[4];
-    BYTE ASC;
-    BYTE ASCQ;
-    BYTE FRUC;
-    BYTE SenseKeySpecific[3];
-    BYTE padding[14];   /* padding to cover case where host requests 24 bytes of sense data */
-} REQUEST_SENSE_RESPONSE;
+    /*Request Response union(Required for Request sense command) */
+    typedef struct {
+        BYTE ResponseCode : 7;
+        BYTE VALID : 1;
+        BYTE Obsolete;
+        BYTE SenseKey : 4;
+        BYTE Resv : 1;
+        BYTE ILI : 1;
+        BYTE EOM : 1;
+        BYTE FILEMARK : 1;
+        BYTE Information[4];
+        BYTE AddSenseLen;
+        BYTE CmdSpecificInfo[4];
+        BYTE ASC;
+        BYTE ASCQ;
+        BYTE FRUC;
+        BYTE SenseKeySpecific[3];
+        BYTE padding[14];   /* padding to cover case where host requests 24 bytes of sense data */
+    } REQUEST_SENSE_RESPONSE;
 
-/*Read capacity union(Required for READ CAPACITY command)*/
-typedef struct {
-    DWORD Last_LBA;
-    BYTE Resv;
-    BYTE Size_LBA[3];
-} SCSI_READ_CAPACITY;
+    /*Read capacity union(Required for READ CAPACITY command)*/
+    typedef struct {
+        DWORD Last_LBA;
+        BYTE Resv;
+        BYTE Size_LBA[3];
+    } SCSI_READ_CAPACITY;
 
-/*Structure internal to stack for holding LBA,buffer addr etc information*/
-typedef struct {
-    //BYTE	intfNum;
-    BYTE 	lun;
-    BYTE 	operation;
-    DWORD 	lba;
-    BYTE 	lbCount;
-    BYTE    *bufferAddr;
-    BYTE 	returnCode;
-    BYTE 	XorY;
-    BYTE	xBufFull;
-    WORD	xWordCnt;
-    BYTE	yBufFull;
-    WORD	yWordCnt;
-    BYTE	bufferProcessed;
-    BYTE	firstFlag;
-    DWORD	xlba;
-    BYTE	xlbaCount;
-    DWORD	ylba;
-    BYTE	ylbaCount;
+    /*Structure internal to stack for holding LBA,buffer addr etc information*/
+    typedef struct {
+        //BYTE	intfNum;
+        BYTE 	lun;
+        BYTE 	operation;
+        DWORD 	lba;
+        BYTE 	lbCount;
+        BYTE    *bufferAddr;
+        BYTE 	returnCode;
+        BYTE 	XorY;
+        BYTE	xBufFull;
+        WORD	xWordCnt;
+        BYTE	yBufFull;
+        WORD	yWordCnt;
+        BYTE	bufferProcessed;
+        BYTE	firstFlag;
+        DWORD	xlba;
+        BYTE	xlbaCount;
+        DWORD	ylba;
+        BYTE	ylbaCount;
 
-}USBMSC_RWbuf_Info;
+    } USBMSC_RWbuf_Info;
 
-/*Media info structure */
-struct USBMSC_mediaInfoStr {
-    DWORD lastBlockLba;
-    DWORD bytesPerBlock;
-    BYTE mediaPresent;
-    BYTE mediaChanged;
-    BYTE writeProtected;
-};
+    /*Media info structure */
+    struct USBMSC_mediaInfoStr {
+        DWORD lastBlockLba;
+        DWORD bytesPerBlock;
+        BYTE mediaPresent;
+        BYTE mediaChanged;
+        BYTE writeProtected;
+    };
 
-/*Lun entry Structures */
-struct _LUN_entry_struct {
-    BYTE number;
-    BYTE PDT;
-    BYTE removable;
-    char t10VID[8];
-    char t10PID[16];
-    char t10rev[4];
-};
+    /*Lun entry Structures */
+    struct _LUN_entry_struct {
+        BYTE number;
+        BYTE PDT;
+        BYTE removable;
+        char t10VID[8];
+        char t10PID[16];
+        char t10rev[4];
+    };
 
-struct config_struct {
-    struct _LUN_entry_struct LUN[MSC_MAX_LUN_NUMBER];
-};
+    struct config_struct {
+        struct _LUN_entry_struct LUN[MSC_MAX_LUN_NUMBER];
+    };
 
-struct _Report_Luns {
-    BYTE LunListLength[4];
-    BYTE Reserved[4];
-    BYTE LunList1[8];
-};
+    struct _Report_Luns {
+        BYTE LunListLength[4];
+        BYTE Reserved[4];
+        BYTE LunList1[8];
+    };
 
-struct _Scsi_Read_Capacity {
-    BYTE lLba[4];               //Last logical block address
-    BYTE bLength[4];            //Block length, in this case 0x200 = 512 bytes for each Logical Block
-};
+    struct _Scsi_Read_Capacity {
+        BYTE lLba[4];               //Last logical block address
+        BYTE bLength[4];            //Block length, in this case 0x200 = 512 bytes for each Logical Block
+    };
 
 //structure for controlling WRITE phase (HOST to MSP430)
-struct _MscWriteControl {
-    DWORD dwBytesToReceiveLeft; //holds how many bytes is still requested by WRITE operation:
-    //Host to MSP430.
-    WORD wFreeBytesLeft;        //free bytes left in UserBuffer
-    DWORD lba;                  //holds the current LBA number. This is the first LBA in the UserBuffer
-    BYTE *pUserBuffer;          //holds the current position of user's receiving buffer.
-                                //If NULL- no receiving operation started
-    WORD wCurrentByte;          //how many bytes in current LBA are received
-    WORD lbaCount;              //how many LBA we have received in current User Buffer
-    BYTE * pCT1;                //holds current EPBCTxx register
-    BYTE * pCT2;                //holds next EPBCTxx register
-    BYTE * pEP2;                //holds addr of the next EP buffer
-    BYTE bCurrentBufferXY;      //indicates which buffer is used by host to transmit data via OUT
-    BYTE bWriteProcessing;      //indicated if the current state is DATA WRITE phase or CBW receiwing
-    BYTE XorY;
-};
+    struct _MscWriteControl {
+        DWORD dwBytesToReceiveLeft; //holds how many bytes is still requested by WRITE operation:
+        //Host to MSP430.
+        WORD wFreeBytesLeft;        //free bytes left in UserBuffer
+        DWORD lba;                  //holds the current LBA number. This is the first LBA in the UserBuffer
+        BYTE *pUserBuffer;          //holds the current position of user's receiving buffer.
+        //If NULL- no receiving operation started
+        WORD wCurrentByte;          //how many bytes in current LBA are received
+        WORD lbaCount;              //how many LBA we have received in current User Buffer
+        BYTE * pCT1;                //holds current EPBCTxx register
+        BYTE * pCT2;                //holds next EPBCTxx register
+        BYTE * pEP2;                //holds addr of the next EP buffer
+        BYTE bCurrentBufferXY;      //indicates which buffer is used by host to transmit data via OUT
+        BYTE bWriteProcessing;      //indicated if the current state is DATA WRITE phase or CBW receiwing
+        BYTE XorY;
+    };
 
 //structure for controlling READ phase (MSP430 to HOST)
-struct _MscReadControl {
-    DWORD dwBytesToSendLeft;    //holds how many bytes is still requested by WRITE operation (Host to MSP430)
-    BYTE *pUserBuffer;          //holds the current position of user's receiving buffer.
-                                //If NULL- no receiving operation started
-    DWORD lba;                  //holds the current LBA number. This is the first LBA in the UserBuffer.
-    BYTE * pCT1;                //holds current EPBCTxx register
-    BYTE * pCT2;                //holds next EPBCTxx register
-    BYTE * pEP2;                //holds addr of the next EP buffer
-    WORD lbaCount;              //how many LBA we have to send to Host
-    BYTE bCurrentBufferXY;      //indicates which buffer is used by host to transmit data via OUT
-    BYTE bReadProcessing;       //indicated if the current state is DATA READ phase or CSW sending
-                                //initiated by McsDataSend()
-    BYTE XorY;
-};
+    struct _MscReadControl {
+        DWORD dwBytesToSendLeft;    //holds how many bytes is still requested by WRITE operation (Host to MSP430)
+        BYTE *pUserBuffer;          //holds the current position of user's receiving buffer.
+        //If NULL- no receiving operation started
+        DWORD lba;                  //holds the current LBA number. This is the first LBA in the UserBuffer.
+        BYTE * pCT1;                //holds current EPBCTxx register
+        BYTE * pCT2;                //holds next EPBCTxx register
+        BYTE * pEP2;                //holds addr of the next EP buffer
+        WORD lbaCount;              //how many LBA we have to send to Host
+        BYTE bCurrentBufferXY;      //indicates which buffer is used by host to transmit data via OUT
+        BYTE bReadProcessing;       //indicated if the current state is DATA READ phase or CSW sending
+        //initiated by McsDataSend()
+        BYTE XorY;
+    };
 
 //structure for common control of MSC stack
-struct _MscControl {
-    WORD wMscUserBufferSize;
-    WORD lbaSize;               //limitid to WORD, but could be increased if required.
-    BYTE lbaBufCapacity;        //how many LBAs (max) contains UserBuffer for read/write operation (>=1)
-    BYTE *xBufferAddr;
-    BYTE *yBufferAddr;
-    BYTE bMediaPresent;
-    BYTE bWriteProtected;
-};
+    struct _MscControl {
+        WORD wMscUserBufferSize;
+        WORD lbaSize;               //limitid to WORD, but could be increased if required.
+        BYTE lbaBufCapacity;        //how many LBAs (max) contains UserBuffer for read/write operation (>=1)
+        BYTE *xBufferAddr;
+        BYTE *yBufferAddr;
+        BYTE bMediaPresent;
+        BYTE bWriteProtected;
+    };
 
-struct _MscState {
-    volatile DWORD Scsi_Residue;
-    volatile BYTE Scsi_Status;  /*Variable to track command status */
-    BOOL bMcsCommandSupported;  /*Flag to indicate read/write command is recieved from host */
-    BOOL bMscCbwReceived;       /*Flag to inidicate whether any CBW recieved from host*/
-    BOOL bMscSendCsw;
-    BOOL isMSCConfigured;
-    BYTE bUnitAttention;
-    BYTE bMscCbwFailed;
-    BYTE bMscResetRequired;
-	BYTE stallEndpoint;
-	BYTE stallAtEndofTx;
-};
+    struct _MscState {
+        volatile DWORD Scsi_Residue;
+        volatile BYTE Scsi_Status;  /*Variable to track command status */
+        BOOL bMcsCommandSupported;  /*Flag to indicate read/write command is recieved from host */
+        BOOL bMscCbwReceived;       /*Flag to inidicate whether any CBW recieved from host*/
+        BOOL bMscSendCsw;
+        BOOL isMSCConfigured;
+        BYTE bUnitAttention;
+        BYTE bMscCbwFailed;
+        BYTE bMscResetRequired;
+        BYTE stallEndpoint;
+        BYTE stallAtEndofTx;
+    };
 
-extern struct _MscWriteControl MscWriteControl;
-extern struct _MscReadControl MscReadControl;
-extern struct _MscControl MscControl[];
+    extern struct _MscWriteControl MscWriteControl;
+    extern struct _MscReadControl MscReadControl;
+    extern struct _MscControl MscControl[];
 
-/*----------------------------------------------------------------------------+
- | Extern Variables                                                            |
- +----------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------+
+     | Extern Variables                                                            |
+     +----------------------------------------------------------------------------*/
 
-extern CBW cbw;
-extern CSW csw;
-extern REQUEST_SENSE_RESPONSE RequestSenseResponse;
+    extern CBW cbw;
+    extern CSW csw;
+    extern REQUEST_SENSE_RESPONSE RequestSenseResponse;
 
-/*----------------------------------------------------------------------------+
- | Function Prototypes                                                         |
- +----------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------+
+     | Function Prototypes                                                         |
+     +----------------------------------------------------------------------------*/
 
-/*SCSI Wrapper functions */
-BYTE Scsi_Cmd_Parser (BYTE opcode);
-BYTE Scsi_Send_CSW (BYTE intfNum);
+    /*SCSI Wrapper functions */
+    BYTE Scsi_Cmd_Parser (BYTE opcode);
+    BYTE Scsi_Send_CSW (BYTE intfNum);
 
-/*Function to reset MSC SCSI state machine */
-VOID Msc_ResetStateMachine(VOID);
-VOID Msc_ResetFlags(VOID);
-VOID Msc_ResetStruct(VOID);
-VOID SET_RequestsenseNotReady(VOID);
-VOID SET_RequestsenseMediaNotPresent(VOID);
-VOID MscResetCtrlLun(VOID);
+    /*Function to reset MSC SCSI state machine */
+    VOID Msc_ResetStateMachine(VOID);
+    VOID Msc_ResetFlags(VOID);
+    VOID Msc_ResetStruct(VOID);
+    VOID SET_RequestsenseNotReady(VOID);
+    VOID SET_RequestsenseMediaNotPresent(VOID);
+    VOID MscResetCtrlLun(VOID);
 
-USBMSC_RWbuf_Info* USBMSC_fetchInfoStruct(VOID);
+    USBMSC_RWbuf_Info* USBMSC_fetchInfoStruct(VOID);
 #ifdef __cplusplus
 }
 #endif

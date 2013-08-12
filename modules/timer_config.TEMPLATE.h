@@ -6,7 +6,7 @@
 /**
 * \file
 * \brief Configuration include file for \ref MOD_TIMER
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 #ifndef _TIMER_CONFIG_H_
@@ -36,13 +36,13 @@
 ///\brief Enter the ACLK clock frequency in Hz
 ///\note This is not required if clock_sys.h is included above
 #ifndef ACLK_FREQ
-    #define ACLK_FREQ   32768    ///< \hideinitializer
+#define ACLK_FREQ   32768    ///< \hideinitializer
 #endif
 
 ///\brief Enter the SMCLK clock frequency in Hz
 ///\note This is not required if clock_sys.h is included above
 #ifndef SMCLK_FREQ
-    #define SMCLK_FREQ  4000000    ///< \hideinitializer
+#define SMCLK_FREQ  4000000    ///< \hideinitializer
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -84,6 +84,6 @@
 
 
 ///\}
-    
+
 #endif /*_TIMER_CONFIG_H_*/
 ///\}

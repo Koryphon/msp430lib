@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbPHDC.c ========
  */
 #include <USB_Config/descriptors.h>
@@ -58,7 +58,7 @@ static struct _PHDCWrite {
 
 static struct _PHDCRead {
     BYTE *pUserBuffer;                          //holds the current position of user's receiving buffer. If NULL- no receiving
-                                                //operation started
+    //operation started
     BYTE *pCurrentEpPos;                        //current positon to read of received data from curent EP
     WORD nBytesToReceive;                       //holds how many bytes was requested by receiveData() to receive
     WORD nBytesToReceiveLeft;                   //holds how many bytes is still requested by receiveData() to receive
@@ -108,7 +108,7 @@ BYTE USBPHDC_sendData (const BYTE* data, WORD size, BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (size == 0){
+    if (size == 0) {
         return (kUSBPHDC_generalError);
     }
 
@@ -117,15 +117,15 @@ BYTE USBPHDC_sendData (const BYTE* data, WORD size, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)){
+        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
         //data can not be read because of USB suspended
-    	usbRestoreInEndpointInterrupt(state);
+        usbRestoreInEndpointInterrupt(state);
         return (kUSBPHDC_busNotAvailable);
     }
 
-    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft != 0){
+    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft != 0) {
         //the USB still sends previous data, we have to wait
-    	usbRestoreInEndpointInterrupt(state);
+        usbRestoreInEndpointInterrupt(state);
         return (kUSBPHDC_intfBusyError);
     }
 
@@ -159,34 +159,35 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft == 0){  //do we have somtething to send?
-        if (!PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bZeroPacketSent){       //zero packet was not yet sent
+    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft == 0) { //do we have somtething to send?
+        if (!PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bZeroPacketSent) {      //zero packet was not yet sent
             PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bZeroPacketSent = TRUE;
 
             if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].last_ByteSend ==
-                EP_MAX_PACKET_SIZE_PHDC){
+                EP_MAX_PACKET_SIZE_PHDC) {
                 if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY ==
-                    X_BUFFER){
+                    X_BUFFER) {
                     if (tInputEndPointDescriptorBlock[edbIndex].bEPBCTX &
-                        EPBCNT_NAK){
-                    tInputEndPointDescriptorBlock[edbIndex].bEPBCTX = 0;
+                        EPBCNT_NAK) {
+                        tInputEndPointDescriptorBlock[edbIndex].bEPBCTX = 0;
                         PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY
-                            = Y_BUFFER;                                     //switch buffer
+                        = Y_BUFFER;                                     //switch buffer
                     }
-                } else   {
-                    if (tInputEndPointDescriptorBlock[edbIndex].bEPBCTY &
-                        EPBCNT_NAK){
-                    tInputEndPointDescriptorBlock[edbIndex].bEPBCTY = 0;
-                        PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY
-                            = X_BUFFER;                                     //switch buffer
                 }
+                else   {
+                    if (tInputEndPointDescriptorBlock[edbIndex].bEPBCTY &
+                        EPBCNT_NAK) {
+                        tInputEndPointDescriptorBlock[edbIndex].bEPBCTY = 0;
+                        PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY
+                        = X_BUFFER;                                     //switch buffer
+                    }
                 }
             }
 
             PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSend = 0;    //nothing to send
 
             //call event callback function
-            if (wUsbEventMask & kUSB_sendCompletedEvent){
+            if (wUsbEventMask & kUSB_sendCompletedEvent) {
                 bWakeUp = USBPHDC_handleSendCompleted(intfNum);
             }
         } //if (!bSentZeroPacket)
@@ -196,7 +197,7 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
 
     PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bZeroPacketSent = FALSE;         //zero packet will be not sent: we have data
 
-    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER){
+    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_X_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTX;
@@ -204,7 +205,8 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
         //second EP buffer
         pEP2 = (BYTE*)stUsbHandle[intfNum].iep_Y_Buffer;
         pCT2 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
-    } else   {
+    }
+    else   {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_Y_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
@@ -221,10 +223,10 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
             INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft;
     nTmp2 = *pCT1;
 
-    if (nTmp2 & EPBCNT_NAK){
+    if (nTmp2 & EPBCNT_NAK) {
         USB_TX_memcpy(pEP1, PHDCWriteCtrl[INTFNUM_OFFSET(
                                               intfNum)].pUsbBufferToSend,
-            byte_count);                                                        //copy data into IEP3 X or Y buffer
+                      byte_count);                                                        //copy data into IEP3 X or Y buffer
         *pCT1 = byte_count;                                                     //Set counter for usb In-Transaction
         PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
             (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY +
@@ -238,7 +240,7 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
         nTmp2 = *pCT2;
         if ((PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft >
              0) &&                                                              //do we have more data to send?
-            (nTmp2 & EPBCNT_NAK)){ //if the second buffer is free?
+            (nTmp2 & EPBCNT_NAK)) { //if the second buffer is free?
             //how many byte we can send over one endpoint buffer
             byte_count =
                 (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft >
@@ -248,7 +250,7 @@ BOOL PHDCToHostFromBuffer (BYTE intfNum)
 
             USB_TX_memcpy(pEP2, PHDCWriteCtrl[INTFNUM_OFFSET(
                                                   intfNum)].pUsbBufferToSend,
-                byte_count);                                                    //copy data into IEP3 X or Y buffer
+                          byte_count);                                                    //copy data into IEP3 X or Y buffer
             *pCT2 = byte_count;                                                 //Set counter for usb In-Transaction
             PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
                 (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY +
@@ -308,7 +310,7 @@ VOID PHDCCopyUsbToBuff (BYTE* pEP, BYTE* pCT, BYTE intfNum)
     PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer += nCount;        //move buffer pointer
     //to read rest of data next time from this place
 
-    if (nCount == PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp){    //all bytes are copied from receive buffer?
+    if (nCount == PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp) {   //all bytes are copied from receive buffer?
         //switch current buffer
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
             (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY + 1) & 0x01;
@@ -317,7 +319,8 @@ VOID PHDCCopyUsbToBuff (BYTE* pEP, BYTE* pCT, BYTE intfNum)
 
         //clear NAK, EP ready to receive data
         *pCT = 0x00;
-    } else   {
+    }
+    else   {
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp -= nCount;
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos = pEP + nCount;
     }
@@ -340,7 +343,7 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
     if ((size == 0) ||                                                          //read size is 0
-        (data == NULL)){
+        (data == NULL)) {
         return (kUSBPHDC_generalError);
     }
 
@@ -349,14 +352,14 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)){
+        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
         //data can not be read because of USB suspended
-    	usbRestoreOutEndpointInterrupt(state);
+        usbRestoreOutEndpointInterrupt(state);
         return (kUSBPHDC_busNotAvailable);
     }
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL){             //receive process already started
-    	usbRestoreOutEndpointInterrupt(state);
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL) {            //receive process already started
+        usbRestoreOutEndpointInterrupt(state);
         return (kUSBPHDC_intfBusyError);
     }
 
@@ -365,15 +368,15 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
     PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = data;                   //set user receive buffer
 
     //read rest of data from buffer, if any4
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0){
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0) {
         //copy data from pEP-endpoint into User's buffer
         PHDCCopyUsbToBuff(PHDCReadCtrl[INTFNUM_OFFSET(
                                            intfNum)].pCurrentEpPos,
-            PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
+                          PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
 
-        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0){    //the Receive opereation is completed
+        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {   //the Receive opereation is completed
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;           //no more receiving pending
-            if (wUsbEventMask & kUSB_receiveCompletedEvent){
+            if (wUsbEventMask & kUSB_receiveCompletedEvent) {
                 USBPHDC_handleReceiveCompleted(intfNum);                        //call event handler in interrupt context
             }
             usbRestoreOutEndpointInterrupt(state);
@@ -382,12 +385,13 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
         //check other EP buffer for data - exchange pCT1 with pCT2
         if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 ==
-            &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX){
+            &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX) {
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
                 (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
-        } else   {
+        }
+        else   {
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX;
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
@@ -396,17 +400,17 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
         nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
         //try read data from second buffer
-        if (nTmp1 & EPBCNT_NAK){                                                //if the second buffer has received data?
+        if (nTmp1 & EPBCNT_NAK) {                                               //if the second buffer has received data?
             nTmp1 = nTmp1 & 0x7f;                                               //clear NAK bit
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;           //holds how many valid bytes in the EP buffer
             PHDCCopyUsbToBuff(PHDCReadCtrl[INTFNUM_OFFSET(
                                                intfNum)].pCurrentEpPos,
-                PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
+                              PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
         }
 
-        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0){    //the Receive opereation is completed
+        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {   //the Receive opereation is completed
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;           //no more receiving pending
-            if (wUsbEventMask & kUSB_receiveCompletedEvent){
+            if (wUsbEventMask & kUSB_receiveCompletedEvent) {
                 USBPHDC_handleReceiveCompleted(intfNum);                        //call event handler in interrupt context
             }
             usbRestoreOutEndpointInterrupt(state);
@@ -416,8 +420,8 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
     //read 'fresh' data, if available
     nTmp1 = 0;
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER){    //this is current buffer
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK){ //this buffer has a valid data packet
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) {   //this is current buffer
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK) { //this buffer has a valid data packet
             //this is the active EP buffer
             //pEP1
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
@@ -432,8 +436,9 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
             nTmp1 = 1;                                                          //indicate that data is available
         }
-    } else   { //Y_BUFFER
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK){
+    }
+    else   {   //Y_BUFFER
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK) {
             //this is the active EP buffer
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
                 (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
@@ -448,41 +453,40 @@ BYTE USBPHDC_receiveData (BYTE* data, WORD size, BYTE intfNum)
             nTmp1 = 1;                                                          //indicate that data is available
         }
     }
-    if (nTmp1){
+    if (nTmp1) {
         //how many byte we can get from one endpoint buffer
         nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
-        while (nTmp1 == 0)
-        {
+        while (nTmp1 == 0) {
             nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
         }
 
-        if (nTmp1 & EPBCNT_NAK){
+        if (nTmp1 & EPBCNT_NAK) {
             nTmp1 = nTmp1 & 0x7f;                                               //clear NAK bit
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;           //holds how many valid bytes in the EP buffer
 
             PHDCCopyUsbToBuff(PHDCReadCtrl[INTFNUM_OFFSET(
                                                intfNum)].pCurrentEpPos,
-                PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
+                              PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
 
             nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
             //try read data from second buffer
             if ((PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft >
                  0) &&                                                          //do we have more data to send?
-                (nTmp1 & EPBCNT_NAK)){                                          //if the second buffer has received data?
+                (nTmp1 & EPBCNT_NAK)) {                                         //if the second buffer has received data?
                 nTmp1 = nTmp1 & 0x7f;                                           //clear NAK bit
                 PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;       //holds how many valid bytes in the EP buffer
                 PHDCCopyUsbToBuff(PHDCReadCtrl[INTFNUM_OFFSET(
                                                    intfNum)].pEP2,
-                    PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2, intfNum);
+                                  PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2, intfNum);
                 PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                     PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
             }
         }
     }
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0){        //the Receive opereation is completed
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {       //the Receive opereation is completed
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;               //no more receiving pending
-        if (wUsbEventMask & kUSB_receiveCompletedEvent){
+        if (wUsbEventMask & kUSB_receiveCompletedEvent) {
             USBPHDC_handleReceiveCompleted(intfNum);                            //call event handler in interrupt context
         }
         usbRestoreOutEndpointInterrupt(state);
@@ -506,7 +510,7 @@ BOOL PHDCToBufferFromHost (BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0){        //do we have somtething to receive?
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {       //do we have somtething to receive?
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;               //no more receiving pending
         return (bWakeUp);
     }
@@ -514,11 +518,11 @@ BOOL PHDCToBufferFromHost (BYTE intfNum)
     //No data to receive...
     if (!((tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX |
            tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY)
-          & 0x80)){
+          & 0x80)) {
         return (bWakeUp);
     }
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER){    //X is current buffer
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) {   //X is current buffer
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].oep_X_Buffer;
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
@@ -529,7 +533,8 @@ BOOL PHDCToBufferFromHost (BYTE intfNum)
             (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 =
             &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
-    } else   {
+    }
+    else   {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
@@ -545,7 +550,7 @@ BOOL PHDCToBufferFromHost (BYTE intfNum)
     //how many byte we can get from one endpoint buffer
     nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
 
-    if (nTmp1 & EPBCNT_NAK){
+    if (nTmp1 & EPBCNT_NAK) {
         nTmp1 = nTmp1 & 0x7f;                                                   //clear NAK bit
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;               //holds how many valid bytes in the EP buffer
 
@@ -555,25 +560,25 @@ BOOL PHDCToBufferFromHost (BYTE intfNum)
         nTmp1 = *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
         //try read data from second buffer
         if ((PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft > 0) &&  //do we have more data to send?
-            (nTmp1 & EPBCNT_NAK)){                                              //if the second buffer has received data?
+            (nTmp1 & EPBCNT_NAK)) {                                             //if the second buffer has received data?
             nTmp1 = nTmp1 & 0x7f;                                               //clear NAK bit
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;           //holds how many valid bytes in the EP buffer
             PHDCCopyUsbToBuff(PHDCReadCtrl[INTFNUM_OFFSET(
                                                intfNum)].pEP2,
-                PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2, intfNum);
+                              PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2, intfNum);
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                 PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
         }
     }
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0){        //the Receive opereation is completed
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {       //the Receive opereation is completed
         PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;               //no more receiving pending
-        if (wUsbEventMask & kUSB_receiveCompletedEvent){
+        if (wUsbEventMask & kUSB_receiveCompletedEvent) {
             bWakeUp = USBPHDC_handleReceiveCompleted(intfNum);
         }
 
-        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp){                  //Is not read data still available in the EP?
-            if (wUsbEventMask & kUSB_dataReceivedEvent){
+        if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp) {                 //Is not read data still available in the EP?
+            if (wUsbEventMask & kUSB_dataReceivedEvent) {
                 bWakeUp = USBPHDC_handleDataReceived(intfNum);
             }
         }
@@ -604,7 +609,7 @@ BYTE USBPHDC_abortReceive (WORD* size, BYTE intfNum)
     *size = 0;                                                  //set received bytes count to 0
 
     //is receive operation underway?
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer){
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer) {
         //how many bytes are already received?
         *size = PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceive -
                 PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft;
@@ -633,20 +638,20 @@ BYTE USBPHDC_rejectData (BYTE intfNum)
     //atomic operation - disable interrupts
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
-    if (bFunctionSuspended){
-    	usbRestoreOutEndpointInterrupt(state);
+    if (bFunctionSuspended) {
+        usbRestoreOutEndpointInterrupt(state);
         return (kUSBPHDC_busNotAvailable);
     }
 
     //Is receive operation underway?
     //- do not flush buffers if any operation still active.
-    if (!PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer){
+    if (!PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer) {
         BYTE tmp1 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX &
                     EPBCNT_NAK;
         BYTE tmp2 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY &
                     EPBCNT_NAK;
 
-        if (tmp1 ^ tmp2){ //switch current buffer if any and only ONE of buffers is full
+        if (tmp1 ^ tmp2) { //switch current buffer if any and only ONE of buffers is full
             //switch current buffer
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
                 (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY +
@@ -693,7 +698,7 @@ BYTE USBPHDC_intfStatus (BYTE intfNum, WORD* bytesSent, WORD* bytesReceived)
     stateOut = usbDisableOutEndpointInterrupt(edbIndex);
 
     //Is send operation underway?
-    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft != 0){
+    if (PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSendLeft != 0) {
         ret |= kUSBPHDC_waitingForSend;
         *bytesSent = PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].nPHDCBytesToSend -
                      PHDCWriteCtrl[INTFNUM_OFFSET(intfNum)].
@@ -701,26 +706,27 @@ BYTE USBPHDC_intfStatus (BYTE intfNum, WORD* bytesSent, WORD* bytesReceived)
     }
 
     //Is receive operation underway?
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL){
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL) {
         ret |= kUSBPHDC_waitingForReceive;
         *bytesReceived =
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceive -
             PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft;
-    } else   { //receive operation not started
-                                                                //do not access USB memory if suspended (PLL off). It may produce
-                                                                //BUS_ERROR
-        if (!bFunctionSuspended){
+    }
+    else   {   //receive operation not started
+        //do not access USB memory if suspended (PLL off). It may produce
+        //BUS_ERROR
+        if (!bFunctionSuspended) {
             if ((tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX &
                  EPBCNT_NAK)  |                                 //any of buffers has a valid data packet
                 (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY &
-                 EPBCNT_NAK)){
+                 EPBCNT_NAK)) {
                 ret |= kUSBPHDC_dataWaiting;
             }
         }
     }
 
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)){
+        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
         //if suspended or not enumerated - report no other tasks pending
         ret = kUSBPHDC_busNotAvailable;
     }
@@ -748,23 +754,24 @@ BYTE USBPHDC_bytesInUSBBuffer (BYTE intfNum)
     //atomic operation - disable interrupts
 
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)){
-    	usbRestoreOutEndpointInterrupt(state);
+        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+        usbRestoreOutEndpointInterrupt(state);
         //if suspended or not enumerated - report 0 bytes available
         return (0);
     }
 
-    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0){  //If a RX operation is underway, part of data may was read of the
-                                                                //OEP buffer
+    if (PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0) { //If a RX operation is underway, part of data may was read of the
+        //OEP buffer
         bTmp1 = PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp;
-        if (*PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & EPBCNT_NAK){ //the next buffer has a valid data packet
+        if (*PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & EPBCNT_NAK) { //the next buffer has a valid data packet
             bTmp1 += *PHDCReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & 0x7F;
         }
-    } else   {
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK){ //this buffer has a valid data packet
+    }
+    else   {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK) { //this buffer has a valid data packet
             bTmp1 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & 0x7F;
         }
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK){ //this buffer has a valid data packet
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK) { //this buffer has a valid data packet
             bTmp1 += tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & 0x7F;
         }
     }
@@ -788,22 +795,21 @@ BYTE USBPHDC_GetDataStatusReq (VOID)
     abUsbRequestReturnData[0] = 0;
     abUsbRequestReturnData[1] = 0;
 
-    for (i = 0; i < PHDC_NUM_INTERFACES; i++)
-    {
+    for (i = 0; i < PHDC_NUM_INTERFACES; i++) {
 #ifdef NON_COMPOSITE_MULTIPLE_INTERFACES
         if (abromConfigurationDescriptorGroupPHDC.stPhdc[i].bInterfaceNumber ==
-            tSetupPacket.wIndex){
+            tSetupPacket.wIndex) {
 #else
         if (abromConfigurationDescriptorGroup.stPhdc[i].bInterfaceNumber ==
-            tSetupPacket.wIndex){
-#endif			
-            if (PHDCWriteCtrl[i].nPHDCBytesToSendLeft){
+            tSetupPacket.wIndex) {
+#endif
+            if (PHDCWriteCtrl[i].nPHDCBytesToSendLeft) {
                 abUsbRequestReturnData[0] |= 1 <<
                                              (stUsbHandle[PHDC0_INTFNUM +
                                                           i].ep_Out_Addr);
             }
 
-            if (PHDCReadCtrl[i].nBytesInEp){
+            if (PHDCReadCtrl[i].nBytesInEp) {
                 abUsbRequestReturnData[0] |= 1 <<
                                              (stUsbHandle[PHDC0_INTFNUM +
                                                           i].ep_In_Addr & 0x7F);

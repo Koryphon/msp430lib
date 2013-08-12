@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,7 +26,7 @@
 /**
 * \addtogroup MOD_CLI Command Line Interface
 * \brief Generic Command Line Interface
-* \author Alex Mykyta 
+* \author Alex Mykyta
 *
 * This module implements a generic command line interface that can be attached to any character IO
 * stream. Custom command functions can be executed by the user through the CLI.
@@ -40,7 +40,7 @@
 /**
 * \file
 * \brief Include file for \ref MOD_CLI "Command Line Interface"
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 #ifndef _CLI_H
@@ -52,24 +52,24 @@ extern "C" {
 
 #include <stdint.h>
 
-typedef struct{
-    char* strCommand;
-    int (* cmdptr)(uint16_t argc, char *argv[]);
-} cmdentry_t;
+    typedef struct {
+        char* strCommand;
+        int (* cmdptr)(uint16_t argc, char *argv[]);
+    } cmdentry_t;
 
-/** 
-* \brief Incoming character processing function.
-* 
-* Pass each incoming character into this function. Strings are parsed and the appropriate command
-* function is called. Any following words are passed in as arguments.
-**/
-void cli_process_char(char inchar);
+    /**
+    * \brief Incoming character processing function.
+    *
+    * Pass each incoming character into this function. Strings are parsed and the appropriate command
+    * function is called. Any following words are passed in as arguments.
+    **/
+    void cli_process_char(char inchar);
 
-void cli_puts(char *str);
-void cli_putc(char chr);
-void cli_print_prompt(void);
-void cli_echo_off(void);
-void cli_echo_on(void);
+    void cli_puts(char *str);
+    void cli_putc(char chr);
+    void cli_print_prompt(void);
+    void cli_echo_off(void);
+    void cli_echo_on(void);
 
 #ifdef __cplusplus
 }

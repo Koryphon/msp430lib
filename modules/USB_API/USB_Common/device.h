@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== device.h ========
  */
 #include <msp430_xc.h>
@@ -46,7 +46,7 @@
     defined (__MSP430F5633__) || \
     defined (__MSP430F5632__) || defined (__MSP430F5631__) || \
     defined (__MSP430F5630__)
-    #define __MSP430F563x_F663x
+#define __MSP430F563x_F663x
 #elif defined (__MSP430F5510__) || defined (__MSP430F5509__) || \
     defined (__MSP430F5508__) || \
     defined (__MSP430F5507__) || defined (__MSP430F5506__) || \
@@ -54,7 +54,7 @@
     defined (__MSP430F5504__) || defined (__MSP430F5503__) || \
     defined (__MSP430F5502__) || \
     defined (__MSP430F5501__) || defined (__MSP430F5500__)
-    #define __MSP430F550x
+#define __MSP430F550x
 #elif defined (__MSP430F5529__) || defined (__MSP430F5528__) || \
     defined (__MSP430F5527__) || \
     defined (__MSP430F5526__) || defined (__MSP430F5525__) || \
@@ -64,10 +64,10 @@
     defined (__MSP430F5517__) || defined (__MSP430F5515__) || \
     defined (__MSP430F5514__) || \
     defined (__MSP430F5513__)
-    #define __MSP430F552x
+#define __MSP430F552x
 #else
-    #error \
-    Define a constant of format __MSP430Fxxxx__ within the projects preprocessor settings, \
-    according to the device being used.
+#error \
+Define a constant of format __MSP430Fxxxx__ within the projects preprocessor settings, \
+according to the device being used.
 #endif
 /*------------------------ Nothing Below This Line --------------------------*/

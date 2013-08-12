@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,10 +36,10 @@
 * \author Alex Mykyta
 * This module also requires the following module:
 *    - \ref MOD_SPI "SPI Bus"
-* 
+*
 * \todo Clean this module up. Most of the functions & defines in the header can be static/internal.
 *
-* 
+*
 **/
 
 #ifndef _SST25VF_H_
@@ -119,36 +119,36 @@ extern "C" {
 ///\brief Functions closely mirror the SST25VF command set. See device documentation for
 /// more detalis.
 ///\{
-    
-    ///\cond PRIVATE
-void sst25vf_xErase(uint32_t Addr, uint8_t EraseCode);
-    ///\endcond
-    
-void sst25vf_SetCurrentDevice(uint8_t device);
-uint8_t sst25vf_GetCurrentDevice(void);
 
-uint16_t sst25vf_Init(void);
-uint8_t sst25vf_RDSR(void);
-void sst25vf_WRSR(uint8_t status);
-void sst25vf_StallBusy(void);
-void sst25vf_CMD(uint8_t data);
+    ///\cond PRIVATE
+    void sst25vf_xErase(uint32_t Addr, uint8_t EraseCode);
+    ///\endcond
+
+    void sst25vf_SetCurrentDevice(uint8_t device);
+    uint8_t sst25vf_GetCurrentDevice(void);
+
+    uint16_t sst25vf_Init(void);
+    uint8_t sst25vf_RDSR(void);
+    void sst25vf_WRSR(uint8_t status);
+    void sst25vf_StallBusy(void);
+    void sst25vf_CMD(uint8_t data);
 #define sst25vf_WREN()            sst25vf_CMD(SST_WREN)
 #define sst25vf_WRDI()            sst25vf_CMD(SST_WRDI)
 #define sst25vf_EWSR()            sst25vf_CMD(SST_EWSR)
 #define sst25vf_EBSY()            sst25vf_CMD(SST_EBSY)
 #define sst25vf_DBSY()            sst25vf_CMD(SST_DBSY)
-void sst25vf_ChipErase(void);
-void sst25vf_Read(uint32_t startAddr, uint8_t *data, uint16_t nBytes);
-void sst25vf_WriteByte(uint32_t startAddr, const uint8_t data);
-void sst25vf_Write(uint32_t startAddr, const uint8_t *data, uint16_t nBytes);
-void sst25vf_WriteSlow(uint32_t startAddr, const uint8_t *data, uint16_t nBytes);
-void sst25vf_AAIStart(uint32_t startAddr, const uint8_t D0, const uint8_t D1);
-void sst25vf_AAICont(const uint8_t D0, const uint8_t D1);
+    void sst25vf_ChipErase(void);
+    void sst25vf_Read(uint32_t startAddr, uint8_t *data, uint16_t nBytes);
+    void sst25vf_WriteByte(uint32_t startAddr, const uint8_t data);
+    void sst25vf_Write(uint32_t startAddr, const uint8_t *data, uint16_t nBytes);
+    void sst25vf_WriteSlow(uint32_t startAddr, const uint8_t *data, uint16_t nBytes);
+    void sst25vf_AAIStart(uint32_t startAddr, const uint8_t D0, const uint8_t D1);
+    void sst25vf_AAICont(const uint8_t D0, const uint8_t D1);
 #define sst25vf_4kErase(A)        sst25vf_xErase((A),SST_ERASE4k)
 #define sst25vf_32kErase(A)        sst25vf_xErase((A),SST_ERASE32k)
 #define sst25vf_64kErase(A)        sst25vf_xErase((A),SST_ERASE64k)
-uint16_t sst25vf_RDID();
-uint32_t sst25vf_JEDECID();
+    uint16_t sst25vf_RDID();
+    uint32_t sst25vf_JEDECID();
 ///\}
 
 #ifdef __cplusplus

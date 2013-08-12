@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,7 +37,7 @@
 //==================================================================================================
 
 // Filesystem object
-typedef struct{
+typedef struct {
     uint16_t BlockSearchStart; // points to the block index where the blocksearch last left off
     uint16_t GetFileCounter; // contains the index of the FT entry to begin the next search at
 } FFS_FS_t;
@@ -49,9 +49,9 @@ typedef struct{
 // Chunk Header
 typedef struct {
     uint8_t nBytes; // number of bytes in current chunk (including header)
-                    // addr + nBytes = address of next chunk's header.
-                    // = 1: Invalid
-                    // = 2-254: Valid
+    // addr + nBytes = address of next chunk's header.
+    // = 1: Invalid
+    // = 2-254: Valid
 } FFS_CHDR_t;
 
 //--------------------------------------------------------------------------------------------------
@@ -65,8 +65,8 @@ typedef struct {
 typedef struct {
     FFS_SHORT_BHDR_t H;
     uint32_t virt_addr; // Virtual address at start of block. Speeds up seeks in large files.
-                            // EX: for first block, it would be 0. Otherwise, it holds the sum of
-                            //     file bytes contained in all previous blocks.
+    // EX: for first block, it would be 0. Otherwise, it holds the sum of
+    //     file bytes contained in all previous blocks.
 } FFS_BHDR_t;
 
 // Block Header statuses

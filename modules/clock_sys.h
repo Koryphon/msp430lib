@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,8 +26,8 @@
 /**
 * \addtogroup MOD_CLOCKSYS Clock System
 * \brief Initializes the clock system
-* \author Alex Mykyta 
-* 
+* \author Alex Mykyta
+*
 * This module provides a generic method of initializing an MSP430's system clocks. Using the
 * configuration file, the clock sources for MCLK SMCLK and ACLK are defined as well as any clock
 * division. If a clock network uses a DCO/PLL as its source, the clock system configures that as
@@ -41,20 +41,20 @@
 *   4xx     | Yes
 *   5xx     | Yes
 *   6xx     | Yes
-* 
-* 
+*
+*
 * \todo Auto-FLL for 5xx and 6xx
 *
 * \todo Add support for 1xx and 2xx series
-* 
-* 
+*
+*
 * \{
 **/
 
 /**
 * \file
 * \brief Include file for \ref MOD_CLOCKSYS "Clock System"
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 
@@ -86,22 +86,22 @@ extern "C" {
 // Universal Functions
 //==================================================================================================
 
-/**
-* \brief Initializes the clock system
-* \return Nothing
-* \attention The initialization routine does \e not setup the IO ports!
-**/
-void clock_init(void);
+    /**
+    * \brief Initializes the clock system
+    * \return Nothing
+    * \attention The initialization routine does \e not setup the IO ports!
+    **/
+    void clock_init(void);
 
-/**
-* \brief Sets MCLK clock division level
-* \param div Frequency division F_out = F_in/(2^div)
-* \retval RES_OK
-* \retval RES_PARAMERR \c div outside the accepted range.
-* 
-* \note Not available for the MSP430F4xx series.
-**/
-RES_t clock_SetDivMCLK(uint8_t div);
+    /**
+    * \brief Sets MCLK clock division level
+    * \param div Frequency division F_out = F_in/(2^div)
+    * \retval RES_OK
+    * \retval RES_PARAMERR \c div outside the accepted range.
+    *
+    * \note Not available for the MSP430F4xx series.
+    **/
+    RES_t clock_SetDivMCLK(uint8_t div);
 
 #ifdef __cplusplus
 }

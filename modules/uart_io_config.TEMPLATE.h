@@ -6,7 +6,7 @@
 /**
 * \file
 * \brief Configuration include file for \ref MOD_UART
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 #ifndef __UART_IO_CONFIG_H__
@@ -33,7 +33,7 @@
 /**<    0 = Polling Mode    : No buffers used. RX and TX is done within the function calls. \n
 *        1 = Interrupt Mode    : All IO is buffered. RX and TX is handled in interrupts.
 **/
-    
+
 /// RX buffer size (Interrupt mode only)
 #define UIO_RXBUF_SIZE    256    ///< \hideinitializer
 
@@ -74,6 +74,6 @@
 #define UIO_BR1_DEFAULT        UIO_BR1_9600
 #define UIO_MCTL_DEFAULT    UIO_MCTL_9600
 ///\}
-    
+
 #endif
 ///\}

@@ -1,33 +1,33 @@
 /* --COPYRIGHT--,BSD
- * Copyright (c) 2012, Texas Instruments Incorporated                          
- * All rights reserved.                                                        
- *                                                                             
- * Redistribution and use in source and binary forms, with or without          
- * modification, are permitted provided that the following conditions          
- * are met:                                                                    
- *                                                                             
- * *  Redistributions of source code must retain the above copyright           
- *    notice, this list of conditions and the following disclaimer.            
- *                                                                             
- * *  Redistributions in binary form must reproduce the above copyright        
- *    notice, this list of conditions and the following disclaimer in the      
- *    documentation and/or other materials provided with the distribution.     
- *                                                                             
- * *  Neither the name of Texas Instruments Incorporated nor the names of      
- *    its contributors may be used to endorse or promote products derived      
- *    from this software without specific prior written permission.            
- *                                                                             
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,       
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR      
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR            
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,       
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,         
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,    
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR     
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,              
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                          
+ * Copyright (c) 2012, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
 
 /*-----------------------------------------------------------------------------+
@@ -52,10 +52,10 @@ BYTE const abromDeviceDescriptor[SIZEOF_DEVICE_DESCRIPTOR] = {
     0x00,                                   // Device's sub class code
     0x00,                                   // Device's protocol type code
     EP0_PACKET_SIZE,                        // End point 0's packet size
-    USB_VID&0xFF, USB_VID>>8,               // Vendor ID for device, TI=0x0451
-                                            // You can order your own VID at www.usb.org
-    USB_PID&0xFF, USB_PID>>8,               // Product ID for device,
-                                            // this ID is to only with this example
+    USB_VID & 0xFF, USB_VID >> 8,           // Vendor ID for device, TI=0x0451
+    // You can order your own VID at www.usb.org
+    USB_PID & 0xFF, USB_PID >> 8,           // Product ID for device,
+    // this ID is to only with this example
     VER_FW_L, VER_FW_H,                     // Revision level of device
     1,                                      // Index of manufacturer name string desc
     2,                                      // Index of product name string desc
@@ -66,8 +66,7 @@ BYTE const abromDeviceDescriptor[SIZEOF_DEVICE_DESCRIPTOR] = {
 /*-----------------------------------------------------------------------------+
 | Configuration Descriptor                                                     |
 |-----------------------------------------------------------------------------*/
-const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup=
-{
+const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup = {
     /* Generic part */
     {
         // CONFIGURATION DESCRIPTOR (9 bytes)
@@ -113,7 +112,7 @@ const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup
             CDC0_DATA_INTERFACE,                // bDataInterface: 0
 
             //ACM Functional Descriptor
-            0x04,	                            // bFunctionLength 
+            0x04,	                            // bFunctionLength
             0x24,	                            // bDescriptorType: CS_INTERFACE
             0x02,	                            // bDescriptorSubtype: Abstract Control Management desc
             0x02,	                            // bmCapabilities
@@ -148,7 +147,7 @@ const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup
             SIZEOF_ENDPOINT_DESCRIPTOR,         // bLength: Endpoint Descriptor size
             DESC_TYPE_ENDPOINT,	                // bDescriptorType: Endpoint
             CDC0_OUTEP_ADDR,	                // bEndpointAddress: (OUT3)
-            EP_DESC_ATTR_TYPE_BULK,	            // bmAttributes: Bulk 
+            EP_DESC_ATTR_TYPE_BULK,	            // bmAttributes: Bulk
             0x40, 0x00,                         // wMaxPacketSize, 64 bytes
             0xFF, 	                            // bInterval: ignored for Bulk transfer
 
@@ -172,50 +171,49 @@ const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup
 |-----------------------------------------------------------------------------*/
 BYTE const abromStringDescriptor[] = {
 
-	// String index0, language support
-	4,		// Length of language descriptor ID
-	3,		// LANGID tag
-	0x09, 0x04,	// 0x0409 for English
+    // String index0, language support
+    4,		// Length of language descriptor ID
+    3,		// LANGID tag
+    0x09, 0x04,	// 0x0409 for English
 
-	// String index1, Manufacturer
-	36,		// Length of this string descriptor
-	3,		// bDescriptorType
-	'T',0x00,'e',0x00,'x',0x00,'a',0x00,'s',0x00,' ',0x00,
-	'I',0x00,'n',0x00,'s',0x00,'t',0x00,'r',0x00,'u',0x00,
-	'm',0x00,'e',0x00,'n',0x00,'t',0x00,'s',0x00,
+    // String index1, Manufacturer
+    36,		// Length of this string descriptor
+    3,		// bDescriptorType
+    'T', 0x00, 'e', 0x00, 'x', 0x00, 'a', 0x00, 's', 0x00, ' ', 0x00,
+    'I', 0x00, 'n', 0x00, 's', 0x00, 't', 0x00, 'r', 0x00, 'u', 0x00,
+    'm', 0x00, 'e', 0x00, 'n', 0x00, 't', 0x00, 's', 0x00,
 
-	// String index2, Product
-	18,		// Length of this string descriptor
-	3,		// bDescriptorType
-	'C',0x00,'D',0x00,'C',0x00,' ',0x00,'T',0x00,'e',0x00,
-	's',0x00,'t',0x00,
+    // String index2, Product
+    18,		// Length of this string descriptor
+    3,		// bDescriptorType
+    'C', 0x00, 'D', 0x00, 'C', 0x00, ' ', 0x00, 'T', 0x00, 'e', 0x00,
+    's', 0x00, 't', 0x00,
 
-	// String index3, Serial Number
-	4,		// Length of this string descriptor
-	3,		// bDescriptorType
-	'0',0x00,
+    // String index3, Serial Number
+    4,		// Length of this string descriptor
+    3,		// bDescriptorType
+    '0', 0x00,
 
-	// String index4, Configuration String
-	22,		// Length of this string descriptor
-	3,		// bDescriptorType
-	'M',0x00,'S',0x00,'P',0x00,'4',0x00,'3',0x00,'0',0x00,
-	' ',0x00,'U',0x00,'S',0x00,'B',0x00,
+    // String index4, Configuration String
+    22,		// Length of this string descriptor
+    3,		// bDescriptorType
+    'M', 0x00, 'S', 0x00, 'P', 0x00, '4', 0x00, '3', 0x00, '0', 0x00,
+    ' ', 0x00, 'U', 0x00, 'S', 0x00, 'B', 0x00,
 
-	// String index5, Interface String
-	46,		// Length of this string descriptor
-	3,		// bDescriptorType
-	'V',0x00,'i',0x00,'r',0x00,'t',0x00,'u',0x00,'a',0x00,
-	'l',0x00,' ',0x00,'C',0x00,'O',0x00,'M',0x00,' ',0x00,
-	'P',0x00,'o',0x00,'r',0x00,'t',0x00,' ',0x00,'(',0x00,
-	'C',0x00,'D',0x00,'C',0x00,')',0x00
+    // String index5, Interface String
+    46,		// Length of this string descriptor
+    3,		// bDescriptorType
+    'V', 0x00, 'i', 0x00, 'r', 0x00, 't', 0x00, 'u', 0x00, 'a', 0x00,
+    'l', 0x00, ' ', 0x00, 'C', 0x00, 'O', 0x00, 'M', 0x00, ' ', 0x00,
+    'P', 0x00, 'o', 0x00, 'r', 0x00, 't', 0x00, ' ', 0x00, '(', 0x00,
+    'C', 0x00, 'D', 0x00, 'C', 0x00, ')', 0x00
 };
 
 /**** Populating the endpoint information handle here ****/
 
-const struct tUsbHandle stUsbHandle[]=
-{
+const struct tUsbHandle stUsbHandle[] = {
     {
-        CDC0_INEP_ADDR, 
+        CDC0_INEP_ADDR,
         CDC0_OUTEP_ADDR,
         1,
         CDC_CLASS,
@@ -229,157 +227,156 @@ const struct tUsbHandle stUsbHandle[]=
 };
 //-------------DEVICE REQUEST LIST---------------------------------------------
 
-const tDEVICE_REQUEST_COMPARE tUsbRequestList[] = 
-{
+const tDEVICE_REQUEST_COMPARE tUsbRequestList[] = {
 
     //---- CDC 0 Class Requests -----//
     // GET LINE CODING
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_INTERFACE,
     USB_CDC_GET_LINE_CODING,
-    0x00,0x00,                                 // always zero
-    CDC0_COMM_INTERFACE,0x00,                 // CDC interface is 0
-    0x07,0x00,                                 // Size of Structure (data length)
-    0xff,&usbGetLineCoding,
+    0x00, 0x00,                                // always zero
+    CDC0_COMM_INTERFACE, 0x00,                // CDC interface is 0
+    0x07, 0x00,                                // Size of Structure (data length)
+    0xff, &usbGetLineCoding,
 
     // SET LINE CODING
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_INTERFACE,
     USB_CDC_SET_LINE_CODING,
-    0x00,0x00,                                 // always zero
-    CDC0_COMM_INTERFACE,0x00,                  // CDC interface is 0
-    0x07,0x00,                                 // Size of Structure (data length)
-    0xff,&usbSetLineCoding,
+    0x00, 0x00,                                // always zero
+    CDC0_COMM_INTERFACE, 0x00,                 // CDC interface is 0
+    0x07, 0x00,                                // Size of Structure (data length)
+    0xff, &usbSetLineCoding,
 
     // SET CONTROL LINE STATE
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_CLASS | USB_REQ_TYPE_INTERFACE,
     USB_CDC_SET_CONTROL_LINE_STATE,
-    0xff,0xff,                                 // Contains data
-    CDC0_COMM_INTERFACE,0x00,                 // CDC interface is 0
-    0x00,0x00,                                 // No further data
-    0xcf,&usbSetControlLineState,
+    0xff, 0xff,                                // Contains data
+    CDC0_COMM_INTERFACE, 0x00,                // CDC interface is 0
+    0x00, 0x00,                                // No further data
+    0xcf, &usbSetControlLineState,
 
     //---- USB Standard Requests -----//
     // clear device feature
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_CLEAR_FEATURE,
-    FEATURE_REMOTE_WAKEUP,0x00,         // feature selector
-    0x00,0x00,
-    0x00,0x00,
-    0xff,&usbClearDeviceFeature,
+    FEATURE_REMOTE_WAKEUP, 0x00,        // feature selector
+    0x00, 0x00,
+    0x00, 0x00,
+    0xff, &usbClearDeviceFeature,
 
     // clear endpoint feature
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_ENDPOINT,
     USB_REQ_CLEAR_FEATURE,
-    FEATURE_ENDPOINT_STALL,0x00,
-    0xff,0x00,
-    0x00,0x00,
-    0xf7,&usbClearEndpointFeature,
+    FEATURE_ENDPOINT_STALL, 0x00,
+    0xff, 0x00,
+    0x00, 0x00,
+    0xf7, &usbClearEndpointFeature,
 
     // get configuration
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_GET_CONFIGURATION,
-    0x00,0x00, 
-    0x00,0x00, 
-    0x01,0x00,
-    0xff,&usbGetConfiguration,
+    0x00, 0x00,
+    0x00, 0x00,
+    0x01, 0x00,
+    0xff, &usbGetConfiguration,
 
     // get device descriptor
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_GET_DESCRIPTOR,
-    0xff,DESC_TYPE_DEVICE,              // bValueL is index and bValueH is type
-    0xff,0xff,
-    0xff,0xff,
-    0xd0,&usbGetDeviceDescriptor,
+    0xff, DESC_TYPE_DEVICE,             // bValueL is index and bValueH is type
+    0xff, 0xff,
+    0xff, 0xff,
+    0xd0, &usbGetDeviceDescriptor,
 
     // get configuration descriptor
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_GET_DESCRIPTOR,
-    0xff,DESC_TYPE_CONFIG,              // bValueL is index and bValueH is type
-    0xff,0xff,
-    0xff,0xff,
-    0xd0,&usbGetConfigurationDescriptor,
+    0xff, DESC_TYPE_CONFIG,             // bValueL is index and bValueH is type
+    0xff, 0xff,
+    0xff, 0xff,
+    0xd0, &usbGetConfigurationDescriptor,
 
     // get string descriptor
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_GET_DESCRIPTOR,
-    0xff,DESC_TYPE_STRING,              // bValueL is index and bValueH is type
-    0xff,0xff,
-    0xff,0xff,
-    0xd0,&usbGetStringDescriptor,
+    0xff, DESC_TYPE_STRING,             // bValueL is index and bValueH is type
+    0xff, 0xff,
+    0xff, 0xff,
+    0xd0, &usbGetStringDescriptor,
 
     // get interface
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
     USB_REQ_GET_INTERFACE,
-    0x00,0x00,
-    0xff,0xff,
-    0x01,0x00,
-    0xf3,&usbGetInterface,
+    0x00, 0x00,
+    0xff, 0xff,
+    0x01, 0x00,
+    0xf3, &usbGetInterface,
 
     // get device status
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_GET_STATUS,
-    0x00,0x00,
-    0x00,0x00,
-    0x02,0x00,
-    0xff,&usbGetDeviceStatus, 
+    0x00, 0x00,
+    0x00, 0x00,
+    0x02, 0x00,
+    0xff, &usbGetDeviceStatus,
     // get interface status
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
     USB_REQ_GET_STATUS,
-    0x00,0x00,
-    0xff,0x00,
-    0x02,0x00,
-    0xf7,&usbGetInterfaceStatus,
+    0x00, 0x00,
+    0xff, 0x00,
+    0x02, 0x00,
+    0xf7, &usbGetInterfaceStatus,
     // 	get endpoint status
     USB_REQ_TYPE_INPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_ENDPOINT,
     USB_REQ_GET_STATUS,
-    0x00,0x00,
-    0xff,0x00,
-    0x02,0x00,
-    0xf7,&usbGetEndpointStatus,
+    0x00, 0x00,
+    0xff, 0x00,
+    0x02, 0x00,
+    0xf7, &usbGetEndpointStatus,
 
     // set address
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_SET_ADDRESS,
-    0xff,0x00,
-    0x00,0x00,
-    0x00,0x00,
-    0xdf,&usbSetAddress,
+    0xff, 0x00,
+    0x00, 0x00,
+    0x00, 0x00,
+    0xdf, &usbSetAddress,
 
     // set configuration
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_SET_CONFIGURATION,
-    0xff,0x00,
-    0x00,0x00,
-    0x00,0x00,
-    0xdf,&usbSetConfiguration,
+    0xff, 0x00,
+    0x00, 0x00,
+    0x00, 0x00,
+    0xdf, &usbSetConfiguration,
 
     // set device feature
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_DEVICE,
     USB_REQ_SET_FEATURE,
-    0xff,0x00,                      // feature selector
-    0x00,0x00,
-    0x00,0x00,
-    0xdf,&usbSetDeviceFeature,
+    0xff, 0x00,                     // feature selector
+    0x00, 0x00,
+    0x00, 0x00,
+    0xdf, &usbSetDeviceFeature,
 
     // set endpoint feature
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_ENDPOINT,
     USB_REQ_SET_FEATURE,
-    0xff,0x00,                      // feature selector
-    0xff,0x00,                      // endpoint number <= 127
-    0x00,0x00,
-    0xd7,&usbSetEndpointFeature,
+    0xff, 0x00,                     // feature selector
+    0xff, 0x00,                     // endpoint number <= 127
+    0x00, 0x00,
+    0xd7, &usbSetEndpointFeature,
 
     // set interface
     USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_STANDARD | USB_REQ_TYPE_INTERFACE,
     USB_REQ_SET_INTERFACE,
-    0xff,0x00,                      // feature selector
-    0xff,0x00,                      // interface number
-    0x00,0x00,
-    0xd7,&usbSetInterface,
+    0xff, 0x00,                     // feature selector
+    0xff, 0x00,                     // interface number
+    0x00, 0x00,
+    0xd7, &usbSetInterface,
 
     // end of usb descriptor -- this one will be matched to any USB request
     // since bCompareMask is 0x00.
-    0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff, 
-    0x00,&usbInvalidRequest     // end of list
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0x00, &usbInvalidRequest    // end of list
 };
 
 /*-----------------------------------------------------------------------------+

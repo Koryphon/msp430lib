@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,7 +28,7 @@
 * NAME          DATE         COMMENTS
 * Alex M.       2011-08-01   born
 * Alex M.       2012-02-22   Portions rewritten in ASM for reliability
-* 
+*
 *=================================================================================================*/
 
 /**
@@ -39,9 +39,9 @@
 /**
 * \file
 * \brief Code for \ref MOD_SLEEP "Sleep"
-* \author Alex Mykyta 
-* 
-* 
+* \author Alex Mykyta
+*
+*
 **/
 
 
@@ -55,46 +55,48 @@
 #define USE_ASM_SPINNING    1
 //--------------------------------------------------------------------------------------------------
 #if(USE_ASM_SPINNING == 1)
-    #if defined(__GNUC__) && defined(__MSP430__)
-        // MSPGCC
-        #define ARG32_MSB    "R15"
-        #define ARG32_LSB    "R14"
-        
-    #elif defined(__TI_COMPILER_VERSION__)
-        // TI's Code Composer Studio
-        #define ARG32_MSB    "R13"
-        #define ARG32_LSB    "R12"
-        
-    #else
-        #error "Compiler not supported yet."
-    #endif
-    
-    static void asmspin(uint32_t count){
-        // count SHOULD always be located at R13:R12 when compiling with CCS
-        // count SHOULD always be located at R15:R14 when compiling with MSPGCC
-        
-        // Loop until count == 0 (8 cycles/loop)
-        __asm__("  nop             ");        // 1 // Loop1:
-        __asm__("  nop             ");        // 1
-        __asm__("  nop             ");        // 1
-        __asm__("  nop             ");        // 1 // Loop2:
-        __asm__("  dec.w " ARG32_LSB);        // 1
-        __asm__("  sbc.w " ARG32_MSB);        // 1
-        __asm__("  jnz $-12        ");        // 2 // jnz Loop1
-        __asm__("  tst.w " ARG32_LSB);        // 1
-        __asm__("  jnz $-10        ");        // 2 // jnz Loop2
-    }
+#if defined(__GNUC__) && defined(__MSP430__)
+// MSPGCC
+#define ARG32_MSB    "R15"
+#define ARG32_LSB    "R14"
+
+#elif defined(__TI_COMPILER_VERSION__)
+// TI's Code Composer Studio
+#define ARG32_MSB    "R13"
+#define ARG32_LSB    "R12"
+
+#else
+#error "Compiler not supported yet."
+#endif
+
+static void asmspin(uint32_t count)
+{
+    // count SHOULD always be located at R13:R12 when compiling with CCS
+    // count SHOULD always be located at R15:R14 when compiling with MSPGCC
+
+    // Loop until count == 0 (8 cycles/loop)
+    __asm__("  nop             ");        // 1 // Loop1:
+    __asm__("  nop             ");        // 1
+    __asm__("  nop             ");        // 1
+    __asm__("  nop             ");        // 1 // Loop2:
+    __asm__("  dec.w " ARG32_LSB);        // 1
+    __asm__("  sbc.w " ARG32_MSB);        // 1
+    __asm__("  jnz $-12        ");        // 2 // jnz Loop1
+    __asm__("  tst.w " ARG32_LSB);        // 1
+    __asm__("  jnz $-10        ");        // 2 // jnz Loop2
+}
 #endif
 
 //--------------------------------------------------------------------------------------------------
-void usleep(register uint16_t us){
+void usleep(register uint16_t us)
+{
     register volatile uint32_t count;
     register uint32_t tmp;
-    
+
     // fast approximation of:
     // count = (us*MCLK_FREQ)/(8*1000000)
     count = us; //8
-    
+
     tmp = MCLK_FREQ >> 10; //76
     tmp = tmp * count; // 102
     tmp >>= 13; // 136
@@ -103,33 +105,35 @@ void usleep(register uint16_t us){
     count += tmp; // 158
     tmp >>= 1; // 160
     count += tmp; // 162
-        
-    #if(USE_ASM_SPINNING == 1)
-        if(count <= 31) return; //169
-        count = count - 31; //172; 172/8 = 21; adjusted to 31
-        
-        asmspin(count);
-    #else
-        if(count <= 25) return; //169
-        count = count - 25; //172; 172/8 = 21; adjusted to 25
-        
-        while(count){ // 8 cyc per loop
-            count--;    
-        }
-    #endif
-    
+
+#if(USE_ASM_SPINNING == 1)
+    if (count <= 31) return; //169
+    count = count - 31; //172; 172/8 = 21; adjusted to 31
+
+    asmspin(count);
+#else
+    if (count <= 25) return; //169
+    count = count - 25; //172; 172/8 = 21; adjusted to 25
+
+    while (count) { // 8 cyc per loop
+        count--;
+    }
+#endif
+
 }
 
 //--------------------------------------------------------------------------------------------------
-void msleep(register uint16_t ms){
-    while(ms != 0){
+void msleep(register uint16_t ms)
+{
+    while (ms != 0) {
         usleep(1000);
         ms--;
     }
 }
 //--------------------------------------------------------------------------------------------------
-void sleep(register uint16_t s){
-    while(s != 0){
+void sleep(register uint16_t s)
+{
+    while (s != 0) {
         msleep(1000);
         s--;
     }

@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbMscReq.c ========
  */
 #include <USB_Config/descriptors.h>
@@ -60,9 +60,9 @@ BYTE USBMSC_reset (VOID)
 
     MscState.bMscResetRequired = FALSE;
     tInputEndPointDescriptorBlock[stUsbHandle[MSC0_INTFNUM].edb_Index].bEPCNF
-        &= ~(EPCNF_STALL | EPCNF_TOGGLE );
+    &= ~(EPCNF_STALL | EPCNF_TOGGLE );
     tOutputEndPointDescriptorBlock[stUsbHandle[MSC0_INTFNUM].edb_Index].bEPCNF
-        &= ~(EPCNF_STALL  | EPCNF_TOGGLE );
+    &= ~(EPCNF_STALL  | EPCNF_TOGGLE );
     usbSendZeroLengthPacketOnIEP0();    //status stage for control transfer
 
     return (FALSE);

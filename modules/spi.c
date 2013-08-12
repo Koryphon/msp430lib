@@ -1,16 +1,16 @@
 /*
 * Copyright (c) 2012, Alexander I. Mykyta
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met: 
-* 
+* modification, are permitted provided that the following conditions are met:
+*
 * 1. Redistributions of source code must retain the above copyright notice, this
-*    list of conditions and the following disclaimer. 
+*    list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice,
 *    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution. 
-* 
+*    and/or other materials provided with the distribution.
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,7 +28,7 @@
 * NAME          DATE         COMMENTS
 * Alex M.       2011-04-07   born
 * Alex M.       2013-08-10   Added uninit routine
-* 
+*
 *=================================================================================================*/
 
 /**
@@ -49,33 +49,37 @@
 #include "spi_internal.h"
 
 //--------------------------------------------------------------------------------------------------
-void spiInit(uint8_t spi_mode){
+void spiInit(uint8_t spi_mode)
+{
     SPI_UCCTL1 |= UCSWRST;
-    SPI_UCCTL0 = spi_mode+UCMSB+UCMST+UCSYNC;
-    SPI_UCCTL1 = (SPI_CLK_SRC<<6)+UCSWRST;
+    SPI_UCCTL0 = spi_mode + UCMSB + UCMST + UCSYNC;
+    SPI_UCCTL1 = (SPI_CLK_SRC << 6) + UCSWRST;
     SPI_UCBR = SPI_CLK_DIV;
-    #if(SPI_USE_USCI < 4)
-        SPI_UCMCTL = 0;
-    #endif
+#if(SPI_USE_USCI < 4)
+    SPI_UCMCTL = 0;
+#endif
     SPI_UCCTL1 &= ~UCSWRST;
 }
 
 //--------------------------------------------------------------------------------------------------
-void spiUninit(void){
+void spiUninit(void)
+{
     SPI_UCCTL1 |= UCSWRST;
 }
 
 //--------------------------------------------------------------------------------------------------
-uint8_t spiSendByte(uint8_t data){
+uint8_t spiSendByte(uint8_t data)
+{
     SPI_UCTXBUF = data;    // write
     while ((SPI_UCIFG & UCRXIFG) == 0); // wait for transfer to complete
     return(SPI_UCRXBUF);
 }
 
 //--------------------------------------------------------------------------------------------------
-void spiReadFrame(uint8_t* pBuffer, uint16_t size){
+void spiReadFrame(uint8_t* pBuffer, uint16_t size)
+{
     uint16_t i = 0;
-    for (i = 0; i < size; i++){
+    for (i = 0; i < size; i++) {
         SPI_UCTXBUF = DUMMY_CHAR;     // dummy write
         while ((SPI_UCIFG & UCRXIFG) == 0); // wait for transfer to complete
         pBuffer[i] = SPI_UCRXBUF;
@@ -83,10 +87,11 @@ void spiReadFrame(uint8_t* pBuffer, uint16_t size){
 }
 
 //--------------------------------------------------------------------------------------------------
-void spiSendFrame(const uint8_t* pBuffer, uint16_t size){
+void spiSendFrame(const uint8_t* pBuffer, uint16_t size)
+{
     uint16_t i = 0;
     volatile uint8_t x;
-    for (i = 0; i < size; i++){
+    for (i = 0; i < size; i++) {
         SPI_UCTXBUF = pBuffer[i];
         while ((SPI_UCIFG & UCTXIFG) == 0); // wait for tx buffer to be ready
     }

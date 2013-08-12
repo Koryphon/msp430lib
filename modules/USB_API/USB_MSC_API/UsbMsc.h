@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbMsc.h ========
  */
 #ifndef _USB_MSC_H_
@@ -42,7 +42,7 @@ extern "C"
 {
 #endif
 
-/*Return values of getState() and USBMSC_poll() API */
+    /*Return values of getState() and USBMSC_poll() API */
 #define kUSBMSC_idle               0
 #define kUSBMSC_readInProgress     1
 #define kUSBMSC_writeInProgress    2
@@ -50,21 +50,21 @@ extern "C"
 #define kUSBMSC_okToSleep          4
 #define kUSBMSC_processBuffer      5
 
-/*----------------------------------------------------------------------------+
- | Function Prototypes                                                         |
- +----------------------------------------------------------------------------*/
-/*Function to handle the MSC SCSI state machine */
-BYTE USBMSC_poll(VOID);
+    /*----------------------------------------------------------------------------+
+     | Function Prototypes                                                         |
+     +----------------------------------------------------------------------------*/
+    /*Function to handle the MSC SCSI state machine */
+    BYTE USBMSC_poll(VOID);
 
-/* MSC functions */
-BOOL MSCToHostFromBuffer ();
-BOOL MSCFromHostToBuffer ();
-BYTE USBMSC_bufferProcessed(VOID);
-BYTE USBMSC_getState ();
-BYTE USBMSC_updateMediaInfo (BYTE lun, struct USBMSC_mediaInfoStr *info);
+    /* MSC functions */
+    BOOL MSCToHostFromBuffer ();
+    BOOL MSCFromHostToBuffer ();
+    BYTE USBMSC_bufferProcessed(VOID);
+    BYTE USBMSC_getState ();
+    BYTE USBMSC_updateMediaInfo (BYTE lun, struct USBMSC_mediaInfoStr *info);
 
-BYTE USBMSC_handleBufferEvent(VOID);
-BYTE USBMSC_registerBufInfo ( BYTE lun, BYTE* RWbuf_x, BYTE* RWbuf_y, WORD size);
+    BYTE USBMSC_handleBufferEvent(VOID);
+    BYTE USBMSC_registerBufInfo ( BYTE lun, BYTE* RWbuf_x, BYTE* RWbuf_y, WORD size);
 
 #ifdef __cplusplus
 }

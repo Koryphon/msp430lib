@@ -6,7 +6,7 @@
 /**
 * \file
 * \brief Configuration include file for \ref MOD_I2C
-* \author Alex Mykyta 
+* \author Alex Mykyta
 **/
 
 #ifndef __I2C_CONFIG_H__
@@ -41,6 +41,6 @@
 #define I2C_CLK_DIV        100
 
 ///\}
-    
+
 #endif
 ///\}

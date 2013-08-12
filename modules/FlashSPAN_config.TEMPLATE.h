@@ -15,11 +15,11 @@
 //==================================================================================================
 /** \name Configuration
  * Generic configuration defines for the \ref MOD_FLASHSPAN module
- * 
- * \details     
+ *
+ * \details
  *    - The total number of blocks can not exceed \c 0xFFFF
  *    - The total number of bytes can not exceed  \c 0xFFFFFFFF (4 GB)
- * 
+ *
  * \{
 **/
 //==================================================================================================

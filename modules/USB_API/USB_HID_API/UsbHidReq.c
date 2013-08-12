@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbHidReq.c ========
  */
 #include "../USB_Common/device.h"
@@ -65,10 +65,10 @@ BYTE usbGetHidDescriptor (VOID)
     wBytesRemainingOnIEP0 = 9;
 #ifdef NON_COMPOSITE_MULTIPLE_INTERFACES
     usbSendDataPacketOnEP0((PBYTE)&abromConfigurationDescriptorGroupHID.stHid[
-            INTERFACE_OFFSET(tSetupPacket.wIndex)].blength_hid_descriptor);
+                               INTERFACE_OFFSET(tSetupPacket.wIndex)].blength_hid_descriptor);
 #else
     usbSendDataPacketOnEP0((PBYTE)&abromConfigurationDescriptorGroup.stHid[
-            INTERFACE_OFFSET(tSetupPacket.wIndex)].blength_hid_descriptor);
+                               INTERFACE_OFFSET(tSetupPacket.wIndex)].blength_hid_descriptor);
 #endif
     return (FALSE);
 }
@@ -90,13 +90,14 @@ BYTE usbSetReport (VOID)
 
     //tSetupPacket.wValue = USB_REQ_HID_FEATURE or USB_REQ_HID_INPUT
     buffer = USBHID_handleSetReport(tSetupPacket.wValue >> 8, tSetupPacket.wValue,
-        tSetupPacket.wLength,
-        tSetupPacket.wIndex);
+                                    tSetupPacket.wLength,
+                                    tSetupPacket.wIndex);
 
     //What if buffer is NULL?
-    if (buffer == 0){
+    if (buffer == 0) {
         usbReceiveDataPacketOnEP0((PBYTE)&abUsbRequestIncomingData);
-    } else {
+    }
+    else {
         usbReceiveDataPacketOnEP0((PBYTE)buffer);   //receive data over EP0 from Host
     }
 
@@ -111,9 +112,9 @@ BYTE usbGetReport (VOID)
 
     //tSetupPacket.wValue = USB_REQ_HID_FEATURE or USB_REQ_HID_INPUT
     buffer = USBHID_handleGetReport(tSetupPacket.wValue >> 8, tSetupPacket.wValue,
-        tSetupPacket.wLength,
-        tSetupPacket.wIndex);
-    if (buffer != 0){
+                                    tSetupPacket.wLength,
+                                    tSetupPacket.wIndex);
+    if (buffer != 0) {
         usbSendDataPacketOnEP0((PBYTE)buffer);
     }
 
@@ -128,7 +129,7 @@ BYTE usbSetProtocol (VOID)
         (BYTE)tSetupPacket.wValue;
     //tSetupPacket.wValue = USB_REQ_HID_BOOT_PROTOCOL or USB_REQ_HID_REPORT_PROTOCOL
     bWakeUp = USBHID_handleBootProtocol((BYTE)tSetupPacket.wValue,
-        tSetupPacket.wIndex);
+                                        tSetupPacket.wIndex);
     usbSendZeroLengthPacketOnIEP0();
 
     return (bWakeUp);
@@ -148,11 +149,12 @@ BYTE usbGetProtocol (VOID)
 BYTE usbSetIdle (VOID)
 {
     if (hidProtocol[INTERFACE_OFFSET(tSetupPacket.wIndex)] ==
-        USB_REQ_HID_BOOT_PROTOCOL){
+        USB_REQ_HID_BOOT_PROTOCOL) {
         hidIdleRate[INTERFACE_OFFSET(tSetupPacket.wIndex)] =
             tSetupPacket.wValue >> 8;
         usbSendZeroLengthPacketOnIEP0();
-    } else {
+    }
+    else {
         usbInvalidRequest();
     }
 
@@ -164,10 +166,11 @@ BYTE usbSetIdle (VOID)
 BYTE usbGetIdle (VOID)
 {
     if (hidProtocol[INTERFACE_OFFSET(tSetupPacket.wIndex)] ==
-        USB_REQ_HID_BOOT_PROTOCOL){
+        USB_REQ_HID_BOOT_PROTOCOL) {
         usbSendDataPacketOnEP0(&hidIdleRate[INTERFACE_OFFSET(tSetupPacket.
-                                                wIndex)]);
-    } else {
+                                                             wIndex)]);
+    }
+    else {
         usbInvalidRequest();
     }
 

@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== defMSP430USB.h ========
  */
 #ifndef _defMSP430USB_H
@@ -40,9 +40,9 @@ extern "C"
 {
 #endif
 
-/*----------------------------------------------------------------------------+
- | Constant Definitions                                                        |
- +----------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------+
+     | Constant Definitions                                                        |
+     +----------------------------------------------------------------------------*/
 #define YES         1
 #define NO          0
 
@@ -59,9 +59,9 @@ extern "C"
 #define ENABLE      1
 
 
-/*----------------------------------------------------------------------------+
- | USB Constants, Type Definition & Macro                                      |
- +----------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------+
+     | USB Constants, Type Definition & Macro                                      |
+     +----------------------------------------------------------------------------*/
 
 //USB related Constant
 #define MAX_ENDPOINT_NUMBER     0x07    //A maximum of 7 endpoints is available
@@ -137,37 +137,37 @@ extern "C"
 
 
 //EDB Data Structure
-typedef struct _tEDB {
-    BYTE bEPCNF;                        //Endpoint Configuration
-    BYTE bEPBBAX;                       //Endpoint X Buffer Base Address
-    BYTE bEPBCTX;                       //Endpoint X Buffer byte Count
-    BYTE bSPARE0;                       //no used
-    BYTE bSPARE1;                       //no used
-    BYTE bEPBBAY;                       //Endpoint Y Buffer Base Address
-    BYTE bEPBCTY;                       //Endpoint Y Buffer byte Count
-    BYTE bEPSIZXY;                      //Endpoint XY Buffer Size
-} tEDB, *tpEDB;
+    typedef struct _tEDB {
+        BYTE bEPCNF;                        //Endpoint Configuration
+        BYTE bEPBBAX;                       //Endpoint X Buffer Base Address
+        BYTE bEPBCTX;                       //Endpoint X Buffer byte Count
+        BYTE bSPARE0;                       //no used
+        BYTE bSPARE1;                       //no used
+        BYTE bEPBBAY;                       //Endpoint Y Buffer Base Address
+        BYTE bEPBCTY;                       //Endpoint Y Buffer byte Count
+        BYTE bEPSIZXY;                      //Endpoint XY Buffer Size
+    } tEDB, *tpEDB;
 
-typedef struct _tEDB0 {
-    BYTE bIEPCNFG;                      //Input Endpoint 0 Configuration Register
-    BYTE bIEPBCNT;                      //Input Endpoint 0 Buffer Byte Count
-    BYTE bOEPCNFG;                      //Output Endpoint 0 Configuration Register
-    BYTE bOEPBCNT;                      //Output Endpoint 0 Buffer Byte Count
-} tEDB0, *tpEDB0;
+    typedef struct _tEDB0 {
+        BYTE bIEPCNFG;                      //Input Endpoint 0 Configuration Register
+        BYTE bIEPBCNT;                      //Input Endpoint 0 Buffer Byte Count
+        BYTE bOEPCNFG;                      //Output Endpoint 0 Configuration Register
+        BYTE bOEPBCNT;                      //Output Endpoint 0 Buffer Byte Count
+    } tEDB0, *tpEDB0;
 
 //EndPoint Desciptor Block Bits
 #define EPCNF_USBIE     0x04            //USB Interrupt on Transaction Completion. Set By MCU
-                                        //0:No Interrupt, 1:Interrupt on completion
+    //0:No Interrupt, 1:Interrupt on completion
 #define EPCNF_STALL     0x08            //USB Stall Condition Indication. Set by UBM
-                                        //0: No Stall, 1:USB Install Condition
+    //0: No Stall, 1:USB Install Condition
 #define EPCNF_DBUF      0x10            //Double Buffer Enable. Set by MCU
-                                        //0: Primary Buffer Only(x-buffer only), 1:Toggle Bit Selects Buffer
+    //0: Primary Buffer Only(x-buffer only), 1:Toggle Bit Selects Buffer
 
 #define EPCNF_TOGGLE     0x20           //USB Toggle bit. This bit reflects the toggle sequence bit of DATA0 and DATA1.
 
 #define EPCNF_UBME      0x80            //UBM Enable or Disable bit. Set or Clear by MCU.
-                                        //0:UBM can't use this endpoint
-                                        //1:UBM can use this endpoint
+    //0:UBM can't use this endpoint
+    //1:UBM can use this endpoint
 #define EPBCNT_BYTECNT_MASK 0x7F        //MASK for Buffer Byte Count
 #define EPBCNT_NAK       0x80           //NAK, 0:No Valid in buffer, 1:Valid packet in buffer
 

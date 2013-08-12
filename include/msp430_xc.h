@@ -7,7 +7,7 @@
 *    - MSPGCC
 *    - TI Compiler
 **/
-        
+
 #ifndef __MSP430_XC_H__
 #define __MSP430_XC_H__
 
@@ -22,22 +22,22 @@ extern "C" {
 //--------------------------------------------------------------------------------------------------
 #if defined(__GNUC__) && defined(__MSP430__)
     // MSPGCC
-    
+
     // main() return value
-    #define MAIN_RET_t      int
-    #define MAIN_RETURN     return(0)
-    
+#define MAIN_RET_t      int
+#define MAIN_RETURN     return(0)
+
 //--------------------------------------------------------------------------------------------------
 #elif defined(__TI_COMPILER_VERSION__)
     // TI Compiler
 
     // main() return value
-    #define MAIN_RET_t      void
-    #define MAIN_RETURN     return
-    
+#define MAIN_RET_t      void
+#define MAIN_RETURN     return
+
 //--------------------------------------------------------------------------------------------------
 #else
-    #error "Compiler not supported."
+#error "Compiler not supported."
 #endif
 
 #ifdef __cplusplus

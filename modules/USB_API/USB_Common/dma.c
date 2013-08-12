@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== dma.c ========
  */
 #include "../USB_Common/device.h"
@@ -39,20 +39,20 @@
 #include <string.h>
 
 #ifdef __REGISTER_MODEL__
-    /* for IAR */
-    #if __REGISTER_MODEL__ == __REGISTER_MODEL_REG20__
-        #define __DMA_ACCESS_REG__ (void __data20 *)
-    #else
-        #define __DMA_ACCESS_REG__ (unsigned short)
-    #endif
+/* for IAR */
+#if __REGISTER_MODEL__ == __REGISTER_MODEL_REG20__
+#define __DMA_ACCESS_REG__ (void __data20 *)
 #else
-    #if defined(__GNUC__) && defined(__MSP430__)
-        /* for GCC */
-        #define __DMA_ACCESS_REG__ (uintptr_t)
-    #else
-        /* for CCS */
-        #define __DMA_ACCESS_REG__ (__SFR_FARPTR)(unsigned long)
-    #endif
+#define __DMA_ACCESS_REG__ (unsigned short)
+#endif
+#else
+#if defined(__GNUC__) && defined(__MSP430__)
+/* for GCC */
+#define __DMA_ACCESS_REG__ (uintptr_t)
+#else
+/* for CCS */
+#define __DMA_ACCESS_REG__ (__SFR_FARPTR)(unsigned long)
+#endif
 #endif
 
 //function pointers
@@ -69,8 +69,7 @@ VOID * memcpyV (VOID * dest, const VOID * source, size_t count)
     WORD i;
     volatile BYTE bTmp;
 
-    for (i = 0; i < count; i++)
-    {
+    for (i = 0; i < count; i++) {
         bTmp = *((BYTE*)source + i);
         *((BYTE*)dest  + i) = bTmp;
     }
@@ -83,35 +82,34 @@ VOID USB_initMemcpy (VOID)
     USB_TX_memcpy = memcpyV;
     USB_RX_memcpy = memcpyV;
 
-    switch (USB_DMA_CHAN)
-    {
-        case 0:
-            DMACTL0 &= ~DMA0TSEL_31;                        //DMA0 is triggered by DMAREQ
-            DMACTL0 |= DMA0TSEL_0;                          //DMA0 is triggered by DMAREQ
-            DMA0CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
-                       DMADSTINCR_3 );                      //and destination address
-            DMACTL4 |= ENNMI;                               //enable NMI interrupt
-            USB_TX_memcpy = memcpyDMA0;
-            USB_RX_memcpy = memcpyDMA0;
-            break;
-        case 1:
-            DMACTL0 &= ~DMA1TSEL_31;                        //DMA1 is triggered by DMAREQ
-            DMACTL0 |= DMA1TSEL_0;                          //DMA1 is triggered by DMAREQ
-            DMA1CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
-                       DMADSTINCR_3 );                      //and destination address
-            DMACTL4 |= ENNMI;                               //enable NMI interrupt
-            USB_TX_memcpy = memcpyDMA1;
-            USB_RX_memcpy = memcpyDMA1;
-            break;
-        case 2:
-            DMACTL0 &= ~DMA2TSEL_31;                        //DMA2 is triggered by DMAREQ
-            DMACTL0 |= DMA2TSEL_0;                          //DMA2 is triggered by DMAREQ
-            DMA2CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
-                       DMADSTINCR_3 );                      //and destination address
-            DMACTL4 |= ENNMI;                               //enable NMI interrupt
-            USB_TX_memcpy = memcpyDMA2;
-            USB_RX_memcpy = memcpyDMA2;
-            break;
+    switch (USB_DMA_CHAN) {
+    case 0:
+        DMACTL0 &= ~DMA0TSEL_31;                        //DMA0 is triggered by DMAREQ
+        DMACTL0 |= DMA0TSEL_0;                          //DMA0 is triggered by DMAREQ
+        DMA0CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
+                   DMADSTINCR_3 );                      //and destination address
+        DMACTL4 |= ENNMI;                               //enable NMI interrupt
+        USB_TX_memcpy = memcpyDMA0;
+        USB_RX_memcpy = memcpyDMA0;
+        break;
+    case 1:
+        DMACTL0 &= ~DMA1TSEL_31;                        //DMA1 is triggered by DMAREQ
+        DMACTL0 |= DMA1TSEL_0;                          //DMA1 is triggered by DMAREQ
+        DMA1CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
+                   DMADSTINCR_3 );                      //and destination address
+        DMACTL4 |= ENNMI;                               //enable NMI interrupt
+        USB_TX_memcpy = memcpyDMA1;
+        USB_RX_memcpy = memcpyDMA1;
+        break;
+    case 2:
+        DMACTL0 &= ~DMA2TSEL_31;                        //DMA2 is triggered by DMAREQ
+        DMACTL0 |= DMA2TSEL_0;                          //DMA2 is triggered by DMAREQ
+        DMA2CTL = (DMADT_1 + DMASBDB + DMASRCINCR_3 +   //configure block transfer (byte-wise) with increasing source
+                   DMADSTINCR_3 );                      //and destination address
+        DMACTL4 |= ENNMI;                               //enable NMI interrupt
+        USB_TX_memcpy = memcpyDMA2;
+        USB_RX_memcpy = memcpyDMA2;
+        break;
     }
 }
 
@@ -120,7 +118,7 @@ VOID USB_initMemcpy (VOID)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA0 (VOID * dest, const VOID *  source, size_t count)
 {
-    if (count == 0){                                        //do nothing if zero bytes to transfer
+    if (count == 0) {                                       //do nothing if zero bytes to transfer
         return (dest);
     }
 
@@ -143,7 +141,7 @@ VOID * memcpyDMA0 (VOID * dest, const VOID *  source, size_t count)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA1 (VOID * dest, const VOID * source, size_t count)
 {
-    if (count == 0){                                        //do nothing if zero bytes to transfer
+    if (count == 0) {                                       //do nothing if zero bytes to transfer
         return (dest);
     }
 
@@ -166,7 +164,7 @@ VOID * memcpyDMA1 (VOID * dest, const VOID * source, size_t count)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA2 (VOID * dest, const VOID * source, size_t count)
 {
-    if (count == 0){                                        //do nothing if zero bytes to transfer
+    if (count == 0) {                                       //do nothing if zero bytes to transfer
         return (dest);
     }
 

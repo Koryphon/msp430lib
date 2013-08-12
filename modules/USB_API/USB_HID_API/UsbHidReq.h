@@ -29,7 +29,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/* 
+/*
  * ======== UsbHidReq.h ========
  */
 #ifndef _UsbHidReq_H_
@@ -41,38 +41,38 @@ extern "C"
 #endif
 
 
-/**
- * Return Hid descriptor to host over control endpoint
- */
-BYTE usbGetHidDescriptor(VOID);
-/**
- * Return HID report descriptor to host over control endpoint
- */
-BYTE usbGetReportDescriptor(VOID);
-/**
- * Receive Set_Report from host over control endpoint
- */
-BYTE usbSetReport(VOID);
-/**
- * Process Get_Report request from host over control endpoint
- */
-BYTE usbGetReport(VOID);
-/**
- * Receive Set_Idle from host over control endpoint
- */
-BYTE usbSetIdle(VOID);
-/**
- * Process Get_Idle request from host over control endpoint
- */
-BYTE usbGetIdle(VOID);
-/**
- * Receive Set_Protocol from host over control endpoint
- */
-BYTE usbSetProtocol(VOID);
-/**
- * Process Get_Protocol request from host over control endpoint
- */
-BYTE usbGetProtocol(VOID);
+    /**
+     * Return Hid descriptor to host over control endpoint
+     */
+    BYTE usbGetHidDescriptor(VOID);
+    /**
+     * Return HID report descriptor to host over control endpoint
+     */
+    BYTE usbGetReportDescriptor(VOID);
+    /**
+     * Receive Set_Report from host over control endpoint
+     */
+    BYTE usbSetReport(VOID);
+    /**
+     * Process Get_Report request from host over control endpoint
+     */
+    BYTE usbGetReport(VOID);
+    /**
+     * Receive Set_Idle from host over control endpoint
+     */
+    BYTE usbSetIdle(VOID);
+    /**
+     * Process Get_Idle request from host over control endpoint
+     */
+    BYTE usbGetIdle(VOID);
+    /**
+     * Receive Set_Protocol from host over control endpoint
+     */
+    BYTE usbSetProtocol(VOID);
+    /**
+     * Process Get_Protocol request from host over control endpoint
+     */
+    BYTE usbGetProtocol(VOID);
 
 
 #ifdef __cplusplus
