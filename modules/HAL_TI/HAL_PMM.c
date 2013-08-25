@@ -107,7 +107,8 @@ static uint16_t SetVCoreUp(uint8_t level)
     PMMIFG &= ~SVSMHDLYIFG;
 
     // Check if a VCore increase is possible
-    if ((PMMIFG & SVMHIFG) == SVMHIFG) {      // -> Vcc is too low for a Vcore increase
+    if ((PMMIFG & SVMHIFG) == SVMHIFG)        // -> Vcc is too low for a Vcore increase
+    {
         // recover the previous settings
         PMMIFG &= ~SVSMHDLYIFG;
         SVSMHCTL = SVSMHCTL_backup;
@@ -260,11 +261,14 @@ uint16_t SetVCore(uint8_t level)
     level &= PMMCOREV_3;                       // Set Mask for Max. level
     actlevel = (PMMCTL0 & PMMCOREV_3);         // Get actual VCore
     // step by step increase or decrease
-    while (((level != actlevel) && (status == 0)) || (level < actlevel)) {
-        if (level > actlevel) {
+    while (((level != actlevel) && (status == 0)) || (level < actlevel))
+    {
+        if (level > actlevel)
+        {
             status = SetVCoreUp(++actlevel);
         }
-        else {
+        else
+        {
             status = SetVCoreDown(--actlevel);
         }
     }

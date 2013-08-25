@@ -77,9 +77,11 @@ RES_t flashSPAN_Init(void)
     uint8_t i;
 
     flashSPAN.BlockCount = 0;
-    for (i = 0; i < FLASH_DEVICECOUNT; i++) {
+    for (i = 0; i < FLASH_DEVICECOUNT; i++)
+    {
         sst25vf_SetCurrentDevice(i);
-        switch (sst25vf_Init()) {
+        switch (sst25vf_Init())
+        {
 #ifdef _SST25VF_W32TB_H_
         case TEST_4000_ID:
             flashSPAN.DeviceBlocks[i] = (TEST_4000_SIZE / FLASH_BLOCKSIZE);
@@ -121,28 +123,33 @@ RES_t flashSPAN_Read(uint32_t address, uint8_t *data, uint16_t nBytes)
     uint32_t maxNbytes;
 
     // check if start address is valid
-    if (address >= ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE)) {
+    if (address >= ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE))
+    {
         return(RES_PARAMERR); //requested data is past available address space
     }
 
     // check if access range is within the address range
-    if ((address + nBytes) > ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE)) {
+    if ((address + nBytes) > ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE))
+    {
         return(RES_PARAMERR);
     }
 
 
     // Calculate device index and local address
     device = 0;
-    while (address >= ((uint32_t)flashSPAN.DeviceBlocks[device]*FLASH_BLOCKSIZE)) {
+    while (address >= ((uint32_t)flashSPAN.DeviceBlocks[device]*FLASH_BLOCKSIZE))
+    {
         address -= ((uint32_t)flashSPAN.DeviceBlocks[device] * FLASH_BLOCKSIZE);
         device++;
     }
 
     // access addresses per device.
-    while (nBytes > 0) {
+    while (nBytes > 0)
+    {
         // calculate the number of bytes that can be accessed in the current device
         maxNbytes = ((uint32_t)flashSPAN.DeviceBlocks[device] * FLASH_BLOCKSIZE) - address;
-        if (nBytes > maxNbytes) {
+        if (nBytes > maxNbytes)
+        {
             // overflows to the next device
             sst25vf_SetCurrentDevice(device);
             sst25vf_Read(address, data, maxNbytes);
@@ -151,7 +158,8 @@ RES_t flashSPAN_Read(uint32_t address, uint8_t *data, uint16_t nBytes)
             address = 0;
             device++;
         }
-        else {
+        else
+        {
             // finish up read
             sst25vf_SetCurrentDevice(device);
             sst25vf_Read(address, data, nBytes);
@@ -168,28 +176,33 @@ RES_t flashSPAN_Write(uint32_t address, uint8_t *data, uint16_t nBytes)
     uint32_t maxNbytes;
 
     // check if start address is valid
-    if (address >= ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE)) {
+    if (address >= ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE))
+    {
         return(RES_PARAMERR); //sector is past available address space
     }
 
     // check if access range is within the address range
-    if ((address + nBytes) > ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE)) {
+    if ((address + nBytes) > ((uint32_t)flashSPAN.BlockCount * FLASH_BLOCKSIZE))
+    {
         return(RES_PARAMERR);
     }
 
 
     // Calculate device index and local address
     device = 0;
-    while (address >= ((uint32_t)flashSPAN.DeviceBlocks[device]*FLASH_BLOCKSIZE)) {
+    while (address >= ((uint32_t)flashSPAN.DeviceBlocks[device]*FLASH_BLOCKSIZE))
+    {
         address -= ((uint32_t)flashSPAN.DeviceBlocks[device] * FLASH_BLOCKSIZE);
         device++;
     }
 
     // access addresses per device.
-    while (nBytes > 0) {
+    while (nBytes > 0)
+    {
         // calculate the number of bytes that can be accessed in the current device
         maxNbytes = ((uint32_t)flashSPAN.DeviceBlocks[device] * FLASH_BLOCKSIZE) - address;
-        if (nBytes > maxNbytes) {
+        if (nBytes > maxNbytes)
+        {
             // overflows to the next device
             sst25vf_SetCurrentDevice(device);
             sst25vf_Write(address, data, maxNbytes);
@@ -198,7 +211,8 @@ RES_t flashSPAN_Write(uint32_t address, uint8_t *data, uint16_t nBytes)
             address = 0;
             device++;
         }
-        else {
+        else
+        {
             // finish up write
             sst25vf_SetCurrentDevice(device);
             sst25vf_Write(address, data, nBytes);
@@ -214,13 +228,15 @@ RES_t flashSPAN_EraseBlock(uint16_t block)
     uint8_t device;
 
     // check if block is valid
-    if (block >= (flashSPAN.BlockCount)) {
+    if (block >= (flashSPAN.BlockCount))
+    {
         return(RES_PARAMERR); //sector is past available address space
     }
 
     // Calculate device index and local block
     device = 0;
-    while (block >= (flashSPAN.DeviceBlocks[device])) {
+    while (block >= (flashSPAN.DeviceBlocks[device]))
+    {
         block = block - flashSPAN.DeviceBlocks[device];
         device++;
     }
@@ -242,7 +258,8 @@ RES_t flashSPAN_EraseAll(void)
 {
     uint8_t device;
 
-    for (device = 0; device < FLASH_DEVICECOUNT; device++) {
+    for (device = 0; device < FLASH_DEVICECOUNT; device++)
+    {
         sst25vf_SetCurrentDevice(device);
         sst25vf_ChipErase();
     }

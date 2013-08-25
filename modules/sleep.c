@@ -115,7 +115,8 @@ void usleep(register uint16_t us)
     if (count <= 25) return; //169
     count = count - 25; //172; 172/8 = 21; adjusted to 25
 
-    while (count) { // 8 cyc per loop
+    while (count)   // 8 cyc per loop
+    {
         count--;
     }
 #endif
@@ -125,7 +126,8 @@ void usleep(register uint16_t us)
 //--------------------------------------------------------------------------------------------------
 void msleep(register uint16_t ms)
 {
-    while (ms != 0) {
+    while (ms != 0)
+    {
         usleep(1000);
         ms--;
     }
@@ -133,7 +135,8 @@ void msleep(register uint16_t ms)
 //--------------------------------------------------------------------------------------------------
 void sleep(register uint16_t s)
 {
-    while (s != 0) {
+    while (s != 0)
+    {
         msleep(1000);
         s--;
     }

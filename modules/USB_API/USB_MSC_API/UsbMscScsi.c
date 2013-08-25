@@ -152,7 +152,8 @@ BYTE Scsi_Read_Format_Capacity[SCSI_READ_FORMAT_CAPACITY_CMD_LEN] =
 {0x00, 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x02, 0x00};
 
 /*Default values initialized for SCSI Inquiry data */
-const BYTE bScsi_Standard_Inquiry_Data[SCSI_SCSI_INQUIRY_CMD_LEN] = {
+const BYTE bScsi_Standard_Inquiry_Data[SCSI_SCSI_INQUIRY_CMD_LEN] =
+{
 #ifdef CDROM_SUPPORT
     0x05,                                                                       //Peripheral qualifier & peripheral device type
 #else
@@ -172,7 +173,8 @@ const BYTE bScsi_Standard_Inquiry_Data[SCSI_SCSI_INQUIRY_CMD_LEN] = {
 #ifdef CDROM_SUPPORT
 
 /* SCSI TOC Record - Pg.459 of mmc6r02g.pdf */
-const BYTE Scsi_Read_TOC_PMA_ATIP_F1[Scsi_Read_TOC_PMA_ATIP_F1_LEN] = {
+const BYTE Scsi_Read_TOC_PMA_ATIP_F1[Scsi_Read_TOC_PMA_ATIP_F1_LEN] =
+{
     0x00, 0x12,                  // Length
     0x01,                        // First Track
     0x01,                        // Last Track
@@ -186,7 +188,8 @@ const BYTE Scsi_Read_TOC_PMA_ATIP_F1[Scsi_Read_TOC_PMA_ATIP_F1_LEN] = {
     0x00, 0x00, 0x00, 0x00
 };
 
-const BYTE Scsi_Read_TOC_PMA_ATIP_F2[Scsi_Read_TOC_PMA_ATIP_F2_LEN] = {
+const BYTE Scsi_Read_TOC_PMA_ATIP_F2[Scsi_Read_TOC_PMA_ATIP_F2_LEN] =
+{
     0x00, 0x2E,                  // Length
     0x01,                        // First Track
     0x01,                        // Last Track
@@ -207,14 +210,16 @@ const BYTE Scsi_Read_TOC_PMA_ATIP_F2[Scsi_Read_TOC_PMA_ATIP_F2_LEN] = {
 };
 
 /* GET_CONFIGURATION Response Pg. 312 of mmc6r02g.pdf */
-const BYTE Scsi_Get_Configuration_Descriptor[SCSI_GET_CONFIGURATION_LEN] = {
+const BYTE Scsi_Get_Configuration_Descriptor[SCSI_GET_CONFIGURATION_LEN] =
+{
 
     /* Feature Header */
     0x00, 0x00, 0x00, 0x00      // Length
 };
 
 /* EVENT STATUS Response Pg. 316 of mmc6r02g.pdf */
-const BYTE Scsi_Event_Status_Descriptor[SCSI_EVENT_STATUS_LEN] = {
+const BYTE Scsi_Event_Status_Descriptor[SCSI_EVENT_STATUS_LEN] =
+{
 
     /* Feature Header */
     0x00, 0x06,                 // Event Descriptor Length
@@ -227,7 +232,8 @@ const BYTE Scsi_Event_Status_Descriptor[SCSI_EVENT_STATUS_LEN] = {
 
 
 /* READ_DISC_INFORMATION Response Pg. 374 of mmc6r02g.pdf  */
-const BYTE Scsi_Disc_Information_Descriptor[SCSI_READ_DISC_INFORMATION_LEN] = {
+const BYTE Scsi_Disc_Information_Descriptor[SCSI_READ_DISC_INFORMATION_LEN] =
+{
 
     0x00, 0x00,                     // Disc Information Length
     0x00,                           // Disc Information Type, Non-Erasable, Last Session, Finalized
@@ -284,7 +290,8 @@ VOID Reset_RequestSenseResponse (VOID)
     RequestSenseResponse.SenseKeySpecific[0] = 0x00;
     RequestSenseResponse.SenseKeySpecific[1] = 0x00;
     RequestSenseResponse.SenseKeySpecific[2] = 0x00;
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < 14; i++)
+    {
         RequestSenseResponse.padding[i] = 0x00;
     }
 }
@@ -294,53 +301,66 @@ VOID Reset_RequestSenseResponse (VOID)
 BYTE Check_CBW (BYTE intfNum, BYTE Dir_Dev_Exp, DWORD Bytes_Dev_Exp)
 {
     if (McsCbw.CBWCB[0] == SCSI_INQUIRY || McsCbw.CBWCB[0] ==
-        SCSI_REQUEST_SENSE) {
+            SCSI_REQUEST_SENSE)
+    {
         return (SUCCESS);
     }
 
-    if (Dir_Dev_Exp == McsCbw.bmCBWFlags) {                 //all is right. Host is sending direction as expected by device
-        if (McsCbw.dCBWDataTransferLength < Bytes_Dev_Exp) { //Host expect less data to send or receive then device
+    if (Dir_Dev_Exp == McsCbw.bmCBWFlags)                   //all is right. Host is sending direction as expected by device
+    {
+        if (McsCbw.dCBWDataTransferLength < Bytes_Dev_Exp)   //Host expect less data to send or receive then device
+        {
             MscState.Scsi_Status = SCSI_PHASE_ERROR;
             MscState.Scsi_Residue = 0 ;
-            if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+            if (McsCbw.bmCBWFlags == DIRECTION_IN)
+            {
                 usbStallInEndpoint(intfNum);
             }
-            else {
+            else
+            {
                 usbStallOutEndpoint(intfNum);
             }
         }
         else if ((McsCbw.dCBWDataTransferLength > Bytes_Dev_Exp) &&
                  (McsCbw.CBWCB[0] != SCSI_MODE_SENSE_6) &&
                  (McsCbw.CBWCB[0] != SCSI_MODE_SENSE_10) &&
-                 (McsCbw.CBWCB[0] != SCSI_READ_TOC_PMA_ATIP)) {
+                 (McsCbw.CBWCB[0] != SCSI_READ_TOC_PMA_ATIP))
+        {
             MscState.Scsi_Status = SCSI_FAILED;
             MscState.Scsi_Residue = McsCbw.dCBWDataTransferLength -
                                     Bytes_Dev_Exp;
-            if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+            if (McsCbw.bmCBWFlags == DIRECTION_IN)
+            {
                 usbStallInEndpoint(intfNum);
             }
-            else {
+            else
+            {
                 usbStallOutEndpoint(intfNum);
             }
         }
-        else {
+        else
+        {
             return ( SUCCESS) ;
         }
     }
-    else {      //Direction mismatch
+    else        //Direction mismatch
+    {
         MscState.Scsi_Residue = McsCbw.dCBWDataTransferLength;
         MscState.Scsi_Status = SCSI_FAILED;
-        if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+        if (McsCbw.bmCBWFlags == DIRECTION_IN)
+        {
             usbStallInEndpoint(intfNum);
         }
         else if ((McsCbw.bmCBWFlags == DIRECTION_OUT) &&
-                 (McsCbw.CBWCB[0] == SCSI_READ_10)) {
+                 (McsCbw.CBWCB[0] == SCSI_READ_10))
+        {
             usbStallOutEndpoint(intfNum);
         }
     }
 
     //Indicates a generic failure. Read/write failure/sense data is handled separately
-    if (MscState.Scsi_Status != SCSI_READWRITE_FAIL) {
+    if (MscState.Scsi_Status != SCSI_READWRITE_FAIL)
+    {
         RequestSenseResponse.ResponseCode = RESCODE_CURRENT_ERROR;
         RequestSenseResponse.VALID = 1;
         RequestSenseResponse.AddSenseLen = 0xA0;
@@ -361,11 +381,12 @@ BYTE Scsi_Verify_CBW ()
      * content of the CBWCB field are appropriate to the SubClass.
      */
     if ((MscState.bMscResetRequired || McsCbw.dCBWSignature !=
-         CBW_SIGNATURE) ||              //Check for correct CBW signature
-        ((McsCbw.bmCBWFlags != DIRECTION_IN && McsCbw.bmCBWFlags !=
-          DIRECTION_OUT) ||
-         (McsCbw.bCBWLUN & 0xF0) ||     //Upper bits have to be zero
-         (McsCbw.bCBWCBLength > 16))) { //maximum length is 16
+            CBW_SIGNATURE) ||              //Check for correct CBW signature
+            ((McsCbw.bmCBWFlags != DIRECTION_IN && McsCbw.bmCBWFlags !=
+              DIRECTION_OUT) ||
+             (McsCbw.bCBWLUN & 0xF0) ||     //Upper bits have to be zero
+             (McsCbw.bCBWCBLength > 16)))   //maximum length is 16
+    {
         MscState.bMscResetRequired = TRUE;
         usbStallEndpoint(MSC0_INTFNUM);
         usbClearOEPByteCount(MSC0_INTFNUM);
@@ -420,21 +441,26 @@ VOID Scsi_Inquiry (BYTE intfNum)
            USBMSC_config.LUN[McsCbw.bCBWLUN].t10rev,
            4);
 
-    if (McsCbw.dCBWDataTransferLength < SCSI_SCSI_INQUIRY_CMD_LEN) {
-        if (McsCbw.dCBWDataTransferLength == 0) {
+    if (McsCbw.dCBWDataTransferLength < SCSI_SCSI_INQUIRY_CMD_LEN)
+    {
+        if (McsCbw.dCBWDataTransferLength == 0)
+        {
             MscState.Scsi_Residue = 0;
             return;
         }
         if (SUCCESS ==
-            MscSendData((PBYTE)Scsi_Standard_Inquiry_Data,
-                        McsCbw.dCBWDataTransferLength)) {
+                MscSendData((PBYTE)Scsi_Standard_Inquiry_Data,
+                            McsCbw.dCBWDataTransferLength))
+        {
             MscState.Scsi_Residue = 0;
         }
-        else {
+        else
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
-    else if (McsCbw.dCBWDataTransferLength > SCSI_SCSI_INQUIRY_CMD_LEN) {
+    else if (McsCbw.dCBWDataTransferLength > SCSI_SCSI_INQUIRY_CMD_LEN)
+    {
         Reset_RequestSenseResponse();
 
         RequestSenseResponse.ResponseCode = RESCODE_CURRENT_ERROR;
@@ -445,13 +471,16 @@ VOID Scsi_Inquiry (BYTE intfNum)
         usbStallInEndpoint(intfNum);
         MscState.Scsi_Status = SCSI_FAILED;
     }
-    else {
+    else
+    {
         if (SUCCESS ==
-            MscSendData((PBYTE)Scsi_Standard_Inquiry_Data,
-                        SCSI_SCSI_INQUIRY_CMD_LEN)) {
+                MscSendData((PBYTE)Scsi_Standard_Inquiry_Data,
+                            SCSI_SCSI_INQUIRY_CMD_LEN))
+        {
             MscState.Scsi_Residue = 0;
         }
-        else {
+        else
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
@@ -461,13 +490,15 @@ VOID Scsi_Inquiry (BYTE intfNum)
 
 VOID Scsi_Read_Capacity10 (BYTE intfNum)
 {
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_READ_CAPACITY_CMD_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_READ_CAPACITY_CMD_LEN))
+    {
         return;
     }
     MscState.Scsi_Residue = 0;
     if (SUCCESS !=
-        MscSendData( (PBYTE)&Scsi_Read_Capacity_10[McsCbw.bCBWLUN],
-                     SCSI_READ_CAPACITY_CMD_LEN)) {
+            MscSendData( (PBYTE)&Scsi_Read_Capacity_10[McsCbw.bCBWLUN],
+                         SCSI_READ_CAPACITY_CMD_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -497,8 +528,9 @@ VOID Scsi_Read10 (BYTE intfNum)
     wLBA_len += McsCbw.CBWCB[8];
 
     if (FAILURE ==
-        Check_CBW( intfNum, DIRECTION_IN, ((DWORD)wLBA_len) *
-                   MscControl[McsCbw.bCBWLUN].lbaSize)) {
+            Check_CBW( intfNum, DIRECTION_IN, ((DWORD)wLBA_len) *
+                       MscControl[McsCbw.bCBWLUN].lbaSize))
+    {
         return;
     }
 
@@ -556,8 +588,9 @@ VOID Scsi_Write10 (BYTE intfNum)
     wLBA_len += McsCbw.CBWCB[8];
 
     if (FAILURE ==
-        Check_CBW(intfNum, DIRECTION_OUT, ((DWORD)wLBA_len) *
-                  MscControl[McsCbw.bCBWLUN].lbaSize)) {
+            Check_CBW(intfNum, DIRECTION_OUT, ((DWORD)wLBA_len) *
+                      MscControl[McsCbw.bCBWLUN].lbaSize))
+    {
         return;
     }
 
@@ -602,7 +635,8 @@ VOID Scsi_Write10 (BYTE intfNum)
 
 VOID Scsi_Mode_Sense6 (BYTE intfNum)
 {
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_MODE_SENSE_6_CMD_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_MODE_SENSE_6_CMD_LEN))
+    {
         return;
     }
     /* Fix for SDOCM00077834 - Set WP bit. WP bit is BIT7 in byte 3 */
@@ -610,11 +644,13 @@ VOID Scsi_Mode_Sense6 (BYTE intfNum)
 
     MscState.Scsi_Residue =  McsCbw.dCBWDataTransferLength -
                              SCSI_MODE_SENSE_6_CMD_LEN;
-    if (MscState.Scsi_Residue) {
+    if (MscState.Scsi_Residue)
+    {
         MscState.stallAtEndofTx = TRUE;
     }
     if (SUCCESS !=
-        MscSendData((PBYTE)Scsi_Mode_Sense_6, SCSI_MODE_SENSE_6_CMD_LEN)) {
+            MscSendData((PBYTE)Scsi_Mode_Sense_6, SCSI_MODE_SENSE_6_CMD_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -623,18 +659,21 @@ VOID Scsi_Mode_Sense6 (BYTE intfNum)
 
 VOID Scsi_Mode_Sense10 (BYTE intfNum)
 {
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_MODE_SENSE_10_CMD_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_MODE_SENSE_10_CMD_LEN))
+    {
         return;
     }
     /* Fix for SDOCM00077834 - Set WP bit. WP bit is BIT7 in byte 3 */
     Scsi_Mode_Sense_10[4] |= (MscControl[McsCbw.bCBWLUN].bWriteProtected << 0x7);
     MscState.Scsi_Residue = McsCbw.dCBWDataTransferLength -
                             SCSI_MODE_SENSE_10_CMD_LEN;
-    if (MscState.Scsi_Residue) {
+    if (MscState.Scsi_Residue)
+    {
         MscState.stallAtEndofTx = TRUE;
     }
     if (SUCCESS !=
-        MscSendData((PBYTE)Scsi_Mode_Sense_10, SCSI_MODE_SENSE_10_CMD_LEN)) {
+            MscSendData((PBYTE)Scsi_Mode_Sense_10, SCSI_MODE_SENSE_10_CMD_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -643,7 +682,8 @@ VOID Scsi_Mode_Sense10 (BYTE intfNum)
 
 VOID Scsi_Request_Sense (BYTE intfNum)
 {
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_REQ_SENSE_CMD_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_REQ_SENSE_CMD_LEN))
+    {
         return;
     }
 
@@ -651,10 +691,12 @@ VOID Scsi_Request_Sense (BYTE intfNum)
     //bUnitAttention flag is set in USBMSC_updateMediaInfo() when the volume
     //is removed or inserted. Note that the response is different for the
     //removed and inserted case.
-    if (MscState.bUnitAttention == TRUE) {
+    if (MscState.bUnitAttention == TRUE)
+    {
         //Check if the volume was removed.
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {
+                kUSBMSC_MEDIA_NOT_PRESENT)
+        {
             Reset_RequestSenseResponse();
             RequestSenseResponse.VALID = 1;
             RequestSenseResponse.SenseKey = S_NOT_READY;
@@ -662,7 +704,8 @@ VOID Scsi_Request_Sense (BYTE intfNum)
             RequestSenseResponse.ASCQ = ASCQ_MEDIUM_NOT_PRESENT;
         }
         //Otherwise it was inserted.
-        else {
+        else
+        {
             Reset_RequestSenseResponse();
             RequestSenseResponse.VALID = 1;
             RequestSenseResponse.SenseKey = S_UNITATTN;
@@ -671,41 +714,51 @@ VOID Scsi_Request_Sense (BYTE intfNum)
         }
     }
 
-    if (McsCbw.dCBWDataTransferLength < SCSI_REQ_SENSE_CMD_LEN) {
+    if (McsCbw.dCBWDataTransferLength < SCSI_REQ_SENSE_CMD_LEN)
+    {
         if (SUCCESS ==
-            MscSendData((PBYTE)&RequestSenseResponse,
-                        McsCbw.dCBWDataTransferLength)) {
+                MscSendData((PBYTE)&RequestSenseResponse,
+                            McsCbw.dCBWDataTransferLength))
+        {
             MscState.Scsi_Residue = 0;
         }
-        else {
+        else
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
-    else if (McsCbw.dCBWDataTransferLength > SCSI_REQ_SENSE_CMD_LEN) {
+    else if (McsCbw.dCBWDataTransferLength > SCSI_REQ_SENSE_CMD_LEN)
+    {
         RequestSenseResponse.AddSenseLen +=
             (McsCbw.dCBWDataTransferLength -  SCSI_REQ_SENSE_CMD_LEN);
         if (SUCCESS ==
-            MscSendData((PBYTE)&RequestSenseResponse,
-                        McsCbw.dCBWDataTransferLength)) {
+                MscSendData((PBYTE)&RequestSenseResponse,
+                            McsCbw.dCBWDataTransferLength))
+        {
             MscState.Scsi_Residue = 0;
         }
-        else {
+        else
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
-    else {
+    else
+    {
         if (SUCCESS ==
-            MscSendData((PBYTE)&RequestSenseResponse, SCSI_REQ_SENSE_CMD_LEN)) {
+                MscSendData((PBYTE)&RequestSenseResponse, SCSI_REQ_SENSE_CMD_LEN))
+        {
             MscState.Scsi_Residue = 0;
         }
-        else {
+        else
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
 
     //Clear the bUnitAttention flag after the response was properly sent via
     //MscSendData().
-    if (MscState.bUnitAttention == TRUE) {
+    if (MscState.bUnitAttention == TRUE)
+    {
         MscState.bUnitAttention = FALSE;
     }
 }
@@ -714,7 +767,8 @@ VOID Scsi_Request_Sense (BYTE intfNum)
 
 VOID Scsi_Test_Unit_Ready (BYTE intfNum)
 {
-    if (SUCCESS != Check_CBW(intfNum, DIRECTION_OUT, 0)) {
+    if (SUCCESS != Check_CBW(intfNum, DIRECTION_OUT, 0))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 
@@ -736,11 +790,13 @@ VOID Scsi_Unknown_Request (BYTE intfNum)
     MscState.Scsi_Residue = 0;
     MscState.Scsi_Status = SCSI_FAILED;
 
-    if (McsCbw.dCBWDataTransferLength && (McsCbw.bmCBWFlags == DIRECTION_IN)) {
+    if (McsCbw.dCBWDataTransferLength && (McsCbw.bmCBWFlags == DIRECTION_IN))
+    {
         MscState.bMcsCommandSupported = FALSE;
         usbStallInEndpoint(intfNum);
     }
-    if (McsCbw.dCBWDataTransferLength && (McsCbw.bmCBWFlags == DIRECTION_OUT)) {
+    if (McsCbw.dCBWDataTransferLength && (McsCbw.bmCBWFlags == DIRECTION_OUT))
+    {
         MscState.bMcsCommandSupported = FALSE;
         usbStallOutEndpoint(intfNum);
     }
@@ -751,11 +807,13 @@ VOID Scsi_Unknown_Request (BYTE intfNum)
 VOID Scsi_Report_Luns (BYTE intfNum)
 {
     if (FAILURE ==
-        Check_CBW( intfNum, DIRECTION_IN, SCSI_REPORT_LUNS_CMD_LEN)) {
+            Check_CBW( intfNum, DIRECTION_IN, SCSI_REPORT_LUNS_CMD_LEN))
+    {
         return;
     }
     if (SUCCESS !=
-        MscSendData( (PBYTE)&Report_Luns, SCSI_REPORT_LUNS_CMD_LEN)) {
+            MscSendData( (PBYTE)&Report_Luns, SCSI_REPORT_LUNS_CMD_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -771,18 +829,22 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
 
     //fails the commands during UNIT ATTENTION
     if ((MscState.bUnitAttention) && (McsCbw.CBWCB[0] != SCSI_INQUIRY) &&
-        (McsCbw.CBWCB[0] != SCSI_REQUEST_SENSE)) {
+            (McsCbw.CBWCB[0] != SCSI_REQUEST_SENSE))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
         return (kUSB_generalError);
     }
 
-    if (!McsCbw.bCBWCBLength) {
+    if (!McsCbw.bCBWCBLength)
+    {
         return (kUSB_generalError);
     }
 
-    switch (McsCbw.CBWCB[0]) {                                      //SCSI Operation code
+    switch (McsCbw.CBWCB[0])                                        //SCSI Operation code
+    {
     case SCSI_READ_10:
-        if (MscControl[McsCbw.bCBWLUN].xBufferAddr == NULL) {   //Check for null address.
+        if (MscControl[McsCbw.bCBWLUN].xBufferAddr == NULL)     //Check for null address.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseNotReady();
             MscState.Scsi_Status = SCSI_FAILED;
@@ -791,7 +853,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
         }
 
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {                        //Check for media present. Do this for any command that accesses
+                kUSBMSC_MEDIA_NOT_PRESENT)                          //Check for media present. Do this for any command that accesses
+        {
             //media.
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
@@ -802,7 +865,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
         break;
 
     case SCSI_WRITE_10:
-        if (MscControl[McsCbw.bCBWLUN].xBufferAddr == NULL) {   //Check for null address.
+        if (MscControl[McsCbw.bCBWLUN].xBufferAddr == NULL)     //Check for null address.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseNotReady();
             MscState.Scsi_Status = SCSI_FAILED;
@@ -810,7 +874,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
         }
 
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {                        //Check for media present. Do this for any command that accesses
+                kUSBMSC_MEDIA_NOT_PRESENT)                          //Check for media present. Do this for any command that accesses
+        {
             //media.
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
@@ -818,7 +883,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
             break;
         }
 
-        if (MscControl[McsCbw.bCBWLUN].bWriteProtected) {       //Do this only for WRITE
+        if (MscControl[McsCbw.bCBWLUN].bWriteProtected)         //Do this only for WRITE
+        {
             ret = kUSB_generalError;
             //Set REQUEST SENSE with "write protected"
             Reset_RequestSenseResponse();
@@ -843,7 +909,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
     case SCSI_MODE_SELECT_6:
     case SCSI_TEST_UNIT_READY:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {                        //Check for media present. Do this for any command that accesses
+                kUSBMSC_MEDIA_NOT_PRESENT)                          //Check for media present. Do this for any command that accesses
+        {
             //media.
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
@@ -868,7 +935,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
 
     case SCSI_READ_CAPACITY_10:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
             usbStallInEndpoint(intfNum);
@@ -883,13 +951,16 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
 
     case SCSI_REPORT_LUNS:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
-            if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+            if (McsCbw.bmCBWFlags == DIRECTION_IN)
+            {
                 usbStallInEndpoint(intfNum);
             }
-            else {
+            else
+            {
                 usbStallOutEndpoint(intfNum);
             }
             break;
@@ -904,7 +975,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
 
     case SCSI_READ_TOC_PMA_ATIP:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
             usbStallInEndpoint(intfNum);
@@ -915,7 +987,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
 
     case SCSI_GET_CONFIGURATION:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
             usbStallInEndpoint(intfNum);
@@ -925,7 +998,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
         break;
     case SCSI_EVENT_STATUS:
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
             usbStallInEndpoint(intfNum);
@@ -937,7 +1011,8 @@ BYTE Scsi_Cmd_Parser (BYTE intfNum)
     case SCSI_READ_DISC_INFORMATION:
 
         if (MscControl[McsCbw.bCBWLUN].bMediaPresent ==
-            kUSBMSC_MEDIA_NOT_PRESENT) {            //Check for media present. Do this for any command that accesses media.
+                kUSBMSC_MEDIA_NOT_PRESENT)              //Check for media present. Do this for any command that accesses media.
+        {
             ret = kUSB_generalError;
             SET_RequestsenseMediaNotPresent();
             usbStallInEndpoint(intfNum);
@@ -969,14 +1044,17 @@ BOOL MSCToHostFromBuffer ()
     BYTE edbIndex;
     BYTE bCount;
 
-    if (MscControl[sRwbuf.lun].yBufferAddr == NULL) {
+    if (MscControl[sRwbuf.lun].yBufferAddr == NULL)
+    {
         //Check if there are any pending data to send
-        if (MscReadControl.dwBytesToSendLeft == 0) {
+        if (MscReadControl.dwBytesToSendLeft == 0)
+        {
             //no more data to send - clear ready busy status
             MscReadControl.bReadProcessing = FALSE;
 
             //check if more LBA to send out pending...
-            if (MscReadControl.lbaCount > 0) {
+            if (MscReadControl.lbaCount > 0)
+            {
                 sRwbuf.lba = MscReadControl.lba;            //update current lba
                 sRwbuf.lbCount = MscControl[sRwbuf.lun].lbaBufCapacity >
                                  MscReadControl.lbaCount ?
@@ -992,9 +1070,12 @@ BOOL MSCToHostFromBuffer ()
             return (TRUE);                                  //data sent out - wake up!
         }
     }
-    else {
-        if ((MscReadControl.lbaCount > 0) && (sRwbuf.bufferProcessed == 1)) {
-            if ((sRwbuf.XorY == 0) && (sRwbuf.yBufFull == 0)) {
+    else
+    {
+        if ((MscReadControl.lbaCount > 0) && (sRwbuf.bufferProcessed == 1))
+        {
+            if ((sRwbuf.XorY == 0) && (sRwbuf.yBufFull == 0))
+            {
                 sRwbuf.bufferProcessed = 0;
                 sRwbuf.XorY = 1;
                 sRwbuf.bufferAddr = MscControl[sRwbuf.lun].yBufferAddr;
@@ -1008,7 +1089,8 @@ BOOL MSCToHostFromBuffer ()
                 //buffer is prepared, let user's Application fill data.
                 USBMSC_handleBufferEvent();
             }
-            else if ((sRwbuf.XorY == 1) && (sRwbuf.xBufFull == 0)) {
+            else if ((sRwbuf.XorY == 1) && (sRwbuf.xBufFull == 0))
+            {
                 sRwbuf.bufferProcessed = 0;
                 sRwbuf.XorY = 0;
                 sRwbuf.bufferAddr = MscControl[sRwbuf.lun].xBufferAddr;
@@ -1025,22 +1107,27 @@ BOOL MSCToHostFromBuffer ()
         }
 
         //Check if there are any pending data to send
-        if (MscReadControl.dwBytesToSendLeft == 0) {
+        if (MscReadControl.dwBytesToSendLeft == 0)
+        {
             //no more data to send - clear ready busy status
             MscReadControl.bReadProcessing = FALSE;
 
-            if (MscReadControl.XorY == 0) {
+            if (MscReadControl.XorY == 0)
+            {
                 sRwbuf.xBufFull = 0;
                 sRwbuf.xWordCnt = 0;
-                if (sRwbuf.yBufFull) {
+                if (sRwbuf.yBufFull)
+                {
                     MscSendData(MscControl[sRwbuf.lun].yBufferAddr, sRwbuf.yWordCnt);
                     MscReadControl.XorY = 1;
                 }
             }
-            else {
+            else
+            {
                 sRwbuf.yBufFull = 0;
                 sRwbuf.yWordCnt = 0;
-                if (sRwbuf.xBufFull) {
+                if (sRwbuf.xBufFull)
+                {
                     MscSendData(MscControl[sRwbuf.lun].xBufferAddr, sRwbuf.xWordCnt);
                     MscReadControl.XorY = 0;
                 }
@@ -1054,13 +1141,15 @@ BOOL MSCToHostFromBuffer ()
     edbIndex = stUsbHandle[MSC0_INTFNUM].edb_Index;
 
     //check if the endpoint is stalled = do not send data.
-    if (tInputEndPointDescriptorBlock[edbIndex].bEPCNF & EPCNF_STALL) {
+    if (tInputEndPointDescriptorBlock[edbIndex].bEPCNF & EPCNF_STALL)
+    {
         return (TRUE);
     }
 
     //send one chunk of 64 bytes
     //check what is current buffer: X or Y
-    if (MscReadControl.bCurrentBufferXY == X_BUFFER) {  //X is current buffer
+    if (MscReadControl.bCurrentBufferXY == X_BUFFER)    //X is current buffer
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].iep_X_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTX;
@@ -1069,7 +1158,8 @@ BOOL MSCToHostFromBuffer ()
         pEP2 = (BYTE*)stUsbHandle[MSC0_INTFNUM].iep_Y_Buffer;
         pCT2 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
     }
-    else {
+    else
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].iep_Y_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
@@ -1085,7 +1175,8 @@ BOOL MSCToHostFromBuffer ()
          EP_MAX_PACKET_SIZE) ? EP_MAX_PACKET_SIZE : MscReadControl.
         dwBytesToSendLeft;
 
-    if (*pCT1 & EPBCNT_NAK) {
+    if (*pCT1 & EPBCNT_NAK)
+    {
         USB_TX_memcpy(pEP1, MscReadControl.pUserBuffer, bCount);    //copy data into IEPx X or Y buffer
         *pCT1 = bCount;                                             //Set counter for usb In-Transaction
         MscReadControl.bCurrentBufferXY =
@@ -1095,7 +1186,8 @@ BOOL MSCToHostFromBuffer ()
 
         //try to send data over second buffer
         if ((MscReadControl.dwBytesToSendLeft > 0) &&               //do we have more data to send?
-            (*pCT2 & EPBCNT_NAK)) {                                 //if the second buffer is free?
+                (*pCT2 & EPBCNT_NAK))                                   //if the second buffer is free?
+        {
             //how many byte we can send over one endpoint buffer
             bCount =
                 (MscReadControl.dwBytesToSendLeft >
@@ -1129,7 +1221,8 @@ BYTE MscSendData (const BYTE* data, WORD size)
 
     edbIndex = stUsbHandle[MSC0_INTFNUM].edb_Index;
 
-    if (size == 0) {
+    if (size == 0)
+    {
         return (FAILURE);
     }
 
@@ -1138,14 +1231,16 @@ BYTE MscSendData (const BYTE* data, WORD size)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         //data can not be read because of USB suspended
         usbRestoreInEndpointInterrupt(state);
         return (FAILURE);
     }
 
     if ((MscReadControl.dwBytesToSendLeft != 0) ||  //data was not sent out
-        (MscReadControl.bReadProcessing == TRUE)) { //still processing previous data
+            (MscReadControl.bReadProcessing == TRUE))   //still processing previous data
+    {
         //the USB still sends previous data, we have to wait
         usbRestoreInEndpointInterrupt(state);
         return (FAILURE);
@@ -1191,7 +1286,8 @@ VOID MscCopyUsbToBuff (BYTE* pEP, BYTE* pCT)
     MscWriteControl.wFreeBytesLeft -= nCount;                   //update counter
 
     MscWriteControl.wCurrentByte += nCount;
-    if (MscWriteControl.wCurrentByte >= MscControl[sRwbuf.lun].lbaSize) {
+    if (MscWriteControl.wCurrentByte >= MscControl[sRwbuf.lun].lbaSize)
+    {
         MscWriteControl.wCurrentByte = 0;
         MscWriteControl.lbaCount++;
     }
@@ -1216,21 +1312,25 @@ BOOL MSCFromHostToBuffer ()
 
     edbIndex = stUsbHandle[MSC0_INTFNUM].edb_Index;
 
-    if (MscState.stallEndpoint == TRUE) {
+    if (MscState.stallEndpoint == TRUE)
+    {
         tOutputEndPointDescriptorBlock[edbIndex].bEPCNF |= EPCNF_STALL;
         return TRUE;
     }
 
-    if (MscState.bMscCbwReceived == TRUE) {
+    if (MscState.bMscCbwReceived == TRUE)
+    {
         //previous CBW is not performed, so exit interrupt hendler
         //and trigger it again later
         return (TRUE);                                      //true for wake up!
     }
 
-    if (!MscWriteControl.bWriteProcessing) {                //receiving CBW
+    if (!MscWriteControl.bWriteProcessing)                  //receiving CBW
+    {
         //CBW will be received here....
         //check what is current buffer: X or Y
-        if (MscWriteControl.bCurrentBufferXY == X_BUFFER) { //X is current buffer
+        if (MscWriteControl.bCurrentBufferXY == X_BUFFER)   //X is current buffer
+        {
             //this is the active EP buffer
             pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_X_Buffer;
             MscWriteControl.pCT1 =
@@ -1238,7 +1338,8 @@ BOOL MSCFromHostToBuffer ()
             MscWriteControl.pCT2 =
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
         }
-        else {
+        else
+        {
             //this is the active EP buffer
             pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_Y_Buffer;
             MscWriteControl.pCT1 =
@@ -1250,7 +1351,8 @@ BOOL MSCFromHostToBuffer ()
         //how many byte we can get from one endpoint buffer
         nTmp1 = *MscWriteControl.pCT1;
 
-        if (nTmp1 & EPBCNT_NAK) {
+        if (nTmp1 & EPBCNT_NAK)
+        {
             BYTE nCount;
 
             //switch current buffer
@@ -1275,14 +1377,17 @@ BOOL MSCFromHostToBuffer ()
     }
 
     //if we are here - LBAs will be received
-    if (MscControl[sRwbuf.lun].yBufferAddr == NULL) {
+    if (MscControl[sRwbuf.lun].yBufferAddr == NULL)
+    {
 
         /*Check if there are any pending LBAs to process */
-        if (MscWriteControl.dwBytesToReceiveLeft > 0) {
+        if (MscWriteControl.dwBytesToReceiveLeft > 0)
+        {
             //read one chunk of 64 bytes
 
             //check what is current buffer: X or Y
-            if (MscWriteControl.bCurrentBufferXY == X_BUFFER) { //X is current buffer
+            if (MscWriteControl.bCurrentBufferXY == X_BUFFER)   //X is current buffer
+            {
                 //this is the active EP buffer
                 pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_X_Buffer;
                 MscWriteControl.pCT1 =
@@ -1294,7 +1399,8 @@ BOOL MSCFromHostToBuffer ()
                 MscWriteControl.pCT2 =
                     &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
             }
-            else {
+            else
+            {
                 //this is the active EP buffer
                 pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_Y_Buffer;
                 MscWriteControl.pCT1 =
@@ -1311,7 +1417,8 @@ BOOL MSCFromHostToBuffer ()
             nTmp1 = *MscWriteControl.pCT1;
 
             if ((nTmp1 & EPBCNT_NAK) &&
-                (MscWriteControl.wFreeBytesLeft >= 64)) {
+                    (MscWriteControl.wFreeBytesLeft >= 64))
+            {
                 //copy data from Endpoint
                 MscCopyUsbToBuff(pEP1, MscWriteControl.pCT1);
 
@@ -1319,15 +1426,17 @@ BOOL MSCFromHostToBuffer ()
 
                 //try read data from second buffer
                 if ((MscWriteControl.dwBytesToReceiveLeft > 0) &&   //do we have more data to send?
-                    (MscWriteControl.wFreeBytesLeft >= 64) &&
-                    (nTmp1 & EPBCNT_NAK)) {                         //if the second buffer has received data?
+                        (MscWriteControl.wFreeBytesLeft >= 64) &&
+                        (nTmp1 & EPBCNT_NAK))                           //if the second buffer has received data?
+                {
                     //copy data from Endpoint
                     MscCopyUsbToBuff(MscWriteControl.pEP2, MscWriteControl.pCT2);
                     //MscWriteControl.pCT1 = MscWriteControl.pCT2;
                 }
 
                 if ((MscWriteControl.wFreeBytesLeft == 0) ||        //user's buffer is full, give it to User
-                    (MscWriteControl.dwBytesToReceiveLeft == 0)) {  //or no bytes to read left - give it to User
+                        (MscWriteControl.dwBytesToReceiveLeft == 0))    //or no bytes to read left - give it to User
+                {
                     sRwbuf.operation = kUSBMSC_WRITE;
                     sRwbuf.lba = MscWriteControl.lba;               //copy lba number
                     MscWriteControl.lba += MscWriteControl.lbaCount;
@@ -1340,17 +1449,22 @@ BOOL MSCFromHostToBuffer ()
                 } //if (wFreeBytesLeft == 0)
             }
         } //if (MscWriteControl.dwBytesToReceiveLeft > 0)
-        else {
+        else
+        {
             //perform error handling here, if required.
             bWakeUp = TRUE;
         }
     }
-    else {
+    else
+    {
         //if we are here - LBAs will be received
-        if (sRwbuf.bufferProcessed == 1) {
-            if (sRwbuf.XorY == 0) {
+        if (sRwbuf.bufferProcessed == 1)
+        {
+            if (sRwbuf.XorY == 0)
+            {
                 sRwbuf.xBufFull = 0;
-                if (sRwbuf.yBufFull) {
+                if (sRwbuf.yBufFull)
+                {
                     sRwbuf.bufferProcessed = 0;
                     sRwbuf.XorY = 1;
                     sRwbuf.bufferAddr = MscControl[McsCbw.bCBWLUN].yBufferAddr;
@@ -1362,9 +1476,11 @@ BOOL MSCFromHostToBuffer ()
                     bWakeUp = USBMSC_handleBufferEvent();
                 }
             }
-            else {
+            else
+            {
                 sRwbuf.yBufFull = 0;
-                if (sRwbuf.xBufFull) {
+                if (sRwbuf.xBufFull)
+                {
                     sRwbuf.bufferProcessed = 0;
                     sRwbuf.XorY = 0;
                     sRwbuf.bufferAddr = MscControl[McsCbw.bCBWLUN].xBufferAddr;
@@ -1379,12 +1495,16 @@ BOOL MSCFromHostToBuffer ()
         }
 
         /*Check if there are any pending LBAs to process */
-        if (MscWriteControl.dwBytesToReceiveLeft > 0) {
+        if (MscWriteControl.dwBytesToReceiveLeft > 0)
+        {
             //read one chunk of 64 bytes
 
-            if (MscWriteControl.wFreeBytesLeft == 0) {
-                if (MscWriteControl.XorY == 0) {
-                    if (sRwbuf.yBufFull == 0) {
+            if (MscWriteControl.wFreeBytesLeft == 0)
+            {
+                if (MscWriteControl.XorY == 0)
+                {
+                    if (sRwbuf.yBufFull == 0)
+                    {
                         MscWriteControl.lba += MscWriteControl.lbaCount;
                         MscWriteControl.wCurrentByte = 0;
                         MscWriteControl.lbaCount = 0;
@@ -1394,8 +1514,10 @@ BOOL MSCFromHostToBuffer ()
                             MscControl[sRwbuf.lun].wMscUserBufferSize;
                     }
                 }
-                else {
-                    if (sRwbuf.xBufFull == 0) {
+                else
+                {
+                    if (sRwbuf.xBufFull == 0)
+                    {
                         MscWriteControl.lba += MscWriteControl.lbaCount;
                         MscWriteControl.wCurrentByte = 0;
                         MscWriteControl.lbaCount = 0;
@@ -1409,7 +1531,8 @@ BOOL MSCFromHostToBuffer ()
 
 
             //check what is current buffer: X or Y
-            if (MscWriteControl.bCurrentBufferXY == X_BUFFER) { //X is current buffer
+            if (MscWriteControl.bCurrentBufferXY == X_BUFFER)   //X is current buffer
+            {
                 //this is the active EP buffer
                 pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_X_Buffer;
                 MscWriteControl.pCT1 =
@@ -1421,7 +1544,8 @@ BOOL MSCFromHostToBuffer ()
                 MscWriteControl.pCT2 =
                     &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
             }
-            else {
+            else
+            {
                 //this is the active EP buffer
                 pEP1 = (BYTE*)stUsbHandle[MSC0_INTFNUM].oep_Y_Buffer;
                 MscWriteControl.pCT1 =
@@ -1438,7 +1562,8 @@ BOOL MSCFromHostToBuffer ()
             nTmp1 = *MscWriteControl.pCT1;
 
             if ((nTmp1 & EPBCNT_NAK) &&
-                (MscWriteControl.wFreeBytesLeft >= 64)) {
+                    (MscWriteControl.wFreeBytesLeft >= 64))
+            {
                 //copy data from Endpoint
                 MscCopyUsbToBuff(pEP1, MscWriteControl.pCT1);
 
@@ -1446,17 +1571,20 @@ BOOL MSCFromHostToBuffer ()
 
                 //try read data from second buffer
                 if ((MscWriteControl.dwBytesToReceiveLeft > 0) &&   //do we have more data to send?
-                    (MscWriteControl.wFreeBytesLeft >= 64) &&
-                    (nTmp1 & EPBCNT_NAK)) {                         //if the second buffer has received data?
+                        (MscWriteControl.wFreeBytesLeft >= 64) &&
+                        (nTmp1 & EPBCNT_NAK))                           //if the second buffer has received data?
+                {
                     //copy data from Endpoint
                     MscCopyUsbToBuff(MscWriteControl.pEP2, MscWriteControl.pCT2);
                     //MscWriteControl.pCT1 = MscWriteControl.pCT2;
                 }
 
                 if ((MscWriteControl.wFreeBytesLeft == 0) ||        //user's buffer is full, give it to User
-                    (MscWriteControl.dwBytesToReceiveLeft == 0)) {  //or no bytes to read left - give it to User
+                        (MscWriteControl.dwBytesToReceiveLeft == 0))    //or no bytes to read left - give it to User
+                {
 
-                    if (sRwbuf.firstFlag == 0) {
+                    if (sRwbuf.firstFlag == 0)
+                    {
                         sRwbuf.firstFlag = 1;
                         sRwbuf.operation = kUSBMSC_WRITE;
                         sRwbuf.lba = MscWriteControl.lba;               //copy lba number
@@ -1465,12 +1593,14 @@ BOOL MSCFromHostToBuffer ()
                         //call event handler, we are ready with data
                         bWakeUp = USBMSC_handleBufferEvent();
                     }
-                    if (MscWriteControl.XorY == 0) {
+                    if (MscWriteControl.XorY == 0)
+                    {
                         sRwbuf.xBufFull = 1;
                         sRwbuf.xlba = MscWriteControl.lba;
                         sRwbuf.xlbaCount = MscWriteControl.lbaCount;
                     }
-                    else {
+                    else
+                    {
                         sRwbuf.yBufFull = 1;
                         sRwbuf.ylba = MscWriteControl.lba;
                         sRwbuf.ylbaCount = MscWriteControl.lbaCount;
@@ -1479,8 +1609,10 @@ BOOL MSCFromHostToBuffer ()
                 } //if (wFreeBytesLeft == 0)
             }
         } //if (MscWriteControl.dwBytesToReceiveLeft > 0)
-        else {
-            if (sRwbuf.xBufFull == 0 && sRwbuf.yBufFull == 0) {
+        else
+        {
+            if (sRwbuf.xBufFull == 0 && sRwbuf.yBufFull == 0)
+            {
                 MscWriteControl.pUserBuffer = NULL;         //no more receiving pending
                 MscWriteControl.bWriteProcessing = FALSE;   //ready to receive next CBW
             }
@@ -1501,19 +1633,22 @@ BYTE USBMSC_bufferProcessed ()
     stateIn = usbDisableInEndpointInterrupt(edbIndex);
     stateOut = usbDisableOutEndpointInterrupt(edbIndex);
 
-    if (MscControl[sRwbuf.lun].yBufferAddr == NULL) {
+    if (MscControl[sRwbuf.lun].yBufferAddr == NULL)
+    {
         /*
          * Fix for SDOCM00078384
          * Reset bWriteProcessing after last buffer is processed by the application
          */
         if (sRwbuf.operation == kUSBMSC_WRITE &&
-            MscWriteControl.dwBytesToReceiveLeft == 0) { //the Receive opereation (MSC_WRITE) is completed
+                MscWriteControl.dwBytesToReceiveLeft == 0)   //the Receive opereation (MSC_WRITE) is completed
+        {
             MscWriteControl.pUserBuffer = NULL;         //no more receiving pending
             MscWriteControl.bWriteProcessing = FALSE;   //ready to receive next CBW
         }
 
         if (sRwbuf.operation == kUSBMSC_WRITE && sRwbuf.returnCode ==
-            kUSBMSC_RWSuccess) {
+                kUSBMSC_RWSuccess)
+        {
             //initialize user buffer.
             MscWriteControl.pUserBuffer = MscControl[sRwbuf.lun].xBufferAddr;
             MscWriteControl.wFreeBytesLeft =
@@ -1523,17 +1658,20 @@ BYTE USBMSC_bufferProcessed ()
             MSCFromHostToBuffer();
         }
         else if (sRwbuf.operation == kUSBMSC_READ && sRwbuf.returnCode ==
-                 kUSBMSC_RWSuccess) {
+                 kUSBMSC_RWSuccess)
+        {
             WORD wCnt = sRwbuf.lbCount * MscControl[sRwbuf.lun].lbaSize;
 
             //trigger sending LBA(s)
             MscSendData(sRwbuf.bufferAddr, wCnt);
 
-            if (sRwbuf.lbCount >= MscReadControl.lbaCount) {
+            if (sRwbuf.lbCount >= MscReadControl.lbaCount)
+            {
                 //all bytes sent, reset structure
                 MscReadControl.lbaCount = 0;
             }
-            else {
+            else
+            {
                 //update read structure
                 MscReadControl.lbaCount -= sRwbuf.lbCount;
                 MscReadControl.lba += sRwbuf.lbCount;
@@ -1542,15 +1680,19 @@ BYTE USBMSC_bufferProcessed ()
             sRwbuf.operation = NULL;                                        //no operation pending...
         }
     }
-    else {
+    else
+    {
         if (sRwbuf.operation == kUSBMSC_WRITE && sRwbuf.returnCode ==
-            kUSBMSC_RWSuccess) {
+                kUSBMSC_RWSuccess)
+        {
             //initialize user buffer.
             sRwbuf.bufferProcessed = 1;
-            if (sRwbuf.XorY == 0) {
+            if (sRwbuf.XorY == 0)
+            {
                 sRwbuf.xBufFull = 0;
             }
-            else {
+            else
+            {
                 sRwbuf.yBufFull = 0;
             }
             sRwbuf.operation = NULL;                    //no operation pending...
@@ -1558,37 +1700,44 @@ BYTE USBMSC_bufferProcessed ()
             MSCFromHostToBuffer();
         }
         else if (sRwbuf.operation == kUSBMSC_READ && sRwbuf.returnCode ==
-                 kUSBMSC_RWSuccess) {
+                 kUSBMSC_RWSuccess)
+        {
             WORD wCnt = sRwbuf.lbCount * MscControl[sRwbuf.lun].lbaSize;
 
             sRwbuf.bufferProcessed = 1;
 
-            if (sRwbuf.XorY == 0) {
+            if (sRwbuf.XorY == 0)
+            {
                 sRwbuf.xBufFull = 1;
                 sRwbuf.xWordCnt = wCnt;
             }
-            else {
+            else
+            {
                 sRwbuf.yBufFull = 1;
                 sRwbuf.yWordCnt = wCnt;
             }
 
-            if (sRwbuf.firstFlag == 0) {
+            if (sRwbuf.firstFlag == 0)
+            {
                 //trigger sending LBA(s)
                 sRwbuf.firstFlag = 1;
                 MscSendData(sRwbuf.bufferAddr, wCnt);
             }
-            else {
+            else
+            {
                 edbIndex = stUsbHandle[MSC0_INTFNUM].edb_Index;
                 //trigger Endpoint Interrupt - to start send operation
                 USBIEPIFG |= 1 << (edbIndex + 1);               //IEPIFGx;
             }
 
-            if (sRwbuf.lbCount >= MscReadControl.lbaCount) {
+            if (sRwbuf.lbCount >= MscReadControl.lbaCount)
+            {
                 //all bytes sent, reset structure
                 MscReadControl.lbaCount = 0;
                 sRwbuf.operation = NULL;
             }
-            else {
+            else
+            {
                 //update read structure
                 MscReadControl.lbaCount -= sRwbuf.lbCount;
                 MscReadControl.lba += sRwbuf.lbCount;
@@ -1597,7 +1746,8 @@ BYTE USBMSC_bufferProcessed ()
         }
     }
 
-    switch (sRwbuf.returnCode) {
+    switch (sRwbuf.returnCode)
+    {
     case kUSBMSC_RWSuccess:
         MscState.Scsi_Residue = 0;
         Reset_RequestSenseResponse();
@@ -1686,17 +1836,21 @@ BYTE USBMSC_bufferProcessed ()
         //case breakouts for all the codes
     }
 
-    if (sRwbuf.returnCode != kUSBMSC_RWSuccess) {
+    if (sRwbuf.returnCode != kUSBMSC_RWSuccess)
+    {
         sRwbuf.operation = NULL;                        //no operation pending...
-        if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+        if (McsCbw.bmCBWFlags == DIRECTION_IN)
+        {
             usbStallInEndpoint(MSC0_INTFNUM);
             MscReadControl.bReadProcessing = FALSE;     //ready to receive next CBW
             MscReadControl.pUserBuffer = NULL;          //no more receiving pending
             MscReadControl.lbaCount = 0;
         }
-        else {
+        else
+        {
             //we need to stall only if not all af data was transfered
-            if (MscWriteControl.dwBytesToReceiveLeft > 0) {
+            if (MscWriteControl.dwBytesToReceiveLeft > 0)
+            {
                 usbStallOutEndpoint(MSC0_INTFNUM);
             }
             MscWriteControl.bWriteProcessing = FALSE;   //ready to receive next CBW
@@ -1751,7 +1905,8 @@ VOID MscResetCtrlLun ()
 {
     int i;
 
-    for (i = 0; i < MSC_MAX_LUN_NUMBER; i++) {
+    for (i = 0; i < MSC_MAX_LUN_NUMBER; i++)
+    {
         MscControl[i].bMediaPresent = 0x80;
         MscControl[i].bWriteProtected = FALSE;
     }
@@ -1763,16 +1918,20 @@ BYTE USBMSC_getState ()
 {
     BYTE state;
 
-    if (sRwbuf.operation == 0 && MscState.bMscSendCsw == FALSE) {
+    if (sRwbuf.operation == 0 && MscState.bMscSendCsw == FALSE)
+    {
         state = kUSBMSC_idle;
     }
-    else if (sRwbuf.operation == kUSBMSC_READ && sRwbuf.lbCount > 0) {
+    else if (sRwbuf.operation == kUSBMSC_READ && sRwbuf.lbCount > 0)
+    {
         state =  kUSBMSC_readInProgress;
     }
-    else if (sRwbuf.operation == kUSBMSC_WRITE && sRwbuf.lbCount > 0) {
+    else if (sRwbuf.operation == kUSBMSC_WRITE && sRwbuf.lbCount > 0)
+    {
         state =  kUSBMSC_writeInProgress;
     }
-    else if (sRwbuf.operation == 0 && MscState.bMscSendCsw == TRUE) {
+    else if (sRwbuf.operation == 0 && MscState.bMscSendCsw == TRUE)
+    {
         state =  kUSBMSC_cmdBeingProcessed;
     }
     return (state);
@@ -1798,29 +1957,35 @@ BYTE USBMSC_updateMediaInfo ( BYTE lun,  struct USBMSC_mediaInfoStr *info)
 
     //If the LUN was reported as not removable, then leave mediaPresent/mediaChanged as
     //their initialized defaults.
-    if (USBMSC_config.LUN[lun].removable) {
+    if (USBMSC_config.LUN[lun].removable)
+    {
         if (((MscControl[lun].bMediaPresent == kUSBMSC_MEDIA_NOT_PRESENT)) &&
-            (info->mediaPresent == kUSBMSC_MEDIA_PRESENT)) {            //If media was inserted...
+                (info->mediaPresent == kUSBMSC_MEDIA_PRESENT))              //If media was inserted...
+        {
             //Set Unit Attention flag. This flag is used in Scsi_Request_Sense().
             MscState.bUnitAttention = TRUE;
             MscState.Scsi_Status = SCSI_FAILED;
         }
 
         if ((MscControl[lun].bMediaPresent == kUSBMSC_MEDIA_PRESENT &&
-             ((info->mediaPresent == kUSBMSC_MEDIA_NOT_PRESENT))) ||    //If media was removed...
-            ((info->mediaPresent == kUSBMSC_MEDIA_PRESENT) &&
-             (info->mediaChanged))) {                                   //Or if media still present, but has changed...
+                ((info->mediaPresent == kUSBMSC_MEDIA_NOT_PRESENT))) ||    //If media was removed...
+                ((info->mediaPresent == kUSBMSC_MEDIA_PRESENT) &&
+                 (info->mediaChanged)))                                     //Or if media still present, but has changed...
+        {
             //Set Unit Attention flag. This flag is used in Scsi_Request_Sense().
             MscState.bUnitAttention = TRUE;
             MscState.Scsi_Status = SCSI_FAILED;
             state = USBMSC_getState();
 
             if (state ==  kUSBMSC_readInProgress || state ==
-                kUSBMSC_writeInProgress) {
-                if (McsCbw.bmCBWFlags == DIRECTION_IN) {
+                    kUSBMSC_writeInProgress)
+            {
+                if (McsCbw.bmCBWFlags == DIRECTION_IN)
+                {
                     usbStallInEndpoint(MSC0_INTFNUM);
                 }
-                else {
+                else
+                {
                     usbStallOutEndpoint(MSC0_INTFNUM);
                 }
 
@@ -1848,7 +2013,8 @@ BYTE USBMSC_registerBufInfo (BYTE lun, BYTE *RWbuf_x, BYTE *RWbuf_y, WORD size)
 
     //check if arguments are valid
     if ((size < MscControl[lun].lbaSize) ||
-        (RWbuf_x == NULL)) {            //Need at least one buffer
+            (RWbuf_x == NULL))              //Need at least one buffer
+    {
         return (kUSB_generalError);
     }
 
@@ -1935,19 +2101,23 @@ USBMSC_RWbuf_Info* USBMSC_fetchInfoStruct (VOID)
 
 VOID Scsi_Read_TocPmaAtip(BYTE intfNum)
 {
-    if (McsCbw.CBWCB[2] & 0x01) {
+    if (McsCbw.CBWCB[2] & 0x01)
+    {
 
         if (SUCCESS !=
-            MscSendData( (PBYTE)&Scsi_Read_TOC_PMA_ATIP_F1[McsCbw.bCBWLUN],
-                         Scsi_Read_TOC_PMA_ATIP_F1_LEN)) {
+                MscSendData( (PBYTE)&Scsi_Read_TOC_PMA_ATIP_F1[McsCbw.bCBWLUN],
+                             Scsi_Read_TOC_PMA_ATIP_F1_LEN))
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
-    else {
+    else
+    {
 
         if (SUCCESS !=
-            MscSendData( (PBYTE)&Scsi_Read_TOC_PMA_ATIP_F2[McsCbw.bCBWLUN],
-                         Scsi_Read_TOC_PMA_ATIP_F2_LEN)) {
+                MscSendData( (PBYTE)&Scsi_Read_TOC_PMA_ATIP_F2[McsCbw.bCBWLUN],
+                             Scsi_Read_TOC_PMA_ATIP_F2_LEN))
+        {
             MscState.Scsi_Status = SCSI_FAILED;
         }
     }
@@ -1956,13 +2126,15 @@ VOID Scsi_Read_TocPmaAtip(BYTE intfNum)
 VOID Scsi_Get_Configuration(BYTE intfNum)
 {
 
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_GET_CONFIGURATION_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_GET_CONFIGURATION_LEN))
+    {
         return;
     }
 
     if (SUCCESS !=
-        MscSendData( (PBYTE)&Scsi_Get_Configuration_Descriptor[McsCbw.bCBWLUN],
-                     SCSI_GET_CONFIGURATION_LEN)) {
+            MscSendData( (PBYTE)&Scsi_Get_Configuration_Descriptor[McsCbw.bCBWLUN],
+                         SCSI_GET_CONFIGURATION_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -1970,12 +2142,14 @@ VOID Scsi_Get_Configuration(BYTE intfNum)
 VOID Scsi_Event_Status_Notification(BYTE intfNum)
 {
 
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_EVENT_STATUS_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_EVENT_STATUS_LEN))
+    {
         return;
     }
     if (SUCCESS !=
-        MscSendData( (PBYTE)&Scsi_Event_Status_Descriptor[McsCbw.bCBWLUN],
-                     SCSI_EVENT_STATUS_LEN)) {
+            MscSendData( (PBYTE)&Scsi_Event_Status_Descriptor[McsCbw.bCBWLUN],
+                         SCSI_EVENT_STATUS_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }
@@ -1984,12 +2158,14 @@ VOID Scsi_Read_Disc_Information(BYTE intfNum)
 {
 
 
-    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_READ_DISC_INFORMATION_LEN)) {
+    if (FAILURE == Check_CBW(intfNum, DIRECTION_IN, SCSI_READ_DISC_INFORMATION_LEN))
+    {
         return;
     }
     if (SUCCESS !=
-        MscSendData( (PBYTE)&Scsi_Disc_Information_Descriptor[McsCbw.bCBWLUN],
-                     SCSI_READ_DISC_INFORMATION_LEN)) {
+            MscSendData( (PBYTE)&Scsi_Disc_Information_Descriptor[McsCbw.bCBWLUN],
+                         SCSI_READ_DISC_INFORMATION_LEN))
+    {
         MscState.Scsi_Status = SCSI_FAILED;
     }
 }

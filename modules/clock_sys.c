@@ -89,7 +89,8 @@ void clock_init(void)
 #endif
 
     // Wait for xtal to stabilize
-    while (IFG1 & OFIFG) {
+    while (IFG1 & OFIFG)
+    {
 
         IFG1 &= ~OFIFG;
         __delay_cycles(0x4800);
@@ -230,7 +231,8 @@ static uint16_t SetVCoreUp(uint8_t level)
     PMMIFG &= ~SVSMHDLYIFG;
 
     // Check if a VCore increase is possible
-    if ((PMMIFG & SVMHIFG) == SVMHIFG) {      // -> Vcc is too low for a Vcore increase
+    if ((PMMIFG & SVMHIFG) == SVMHIFG)        // -> Vcc is too low for a Vcore increase
+    {
         // recover the previous settings
         PMMIFG &= ~SVSMHDLYIFG;
         SVSMHCTL = SVSMHCTL_backup;
@@ -383,11 +385,14 @@ static uint16_t SetVCore(uint8_t level)
     level &= PMMCOREV_3;                       // Set Mask for Max. level
     actlevel = (PMMCTL0 & PMMCOREV_3);         // Get actual VCore
     // step by step increase or decrease
-    while (((level != actlevel) && (status == 0)) || (level < actlevel)) {
-        if (level > actlevel) {
+    while (((level != actlevel) && (status == 0)) || (level < actlevel))
+    {
+        if (level > actlevel)
+        {
             status = SetVCoreUp(++actlevel);
         }
-        else {
+        else
+        {
             status = SetVCoreDown(--actlevel);
         }
     }
@@ -400,11 +405,13 @@ RES_t clock_SetDivMCLK(uint8_t div)
 
     // check if within voltage range
 #if (MCLK_DIV_MINIMUM_RESTRICT == 0)
-    if (div > 5) {
+    if (div > 5)
+    {
         return(RES_PARAMERR);
     }
 #else
-    if ((div < MCLK_DIV_MINIMUM_RESTRICT) || (div > 5)) {
+    if ((div < MCLK_DIV_MINIMUM_RESTRICT) || (div > 5))
+    {
         return(RES_PARAMERR);
     }
 #endif
@@ -454,14 +461,16 @@ void clock_init(void)
 #ifdef _USING_XT1
 #if (XT1_FREQ < 40000L)
     // LFXT
-    while (UCSCTL7 & XT1LFOFFG) { // loop until XT1LF fault clears
+    while (UCSCTL7 & XT1LFOFFG)   // loop until XT1LF fault clears
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC fault Flags fault flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
     UCSCTL6_L &= ~(XT1DRIVE1_L + XT1DRIVE0_L);
 #else
     //XT1 HF
-    while (UCSCTL7 & XT1HFOFFG) { // loop until XT1HF fault clears
+    while (UCSCTL7 & XT1HFOFFG)   // loop until XT1HF fault clears
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC fault Flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -477,7 +486,8 @@ void clock_init(void)
 #endif
 
 #ifdef _USING_XT2
-    while (UCSCTL7 & XT2OFFG) { // loop until XT2 fault clears
+    while (UCSCTL7 & XT2OFFG)   // loop until XT2 fault clears
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC fault Flags
         SFRIFG1 &= ~OFIFG;                                // Clear OFIFG fault flag
     }
@@ -517,7 +527,8 @@ void clock_init(void)
 #endif
 
 
-    while (UCSCTL7 & DCOFFG) { // loop until DCO fault clears
+    while (UCSCTL7 & DCOFFG)   // loop until DCO fault clears
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC fault Flags
         SFRIFG1 &= ~OFIFG;                                // Clear OFIFG fault flag
     }

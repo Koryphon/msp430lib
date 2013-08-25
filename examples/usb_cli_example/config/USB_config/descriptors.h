@@ -147,7 +147,8 @@ extern "C"
 #define EDB(addr) ((addr&0x07)-1)
 
     /* Structure for generic part of configuration descriptor */
-    struct abromConfigurationDescriptorGenric {
+    struct abromConfigurationDescriptorGenric
+    {
         BYTE sizeof_config_descriptor;            // bLength
         BYTE desc_type_config;                    // bDescriptorType: 2
         BYTE sizeof_configuration_descriptor1;    // wTotalLength
@@ -160,7 +161,8 @@ extern "C"
     };
 
     /************************************************CDC Descriptor**************************/
-    struct abromConfigurationDescriptorCdc {
+    struct abromConfigurationDescriptorCdc
+    {
 // interface descriptor (9 bytes)
         BYTE blength_intf;	                      // blength: interface descriptor size
         BYTE desc_type_interface;	              // bdescriptortype: interface
@@ -238,7 +240,8 @@ extern "C"
     }	;
 
     /**************************************HID descriptor structure *************************/
-    struct abromConfigurationDescriptorHid {
+    struct abromConfigurationDescriptorHid
+    {
 //INTERFACE DESCRIPTOR (9 bytes)
         BYTE sizeof_interface_descriptor;        // Desc Length
         BYTE desc_type_interface;                // DescriptorType
@@ -281,7 +284,8 @@ extern "C"
     };
 
     /**************************************MSC descriptor structure *************************/
-    struct abromConfigurationDescriptorMsc {
+    struct abromConfigurationDescriptorMsc
+    {
 // INTERFACE DESCRIPTOR (9 bytes)
         BYTE sizeof_interface_descriptor;         // Desc Length
         BYTE desc_type_interface;                 // DescriptorType
@@ -313,7 +317,8 @@ extern "C"
     };
 
     /* Global structure having Generic,CDC,HID, MSC structures */
-    struct  abromConfigurationDescriptorGroup {
+    struct  abromConfigurationDescriptorGroup
+    {
         /* Generic part of config descriptor */
         const struct abromConfigurationDescriptorGenric abromConfigurationDescriptorGenric;
 #ifdef _MSC_
@@ -340,7 +345,8 @@ extern "C"
 //extern BYTE const abromReportDescriptor[SIZEOF_REPORT_DESCRIPTOR];
 
     /* Handle Structure - Will be populated in descriptors.c based on number of CDC,HID interfaces */
-    struct tUsbHandle {
+    struct tUsbHandle
+    {
         BYTE ep_In_Addr;               // Input EP Addr
         BYTE ep_Out_Addr;              // Output EP Addr
         BYTE edb_Index;                // The EDB index

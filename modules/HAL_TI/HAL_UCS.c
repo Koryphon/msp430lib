@@ -103,11 +103,13 @@ void LFXT_Start(uint16_t xtdrive)
 {
     // If the drive setting is not already set to maximum
     // Set it to max for LFXT startup
-    if ((UCSCTL6 & XT1DRIVE_3) != XT1DRIVE_3) {
+    if ((UCSCTL6 & XT1DRIVE_3) != XT1DRIVE_3)
+    {
         UCSCTL6_L |= XT1DRIVE1_L + XT1DRIVE0_L; // Highest drive setting for XT1startup
     }
 
-    while (SFRIFG1 & OFIFG) {   // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)     // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags fault flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -119,11 +121,13 @@ uint16_t LFXT_Start_Timeout(uint16_t xtdrive, uint16_t timeout)
 {
 // If the drive setting is not already set to maximum
     // Set it to max for LFXT startup
-    if ((UCSCTL6 & XT1DRIVE_3) != XT1DRIVE_3) {
+    if ((UCSCTL6 & XT1DRIVE_3) != XT1DRIVE_3)
+    {
         UCSCTL6_L |= XT1DRIVE1_L + XT1DRIVE0_L; // Highest drive setting for XT1startup
     }
 
-    while ((SFRIFG1 & OFIFG) && timeout--) {  // Check OFIFG fault flag
+    while ((SFRIFG1 & OFIFG) && timeout--)    // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags fault flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -139,7 +143,8 @@ uint16_t LFXT_Start_Timeout(uint16_t xtdrive, uint16_t timeout)
 void XT1_Start(uint16_t xtdrive)
 {
     // Check if drive value is the expected one
-    if ((UCSCTL6 & XT1DRIVE_3) != xtdrive) {
+    if ((UCSCTL6 & XT1DRIVE_3) != xtdrive)
+    {
         UCSCTL6 &= ~XT1DRIVE_3;                 // Clear XT1drive field
         UCSCTL6 |= xtdrive;                     // Set requested value
     }
@@ -147,7 +152,8 @@ void XT1_Start(uint16_t xtdrive)
     UCSCTL6 &= ~XT1OFF;                       // Enable XT1
     UCSCTL6 |= XTS;                           // Enable HF mode
 
-    while (SFRIFG1 & OFIFG) {   // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)     // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -156,7 +162,8 @@ void XT1_Start(uint16_t xtdrive)
 uint16_t XT1_Start_Timeout(uint16_t xtdrive, uint16_t timeout)
 {
     // Check if drive value is the expected one
-    if ((UCSCTL6 & XT1DRIVE_3) != xtdrive) {
+    if ((UCSCTL6 & XT1DRIVE_3) != xtdrive)
+    {
         UCSCTL6 &= ~XT1DRIVE_3;                 // Clear XT1drive field
         UCSCTL6 |= xtdrive;                     // Set requested value
     }
@@ -164,15 +171,18 @@ uint16_t XT1_Start_Timeout(uint16_t xtdrive, uint16_t timeout)
     UCSCTL6 &= ~XT1OFF;                       // Enable XT1
     UCSCTL6 |= XTS;                           // Enable HF mode
 
-    while ((SFRIFG1 & OFIFG) && timeout--) {  // Check OFIFG fault flag
+    while ((SFRIFG1 & OFIFG) && timeout--)    // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;                      // Clear OFIFG fault flag
     }
 
-    if (timeout) {
+    if (timeout)
+    {
         return UCS_STATUS_OK;
     }
-    else {
+    else
+    {
         return UCS_STATUS_ERROR;
     }
 }
@@ -181,7 +191,8 @@ void XT1_Bypass(void)
 {
     UCSCTL6 |= XT1BYPASS;
 
-    while (SFRIFG1 & OFIFG) {   // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)     // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -195,14 +206,16 @@ void XT1_Stop(void)
 void XT2_Start(uint16_t xtdrive)
 {
     // Check if drive value is the expected one
-    if ((UCSCTL6 & XT2DRIVE_3) != xtdrive) {
+    if ((UCSCTL6 & XT2DRIVE_3) != xtdrive)
+    {
         UCSCTL6 &= ~XT2DRIVE_3;                 // Clear XT2drive field
         UCSCTL6 |= xtdrive;                     // Set requested value
     }
 
     UCSCTL6 &= ~XT2OFF;
 
-    while (SFRIFG1 & OFIFG) {                 // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)                   // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;                      // Clear OFIFG fault flag
     }
@@ -211,22 +224,26 @@ void XT2_Start(uint16_t xtdrive)
 uint16_t XT2_Start_Timeout(uint16_t xtdrive, uint16_t timeout)
 {
     // Check if drive value is the expected one
-    if ((UCSCTL6 & XT2DRIVE_3) != xtdrive)  {
+    if ((UCSCTL6 & XT2DRIVE_3) != xtdrive)
+    {
         UCSCTL6 &= ~XT2DRIVE_3;                 // Clear XT2drive field
         UCSCTL6 |= xtdrive;                     // Set requested value
     }
 
     UCSCTL6 &= ~XT2OFF;
 
-    while ((SFRIFG1 & OFIFG) && timeout--) {  // Check OFIFG fault flag
+    while ((SFRIFG1 & OFIFG) && timeout--)    // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
 
-    if (timeout) {
+    if (timeout)
+    {
         return UCS_STATUS_OK;
     }
-    else {
+    else
+    {
         return UCS_STATUS_ERROR;
     }
 }
@@ -236,7 +253,8 @@ void XT2_Bypass(void)
 #ifdef XT2BYPASS              // On devices without XT2 this function will be empty
     UCSCTL6 |= XT2BYPASS;
 
-    while (SFRIFG1 & OFIFG) {   // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)     // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;        // Clear OFIFG fault flag
     }
@@ -254,7 +272,8 @@ void Init_FLL_Settle(uint16_t fsystem, uint16_t ratio)
 
     Init_FLL(fsystem, ratio);
 
-    while (x--) {
+    while (x--)
+    {
         __delay_cycles(30);
     }
 }
@@ -273,15 +292,18 @@ void Init_FLL(uint16_t fsystem, uint16_t ratio)
     d = ratio;
     dco_div_bits = FLLD__2;        // Have at least a divider of 2
 
-    if (fsystem > 16000) {
+    if (fsystem > 16000)
+    {
         d >>= 1 ;
         mode = 1;
     }
-    else {
+    else
+    {
         fsystem <<= 1;               // fsystem = fsystem * 2
     }
 
-    while (d > 512) {
+    while (d > 512)
+    {
         dco_div_bits = dco_div_bits + FLLD0;  // Set next higher div level
         d >>= 1;
     }
@@ -308,15 +330,18 @@ void Init_FLL(uint16_t fsystem, uint16_t ratio)
     else
         UCSCTL1 = DCORSEL_7;
 
-    while (SFRIFG1 & OFIFG) {                               // Check OFIFG fault flag
+    while (SFRIFG1 & OFIFG)                                 // Check OFIFG fault flag
+    {
         UCSCTL7 &= ~(DCOFFG + XT1LFOFFG + XT1HFOFFG + XT2OFFG); // Clear OSC flaut Flags
         SFRIFG1 &= ~OFIFG;                                    // Clear OFIFG fault flag
     }
 
-    if (mode == 1) {                              		  // fsystem > 16000
+    if (mode == 1)                                		  // fsystem > 16000
+    {
         SELECT_MCLK_SMCLK(SELM__DCOCLK + SELS__DCOCLK);       // Select DCOCLK
     }
-    else {
+    else
+    {
         SELECT_MCLK_SMCLK(SELM__DCOCLKDIV + SELS__DCOCLKDIV); // Select DCODIVCLK
     }
 

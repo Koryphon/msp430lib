@@ -53,11 +53,13 @@
 /*******************************************************************************
  * Data Types
  ******************************************************************************/
-struct s_TLV_Die_Record {
+struct s_TLV_Die_Record
+{
     uint8_t die_record[10];
 };
 
-struct s_TLV_ADC_Cal_Data {
+struct s_TLV_ADC_Cal_Data
+{
     uint16_t adc_gain_factor;
     uint16_t adc_offset;
     uint16_t adc_ref15_30_temp;
@@ -68,14 +70,16 @@ struct s_TLV_ADC_Cal_Data {
     uint16_t adc_ref25_85_temp;
 };
 
-struct s_TLV_Timer_D_Cal_Data {
+struct s_TLV_Timer_D_Cal_Data
+{
     uint16_t TDH0CTL1_64;
     uint16_t TDH0CTL1_128;
     uint16_t TDH0CTL1_200;
     uint16_t TDH0CTL1_256;
 };
 
-struct s_TLV_REF_Cal_Data {
+struct s_TLV_REF_Cal_Data
+{
     uint16_t ref_ref15;
     uint16_t ref_ref20;
     uint16_t adc_ref25;

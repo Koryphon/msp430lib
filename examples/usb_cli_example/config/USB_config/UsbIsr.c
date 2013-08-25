@@ -77,11 +77,13 @@ ISR(USB_UBM_VECTOR)
     //Check if the setup interrupt is pending.
     //We need to check it before other interrupts,
     //to work around that the Setup Int has lower priority then Input Endpoint 0
-    if (USBIFG & SETUPIFG) {
+    if (USBIFG & SETUPIFG)
+    {
         bWakeUp = SetupPacketInterruptHandler();
         USBIFG &= ~SETUPIFG;    // clear the interrupt bit
     }
-    switch (__even_in_range(USBVECINT & 0x3f, USBVECINT_OUTPUT_ENDPOINT7)) {
+    switch (__even_in_range(USBVECINT & 0x3f, USBVECINT_OUTPUT_ENDPOINT7))
+    {
     case USBVECINT_NONE:
         break;
     case USBVECINT_PWR_DROP:
@@ -92,19 +94,22 @@ ISR(USB_UBM_VECTOR)
     case USBVECINT_PLL_SIGNAL:
         break;
     case USBVECINT_PLL_RANGE:
-        if (wUsbEventMask & kUSB_clockFaultEvent) {
+        if (wUsbEventMask & kUSB_clockFaultEvent)
+        {
             bWakeUp = USB_handleClockEvent();
         }
         break;
     case USBVECINT_PWR_VBUSOn:
         PWRVBUSonHandler();
-        if (wUsbEventMask & kUSB_VbusOnEvent) {
+        if (wUsbEventMask & kUSB_VbusOnEvent)
+        {
             bWakeUp = USB_handleVbusOnEvent();
         }
         break;
     case USBVECINT_PWR_VBUSOff:
         PWRVBUSoffHandler();
-        if (wUsbEventMask & kUSB_VbusOffEvent) {
+        if (wUsbEventMask & kUSB_VbusOffEvent)
+        {
             bWakeUp = USB_handleVbusOffEvent();
         }
         break;
@@ -118,19 +123,22 @@ ISR(USB_UBM_VECTOR)
         break;
     case USBVECINT_RSTR:
         USB_reset();
-        if (wUsbEventMask & kUSB_UsbResetEvent) {
+        if (wUsbEventMask & kUSB_UsbResetEvent)
+        {
             bWakeUp = USB_handleResetEvent();
         }
         break;
     case USBVECINT_SUSR:
         USB_suspend();
-        if (wUsbEventMask & kUSB_UsbSuspendEvent) {
+        if (wUsbEventMask & kUSB_UsbSuspendEvent)
+        {
             bWakeUp = USB_handleSuspendEvent();
         }
         break;
     case USBVECINT_RESR:
         USB_resume();
-        if (wUsbEventMask & kUSB_UsbResumeEvent) {
+        if (wUsbEventMask & kUSB_UsbResumeEvent)
+        {
             bWakeUp = USB_handleResumeEvent();
         }
         //-- after resume we will wake up! Independ what event handler says.
@@ -164,12 +172,15 @@ ISR(USB_UBM_VECTOR)
         break;
     case USBVECINT_OUTPUT_ENDPOINT2:
         //call callback function if no receive operation is underway
-        if (!CdcIsReceiveInProgress(CDC0_INTFNUM) && USBCDC_bytesInUSBBuffer(CDC0_INTFNUM)) {
-            if (wUsbEventMask & kUSB_dataReceivedEvent) {
+        if (!CdcIsReceiveInProgress(CDC0_INTFNUM) && USBCDC_bytesInUSBBuffer(CDC0_INTFNUM))
+        {
+            if (wUsbEventMask & kUSB_dataReceivedEvent)
+            {
                 bWakeUp = USBCDC_handleDataReceived(CDC0_INTFNUM);
             }
         }
-        else {
+        else
+        {
             //complete receive opereation - copy data to user buffer
             bWakeUp = CdcToBufferFromHost(CDC0_INTFNUM);
         }
@@ -187,7 +198,8 @@ ISR(USB_UBM_VECTOR)
     default:
         break;
     }
-    if (bWakeUp) {
+    if (bWakeUp)
+    {
         __bic_SR_register_on_exit(LPM3_bits);   // Exit LPM0-3
         __no_operation();                       // Required for debugger
     }
@@ -203,22 +215,26 @@ BYTE SetupPacketInterruptHandler(VOID)
     USBCTL |= FRSTE;      // Function Reset Connection Enable - set enable after first setup packet was received
 usbProcessNewSetupPacket:
     // copy the MSB of bmRequestType to DIR bit of USBCTL
-    if ((tSetupPacket.bmRequestType & USB_REQ_TYPE_INPUT) == USB_REQ_TYPE_INPUT) {
+    if ((tSetupPacket.bmRequestType & USB_REQ_TYPE_INPUT) == USB_REQ_TYPE_INPUT)
+    {
         USBCTL |= DIR;
     }
-    else {
+    else
+    {
         USBCTL &= ~DIR;
     }
     bStatusAction = STATUS_ACTION_NOTHING;
     // clear out return data buffer
-    for (bTemp = 0; bTemp < USB_RETURN_DATA_LENGTH; bTemp++) {
+    for (bTemp = 0; bTemp < USB_RETURN_DATA_LENGTH; bTemp++)
+    {
         abUsbRequestReturnData[bTemp] = 0x00;
     }
     // decode and process the request
     bWakeUp = usbDecodeAndProcessUsbRequest();
     // check if there is another setup packet pending
     // if it is, abandon current one by NAKing both data endpoint 0
-    if ((USBIFG & STPOWIFG) != 0x00) {
+    if ((USBIFG & STPOWIFG) != 0x00)
+    {
         USBIFG &= ~(STPOWIFG | SETUPIFG);
         goto usbProcessNewSetupPacket;
     }
@@ -230,7 +246,8 @@ VOID PWRVBUSoffHandler(VOID)
 {
     volatile unsigned int i;
     for (i = 0; i < USB_MCLK_FREQ / 1000 * 1 / 10; i++); // 1ms delay
-    if (!(USBPWRCTL & USBBGVBV)) {
+    if (!(USBPWRCTL & USBBGVBV))
+    {
         USBKEYPID   =    0x9628;        // set KEY and PID to 0x9628 -> access to configuration registers enabled
         bEnumerationStatus = 0x00;      // device is not enumerated
         bFunctionSuspended = FALSE;     // device is not suspended
@@ -257,10 +274,12 @@ VOID IEP0InterruptHandler(VOID)
 {
     USBCTL |= FRSTE;                              // Function Reset Connection Enable
     tEndPoint0DescriptorBlock.bOEPBCNT = 0x00;
-    if (bStatusAction == STATUS_ACTION_DATA_IN) {
+    if (bStatusAction == STATUS_ACTION_DATA_IN)
+    {
         usbSendNextPacketOnIEP0();
     }
-    else {
+    else
+    {
         tEndPoint0DescriptorBlock.bIEPCNFG |= EPCNF_STALL; // no more data
     }
 }
@@ -271,22 +290,27 @@ BYTE OEP0InterruptHandler(VOID)
     BYTE bWakeUp = FALSE;
     USBCTL |= FRSTE;                              // Function Reset Connection Enable
     tEndPoint0DescriptorBlock.bIEPBCNT = 0x00;
-    if (bStatusAction == STATUS_ACTION_DATA_OUT) {
+    if (bStatusAction == STATUS_ACTION_DATA_OUT)
+    {
         usbReceiveNextPacketOnOEP0();
-        if (bStatusAction == STATUS_ACTION_NOTHING) {
+        if (bStatusAction == STATUS_ACTION_NOTHING)
+        {
 #           ifdef _CDC_
-            if (tSetupPacket.bRequest == USB_CDC_SET_LINE_CODING) {
+            if (tSetupPacket.bRequest == USB_CDC_SET_LINE_CODING)
+            {
                 bWakeUp = Handler_SetLineCoding();
             }
 #          endif
 #ifdef _HID_
-            if (tSetupPacket.bRequest == USB_REQ_SET_REPORT) {
+            if (tSetupPacket.bRequest == USB_REQ_SET_REPORT)
+            {
                 bWakeUp = USBHID_handleSetReportDataAvailable(tSetupPacket.wIndex);
             }
 #endif
         }
     }
-    else {
+    else
+    {
         tEndPoint0DescriptorBlock.bOEPCNFG |= EPCNF_STALL; // no more data
     }
     return (bWakeUp);

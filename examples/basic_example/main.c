@@ -78,11 +78,13 @@ void onIdle(void)
 
 void onButtonDown(uint8_t port, uint8_t b)
 {
-    if (b & BIT0) {
+    if (b & BIT0)
+    {
         // Right button
         timer_start(&Timer1, NULL);
     }
-    else if (b & BIT1) {
+    else if (b & BIT1)
+    {
         // Left button
         timer_stop(&Timer1);
     }

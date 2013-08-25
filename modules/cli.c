@@ -72,14 +72,17 @@ static uint16_t split_args(char *str, char *argv[])
     count = 0;
     state = SEEK;
 
-    while (*str) {
+    while (*str)
+    {
         c = *str;
 
-        switch (state) {
+        switch (state)
+        {
         case SEEK:
             if (c == ' ') break;
 
-            if (c == '"') {
+            if (c == '"')
+            {
                 state = IN_QUOTES;
                 argv[count] = str + 1;
                 break;
@@ -89,7 +92,8 @@ static uint16_t split_args(char *str, char *argv[])
             argv[count] = str;
             break;
         case IN_WORD:
-            if (c == ' ') {
+            if (c == ' ')
+            {
                 *str = 0;
                 state = SEEK;
                 count++;
@@ -98,7 +102,8 @@ static uint16_t split_args(char *str, char *argv[])
             }
             break;
         case IN_QUOTES:
-            if (c == '"') {
+            if (c == '"')
+            {
                 *str = 0;
                 state = SEEK;
                 count++;
@@ -110,7 +115,8 @@ static uint16_t split_args(char *str, char *argv[])
         str++;
     }
 
-    if (state != SEEK) {
+    if (state != SEEK)
+    {
         count++;
     }
 
@@ -131,11 +137,13 @@ void cli_process_char(char inchar)
     static char strin[CLI_STRBUF_SIZE];
     static uint16_t stridx = 0;
 
-    if (inchar == '\r') { // recvd return
+    if (inchar == '\r')   // recvd return
+    {
         // Process Command
         strin[stridx] = 0; // null terminate
 
-        if (stridx != 0) {
+        if (stridx != 0)
+        {
             cli_puts("\r\n");
 
             // Split the string into argv table
@@ -144,22 +152,26 @@ void cli_process_char(char inchar)
 
             argc = split_args(strin, argv);
 
-            if (argc > 0) {
+            if (argc > 0)
+            {
                 // Use binary search to lookup the command
                 cmdentry_t *command;
                 cmdentry_t key;
                 key.strCommand = argv[0];
                 command = bsearch(&key, CommandTable, CMDCOUNT, sizeof(cmdentry_t), compare_cmdentry);
 
-                if (command) {
+                if (command)
+                {
                     int err;
                     err = (command->cmdptr)(argc, argv); // Execute command
 
-                    if (err) {
+                    if (err)
+                    {
                         cli_print_error(err);
                     }
                 }
-                else {
+                else
+                {
                     cli_print_notfound(argv[0]);
                 }
             }
@@ -169,17 +181,22 @@ void cli_process_char(char inchar)
 
         stridx = 0;
     }
-    else if ((inchar == 0x7F) || (inchar == '\b')) { // Backspace Key
-        if (stridx != 0) {
+    else if ((inchar == 0x7F) || (inchar == '\b'))   // Backspace Key
+    {
+        if (stridx != 0)
+        {
             stridx--;
             cli_puts("\b \b");
         }
     }
-    else if (inchar == '\n') {
+    else if (inchar == '\n')
+    {
         // discard line feed characters.
     }
-    else {
-        if (stridx < CLI_STRBUF_SIZE) {
+    else
+    {
+        if (stridx < CLI_STRBUF_SIZE)
+        {
             strin[stridx++] = inchar;
             if (echo) cli_putc(inchar);
         }

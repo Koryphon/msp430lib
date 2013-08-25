@@ -69,8 +69,10 @@ static uint16_t u8_to_bcd(uint8_t n)
     bcd = 0;
     bcd_weight = 1;
 
-    while (n) {
-        if (n & 0x01) {
+    while (n)
+    {
+        if (n & 0x01)
+        {
             bcd = __bcd_add_short(bcd, bcd_weight);
         }
 
@@ -90,8 +92,10 @@ static uint32_t u16_to_bcd(uint16_t n)
     bcd = 0;
     bcd_weight = 1;
 
-    while (n) {
-        if (n & 0x0001) {
+    while (n)
+    {
+        if (n & 0x0001)
+        {
             bcd = __bcd_add_long(bcd, bcd_weight);
         }
 
@@ -112,19 +116,23 @@ uint8_t snprint_x8(char *buffer, size_t buf_size, uint8_t num)
     uint8_t i = sizeof(num) * 2;
     uint8_t tmp;
 
-    while (i) {
+    while (i)
+    {
         i--;
         tmp = num & 0x0F;
-        if (tmp < 10) {
+        if (tmp < 10)
+        {
             str[i] = '0' + tmp;
         }
-        else {
+        else
+        {
             str[i] = 'A' - 10 + tmp;
         }
         num >>= 4;
     }
 
-    while (i <= sizeof(num) * 2 - 1) {
+    while (i <= sizeof(num) * 2 - 1)
+    {
         buffer[i] = str[i];
         i++;
         if (i == buf_size) return(sizeof(num) * 2);
@@ -141,19 +149,23 @@ uint8_t snprint_x16(char *buffer, size_t buf_size, uint16_t num)
     uint8_t i = sizeof(num) * 2;
     uint8_t tmp;
 
-    while (i) {
+    while (i)
+    {
         i--;
         tmp = num & 0x0F;
-        if (tmp < 10) {
+        if (tmp < 10)
+        {
             str[i] = '0' + tmp;
         }
-        else {
+        else
+        {
             str[i] = 'A' - 10 + tmp;
         }
         num >>= 4;
     }
 
-    while (i <= sizeof(num) * 2 - 1) {
+    while (i <= sizeof(num) * 2 - 1)
+    {
         buffer[i] = str[i];
         i++;
         if (i == buf_size) return(sizeof(num) * 2);
@@ -170,19 +182,23 @@ uint8_t snprint_x32(char *buffer, size_t buf_size, uint32_t num)
     uint8_t i = sizeof(num) * 2;
     uint8_t tmp;
 
-    while (i) {
+    while (i)
+    {
         i--;
         tmp = num & 0x0F;
-        if (tmp < 10) {
+        if (tmp < 10)
+        {
             str[i] = '0' + tmp;
         }
-        else {
+        else
+        {
             str[i] = 'A' - 10 + tmp;
         }
         num >>= 4;
     }
 
-    while (i <= sizeof(num) * 2 - 1) {
+    while (i <= sizeof(num) * 2 - 1)
+    {
         buffer[i] = str[i];
         i++;
         if (i == buf_size) return(sizeof(num) * 2);
@@ -203,7 +219,8 @@ uint8_t snprint_d8(char *buffer, size_t buf_size, uint8_t num)
     uint16_t bcd;
     bcd = u8_to_bcd(num);
 
-    do {
+    do
+    {
         i -= 1;
         str[i] = (bcd & 0x0F) + '0';
         bcd >>= 4;
@@ -211,7 +228,8 @@ uint8_t snprint_d8(char *buffer, size_t buf_size, uint8_t num)
     while (bcd != 0);
 #else
     div_t divresult;
-    do {
+    do
+    {
         i -= 1;
         divresult = div(num, 10);
         str[i] = divresult.rem + '0';
@@ -224,7 +242,8 @@ uint8_t snprint_d8(char *buffer, size_t buf_size, uint8_t num)
 
     if (buf_size == 0) return(nchars);
 
-    do {
+    do
+    {
         *buffer = str[i];
         i++;
         buffer++;
@@ -247,7 +266,8 @@ uint8_t snprint_d16(char *buffer, size_t buf_size, uint16_t num)
     uint32_t bcd;
     bcd = u16_to_bcd(num);
 
-    do {
+    do
+    {
         i -= 1;
         str[i] = (bcd & 0x0F) + '0';
         bcd >>= 4;
@@ -255,7 +275,8 @@ uint8_t snprint_d16(char *buffer, size_t buf_size, uint16_t num)
     while (bcd != 0);
 #else
     div_t divresult;
-    do {
+    do
+    {
         i -= 1;
         divresult = div(num, 10);
         str[i] = divresult.rem + '0';
@@ -268,7 +289,8 @@ uint8_t snprint_d16(char *buffer, size_t buf_size, uint16_t num)
 
     if (buf_size == 0) return(nchars);
 
-    do {
+    do
+    {
         *buffer = str[i];
         i++;
         buffer++;
@@ -288,7 +310,8 @@ uint8_t snprint_d32(char *buffer, size_t buf_size, uint32_t num)
     i = 10; // max of 10 digits
 
     ldiv_t divresult;
-    do {
+    do
+    {
         i -= 1;
         divresult = ldiv(num, 10);
         str[i] = divresult.rem + '0';
@@ -300,7 +323,8 @@ uint8_t snprint_d32(char *buffer, size_t buf_size, uint32_t num)
 
     if (buf_size == 0) return(nchars);
 
-    do {
+    do
+    {
         *buffer = str[i];
         i++;
         buffer++;
@@ -315,13 +339,15 @@ uint8_t snprint_d32(char *buffer, size_t buf_size, uint32_t num)
 //--------------------------------------------------------------------------------------------------
 uint8_t snprint_sd8(char *buffer, size_t buf_size, int8_t num)
 {
-    if (num < 0) {
+    if (num < 0)
+    {
         buffer[0] = '-';
         buffer++;
         buf_size--;
         return(snprint_d8(buffer, buf_size, -num) + 1);
     }
-    else {
+    else
+    {
         return(snprint_d8(buffer, buf_size, num));
     }
 }
@@ -329,13 +355,15 @@ uint8_t snprint_sd8(char *buffer, size_t buf_size, int8_t num)
 //--------------------------------------------------------------------------------------------------
 uint8_t snprint_sd16(char *buffer, size_t buf_size, int16_t num)
 {
-    if (num < 0) {
+    if (num < 0)
+    {
         buffer[0] = '-';
         buffer++;
         buf_size--;
         return(snprint_d16(buffer, buf_size, -num) + 1);
     }
-    else {
+    else
+    {
         return(snprint_d16(buffer, buf_size, num));
     }
 }
@@ -343,13 +371,15 @@ uint8_t snprint_sd16(char *buffer, size_t buf_size, int16_t num)
 //--------------------------------------------------------------------------------------------------
 uint8_t snprint_sd32(char *buffer, size_t buf_size, int32_t num)
 {
-    if (num < 0) {
+    if (num < 0)
+    {
         buffer[0] = '-';
         buffer++;
         buf_size--;
         return(snprint_d32(buffer, buf_size, -num) + 1);
     }
-    else {
+    else
+    {
         return(snprint_d32(buffer, buf_size, num));
     }
 }

@@ -55,7 +55,8 @@ extern "C" {
     /**
      * \brief Public structure used to define a new timer's behavior
      **/
-    struct timerctl {
+    struct timerctl
+    {
         uint16_t interval_ms;    ///< Timer interval in milliseconds
         bool repeat;            ///< Should the timer repeat? True or False
         void (*fptr)(void*);    ///< Pointer to the function to call each time the timer expires
@@ -68,7 +69,8 @@ extern "C" {
 #ifdef __DOXYGEN__
 
 #else
-    struct timer_s {
+    struct timer_s
+    {
         uint32_t ticks_remaining;
         uint32_t ticks_reload; // if reload is 0, timer does not repeat.
         void (*fptr)(void*); // Callback function

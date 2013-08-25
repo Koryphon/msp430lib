@@ -51,14 +51,16 @@ extern VOID *(*USB_RX_memcpy)(VOID * dest, const VOID * source, size_t count);
 
 extern BYTE const report_len_input[HID_NUM_INTERFACES];
 
-static struct _HidWrite {
+static struct _HidWrite
+{
     WORD nHidBytesToSend;                       //holds counter of bytes to be sent
     WORD nHidBytesToSendLeft;                   //holds counter how many bytes is still to be sent
     const BYTE* pHidBufferToSend;               //holds the buffer with data to be sent
     BYTE bCurrentBufferXY;                      //indicates which buffer is to use next for for write into IN OUT endpoint
 } HidWriteCtrl[HID_NUM_INTERFACES];
 
-static struct _HidRead {
+static struct _HidRead
+{
     BYTE *pUserBuffer;                          //holds the current position of user's receiving buffer. If NULL- no receiving
     //operation started
     BYTE *pCurrentEpPos;                        //current positon to read of received data from curent EP
@@ -100,7 +102,8 @@ VOID HidResetData ()
 
     memset(&HidReadCtrl, 0, sizeof(HidReadCtrl));
     memset(&HidWriteCtrl, 0, sizeof(HidWriteCtrl));
-    for (i = 0; i < HID_NUM_INTERFACES; i++) {
+    for (i = 0; i < HID_NUM_INTERFACES; i++)
+    {
         hidProtocol[i] = USB_REQ_HID_REPORT_PROTOCOL;
     }
 }
@@ -123,16 +126,19 @@ BYTE USBHID_sendReport (const BYTE * reportData, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         return (kUSBHID_busNotAvailable);
     }
 
-    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) {
+    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER)
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_X_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTX;
     }
-    else {
+    else
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_Y_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
@@ -140,7 +146,8 @@ BYTE USBHID_sendReport (const BYTE * reportData, BYTE intfNum)
 
     byte_count = report_len_input[INTFNUM_OFFSET(intfNum)];
 
-    if (*pCT1 & EPBCNT_NAK) {                                                       //if this EP is empty
+    if (*pCT1 & EPBCNT_NAK)                                                         //if this EP is empty
+    {
         USB_TX_memcpy(pEP1, reportData, byte_count);                                //copy data into IEP X or Y buffer
         *pCT1 = byte_count;                                                         //Set counter for usb In-Transaction
         HidWriteCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
@@ -167,12 +174,15 @@ BYTE USBHID_receiveReport (BYTE * reportData, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         return (kUSBHID_busNotAvailable);
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) { //this is current buffer
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK) { //this buffer has a valid data packet
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER)   //this is current buffer
+    {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK)   //this buffer has a valid data packet
+        {
             //this is the active EP buffer
             //pEP1
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
@@ -188,8 +198,10 @@ BYTE USBHID_receiveReport (BYTE * reportData, BYTE intfNum)
             nTmp1 = 1;                                                      //indicate that data is available
         }
     }
-    else {                                                                  //Y_BUFFER
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK) {
+    else                                                                    //Y_BUFFER
+    {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK)
+        {
             //this is the active EP buffer
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
                 (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
@@ -205,11 +217,13 @@ BYTE USBHID_receiveReport (BYTE * reportData, BYTE intfNum)
         }
     }
 
-    if (nTmp1) {
+    if (nTmp1)
+    {
         //how many byte we can get from one endpoint buffer
         nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
 
-        if (nTmp1 & EPBCNT_NAK) {
+        if (nTmp1 & EPBCNT_NAK)
+        {
             nTmp1 = nTmp1 & 0x7f;                                           //clear NAK bit
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1;        //holds how many valid bytes in the EP buffer
 
@@ -242,7 +256,8 @@ BYTE USBHID_sendData (const BYTE* data, WORD size, BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (size == 0) {
+    if (size == 0)
+    {
         return (kUSBHID_generalError);
     }
 
@@ -252,13 +267,15 @@ BYTE USBHID_sendData (const BYTE* data, WORD size, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         //data can not be read because of USB suspended
         usbRestoreInEndpointInterrupt(state);
         return (kUSBHID_busNotAvailable);
     }
 
-    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft != 0) {
+    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft != 0)
+    {
         //the USB still sends previous data, we have to wait
         usbRestoreInEndpointInterrupt(state);
         return (kUSBHID_intfBusyError);
@@ -292,17 +309,20 @@ BOOL HidToHostFromBuffer (BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft == 0) {   //do we have somtething to send?
+    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft == 0)     //do we have somtething to send?
+    {
         HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSend = 0;
 
         //call event callback function
-        if (wUsbEventMask & kUSB_sendCompletedEvent) {
+        if (wUsbEventMask & kUSB_sendCompletedEvent)
+        {
             bWakeUp = USBHID_handleSendCompleted(intfNum);
         }
         return (bWakeUp);
     }
 
-    if (!(tInputEndPointDescriptorBlock[edbIndex].bEPCNF & EPCNF_TOGGLE)) {
+    if (!(tInputEndPointDescriptorBlock[edbIndex].bEPCNF & EPCNF_TOGGLE))
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_X_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTX;
@@ -311,7 +331,8 @@ BOOL HidToHostFromBuffer (BYTE intfNum)
         pEP2 = (BYTE*)stUsbHandle[intfNum].iep_Y_Buffer;
         pCT2 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
     }
-    else {
+    else
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].iep_Y_Buffer;
         pCT1 = &tInputEndPointDescriptorBlock[edbIndex].bEPBCTY;
@@ -330,7 +351,8 @@ BOOL HidToHostFromBuffer (BYTE intfNum)
         2 : HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft;
     nTmp2 = *pCT1;
 
-    if (nTmp2 & EPBCNT_NAK) {
+    if (nTmp2 & EPBCNT_NAK)
+    {
         USB_TX_memcpy(pEP1 + 2, HidWriteCtrl[INTFNUM_OFFSET(
                                                  intfNum)].pHidBufferToSend,
                       byte_count);                                                        //copy data into IEP3 X or Y buffer
@@ -346,7 +368,8 @@ BOOL HidToHostFromBuffer (BYTE intfNum)
         //try to send data over second buffer
         nTmp2 = *pCT2;
         if ((HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft > 0) &&  //do we have more data to send?
-            (nTmp2 & EPBCNT_NAK)) {                                             //if the second buffer is free?
+                (nTmp2 & EPBCNT_NAK))                                               //if the second buffer is free?
+        {
             //how many byte we can send over one endpoint buffer
             byte_count =
                 (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft >
@@ -417,7 +440,8 @@ VOID HidCopyUsbToBuff (BYTE* pEP, BYTE* pCT, BYTE intfNum)
     HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer += nCount;                     //move buffer pointer
     //to read rest of data next time from this place
 
-    if (nCount == HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp) {                //all bytes are copied from receive buffer?
+    if (nCount == HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp)                  //all bytes are copied from receive buffer?
+    {
         //switch current buffer
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
             (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY + 1) & 0x01;
@@ -427,7 +451,8 @@ VOID HidCopyUsbToBuff (BYTE* pEP, BYTE* pCT, BYTE intfNum)
         //clear NAK, EP ready to receive data
         *pCT = 0;
     }
-    else {
+    else
+    {
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp -= nCount;
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos = pEP + nCount;
     }
@@ -450,7 +475,8 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
     if ((size == 0) ||                                                      //read size is 0
-        (data == NULL)) {
+            (data == NULL))
+    {
         return (kUSBHID_generalError);
     }
 
@@ -460,12 +486,14 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         usbRestoreOutEndpointInterrupt(state);
         return (kUSBHID_busNotAvailable);
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL) {         //receive process already started
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL)           //receive process already started
+    {
         usbRestoreOutEndpointInterrupt(state);
         return (kUSBHID_receiveInProgress);
     }
@@ -475,13 +503,15 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
     HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = data;                //set user receive buffer
 
     //read rest of data from buffer, if any
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0) {
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0)
+    {
         //copy data from pEP-endpoint into User's buffer
         HidCopyUsbToBuff(HidReadCtrl[INTFNUM_OFFSET(
                                          intfNum)].pCurrentEpPos,
                          HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
 
-        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) { //the Receive opereation is completed
+        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0)   //the Receive opereation is completed
+        {
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;        //no more receiving pending
             USBHID_handleReceiveCompleted(intfNum);                         //call event handler in interrupt context
             usbRestoreOutEndpointInterrupt(state);
@@ -490,13 +520,15 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
         //check other EP buffer for data - exchange pCT1 with pCT2
         if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 ==
-            &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX) {
+                &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX)
+        {
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
                 (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
         }
-        else {
+        else
+        {
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
                 &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX;
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
@@ -504,11 +536,13 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
         }
         nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
         //try read data from second buffer
-        if (nTmp1 & EPBCNT_NAK) {                                           //if the second buffer has received data?
+        if (nTmp1 & EPBCNT_NAK)                                             //if the second buffer has received data?
+        {
             nTmp1 = nTmp1 & 0x7f;                                           //clear NAK bit
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp =
                 *(HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos + 1);  //holds how many valid bytes in the EP buffer
-            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2) {
+            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2)
+            {
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1 - 2;
             }
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos += 2;        //here starts user data
@@ -517,9 +551,11 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
                              HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1, intfNum);
         }
 
-        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) { //the Receive opereation is completed
+        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0)   //the Receive opereation is completed
+        {
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;        //no more receiving pending
-            if (wUsbEventMask & kUSB_receiveCompletedEvent) {
+            if (wUsbEventMask & kUSB_receiveCompletedEvent)
+            {
                 USBHID_handleReceiveCompleted(intfNum);                     //call event handler in interrupt context
             }
             usbRestoreOutEndpointInterrupt(state);
@@ -529,8 +565,10 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
 
     //read 'fresh' data, if available
     nTmp1 = 0;
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) { //this is current buffer
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK) { //this buffer has a valid data packet
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER)   //this is current buffer
+    {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK)   //this buffer has a valid data packet
+        {
             //this is the active EP buffer
             //pEP1
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
@@ -546,8 +584,10 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
             nTmp1 = 1;                                                      //indicate that data is available
         }
     }
-    else {                                                                  //Y_BUFFER
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK) {
+    else                                                                    //Y_BUFFER
+    {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK)
+        {
             //this is the active EP buffer
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos =
                 (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
@@ -563,15 +603,18 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
         }
     }
 
-    if (nTmp1) {
+    if (nTmp1)
+    {
         //how many byte we can get from one endpoint buffer
         nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
 
-        if (nTmp1 & EPBCNT_NAK) {
+        if (nTmp1 & EPBCNT_NAK)
+        {
             nTmp1 = nTmp1 & 0x7f;                                           //clear NAK bit
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp =
                 *(HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos + 1);  //holds how many valid bytes in the EP buffer
-            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2) {
+            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2)
+            {
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1 - 2;
             }
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCurrentEpPos += 2;        //here starts user data
@@ -582,13 +625,15 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
             nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
             //try read data from second buffer
             if ((HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft >
-                 0) &&                                                      //do we have more data to receive?
-                (nTmp1 & EPBCNT_NAK)) {                                     //if the second buffer has received data?
+                    0) &&                                                      //do we have more data to receive?
+                    (nTmp1 & EPBCNT_NAK))                                       //if the second buffer has received data?
+            {
                 nTmp1 = nTmp1 & 0x7f;                                       //clear NAK bit
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp =
                     *(HidReadCtrl[INTFNUM_OFFSET(intfNum)].pEP2 + 1);       //holds how many valid bytes in the EP buffer
                 if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 -
-                    2) {
+                        2)
+                {
                     HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1 - 2;
                 }
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].pEP2 += 2;             //here starts user data
@@ -601,9 +646,11 @@ BYTE USBHID_receiveData (BYTE* data, WORD size, BYTE intfNum)
         }
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {    //the Receive opereation is completed
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0)      //the Receive opereation is completed
+    {
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;            //no more receiving pending
-        if (wUsbEventMask & kUSB_receiveCompletedEvent) {
+        if (wUsbEventMask & kUSB_receiveCompletedEvent)
+        {
             USBHID_handleReceiveCompleted(intfNum);                         //call event handler in interrupt context
         }
         usbRestoreOutEndpointInterrupt(state);
@@ -627,19 +674,22 @@ BOOL HidToBufferFromHost (BYTE intfNum)
 
     edbIndex = stUsbHandle[intfNum].edb_Index;
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {    //do we have somtething to receive?
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0)      //do we have somtething to receive?
+    {
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;            //no more receiving pending
         return (bWakeUp);
     }
 
     //No data to receive...
     if (!((tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX |
-           tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY)
-          & 0x80)) {
+            tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY)
+            & 0x80))
+    {
         return (bWakeUp);
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER) { //X is current buffer
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY == X_BUFFER)   //X is current buffer
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].oep_X_Buffer;
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
@@ -651,7 +701,8 @@ BOOL HidToBufferFromHost (BYTE intfNum)
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 =
             &tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY;
     }
-    else {
+    else
+    {
         //this is the active EP buffer
         pEP1 = (BYTE*)stUsbHandle[intfNum].oep_Y_Buffer;
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1 =
@@ -667,10 +718,12 @@ BOOL HidToBufferFromHost (BYTE intfNum)
     //how many byte we can get from one endpoint buffer
     nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT1;
 
-    if (nTmp1 & EPBCNT_NAK) {
+    if (nTmp1 & EPBCNT_NAK)
+    {
         nTmp1 = nTmp1 & 0x7f;                                                   //clear NAK bit
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = *(pEP1 + 1);          //holds how many valid bytes in the EP buffer
-        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2) {
+        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2)
+        {
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1 - 2;
         }
         pEP1 += 2;                                                              //here starts user data
@@ -680,10 +733,12 @@ BOOL HidToBufferFromHost (BYTE intfNum)
         nTmp1 = *HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2;
         //try read data from second buffer
         if ((HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft > 0) &&   //do we have more data to send?
-            (nTmp1 & EPBCNT_NAK)) {                                             //if the second buffer has received data?
+                (nTmp1 & EPBCNT_NAK))                                               //if the second buffer has received data?
+        {
             nTmp1 = nTmp1 & 0x7f;                                               //clear NAK bit
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = *(pEP1 + 1);      //holds how many valid bytes in the EP buffer
-            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2) {
+            if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > nTmp1 - 2)
+            {
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp = nTmp1 - 2;
             }
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].pEP2 += 2;                     //here starts user data
@@ -695,14 +750,18 @@ BOOL HidToBufferFromHost (BYTE intfNum)
         }
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0) {        //the Receive opereation is completed
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft == 0)          //the Receive opereation is completed
+    {
         HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer = NULL;                //no more receiving pending
-        if (wUsbEventMask & kUSB_receiveCompletedEvent) {
+        if (wUsbEventMask & kUSB_receiveCompletedEvent)
+        {
             bWakeUp = USBHID_handleReceiveCompleted(intfNum);
         }
 
-        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp) {                  //Is not read data still available in the EP?
-            if (wUsbEventMask & kUSB_dataReceivedEvent) {
+        if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp)                    //Is not read data still available in the EP?
+        {
+            if (wUsbEventMask & kUSB_dataReceivedEvent)
+            {
                 bWakeUp = USBHID_handleDataReceived(intfNum);
             }
         }
@@ -732,7 +791,8 @@ BYTE USBHID_abortReceive (WORD* size, BYTE intfNum)
     *size = 0;                                                                  //set received bytes count to 0
 
     //is receive operation underway?
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer) {
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer)
+    {
         //how many bytes are already received?
         *size = HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceive -
                 HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceiveLeft;
@@ -762,20 +822,23 @@ BYTE USBHID_rejectData (BYTE intfNum)
     //interrupts disable
 
     //do not access USB memory if suspended (PLL off). It may produce BUS_ERROR
-    if (bFunctionSuspended) {
+    if (bFunctionSuspended)
+    {
         usbRestoreOutEndpointInterrupt(state);
         return (kUSBHID_busNotAvailable);
     }
 
     //Is receive operation underway?
     //- do not flush buffers if any operation still active.
-    if (!HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer) {
+    if (!HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer)
+    {
         BYTE tmp1 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX &
                     EPBCNT_NAK;
         BYTE tmp2 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY &
                     EPBCNT_NAK;
 
-        if (tmp1 ^ tmp2) {                                                      //switch current buffer if any and only ONE of the
+        if (tmp1 ^ tmp2)                                                        //switch current buffer if any and only ONE of the
+        {
             //buffers is full
             //switch current buffer
             HidReadCtrl[INTFNUM_OFFSET(intfNum)].bCurrentBufferXY =
@@ -823,34 +886,40 @@ BYTE USBHID_intfStatus (BYTE intfNum, WORD* bytesSent, WORD* bytesReceived)
     stateOut = usbDisableOutEndpointInterrupt(edbIndex);
 
     //Is send operation underway?
-    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft != 0) {
+    if (HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft != 0)
+    {
         ret |= kUSBHID_waitingForSend;
         *bytesSent = HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSend -
                      HidWriteCtrl[INTFNUM_OFFSET(intfNum)].nHidBytesToSendLeft;
     }
 
     //Is receive operation underway?
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL) {
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].pUserBuffer != NULL)
+    {
         ret |= kUSBHID_waitingForReceive;
         *bytesReceived = HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesToReceive -
                          HidReadCtrl[INTFNUM_OFFSET(intfNum)].
                          nBytesToReceiveLeft;
     }
-    else {                                                                      //not receive operation started
+    else                                                                        //not receive operation started
+    {
         //do not access USB memory if suspended (PLL off).
         //It may produce BUS_ERROR
-        if (!bFunctionSuspended) {
+        if (!bFunctionSuspended)
+        {
             if ((tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX &
-                 EPBCNT_NAK)  |                                                 //any of buffers has a valid data packet
-                (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY &
-                 EPBCNT_NAK)) {
+                    EPBCNT_NAK)  |                                                 //any of buffers has a valid data packet
+                    (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY &
+                     EPBCNT_NAK))
+            {
                 ret |= kUSBHID_dataWaiting;
             }
         }
     }
 
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         //if suspended or not enumerated  - report no other tasks pending
         ret = kUSBHID_busNotAvailable;
     }
@@ -880,41 +949,52 @@ BYTE USBHID_bytesInUSBBuffer (BYTE intfNum)
     state = usbDisableOutEndpointInterrupt(edbIndex);
 
     if ((bFunctionSuspended) ||
-        (bEnumerationStatus != ENUMERATION_COMPLETE)) {
+            (bEnumerationStatus != ENUMERATION_COMPLETE))
+    {
         //if suspended or not enumerated - report 0 bytes available
         usbRestoreOutEndpointInterrupt(state);
         return (0);
     }
 
-    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0) {                  //If a RX operation is underway, part of data may
+    if (HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp > 0)                    //If a RX operation is underway, part of data may
+    {
         //was read of the OEP buffer
         bTmp1 = HidReadCtrl[INTFNUM_OFFSET(intfNum)].nBytesInEp;
-        if (*HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & EPBCNT_NAK) {          //the next buffer has a valid data packet
+        if (*HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & EPBCNT_NAK)            //the next buffer has a valid data packet
+        {
             bTmp2 = *(HidReadCtrl[INTFNUM_OFFSET(intfNum)].pEP2 + 1);           //holds how many valid bytes in the EP buffer
             if (bTmp2 >
-                (*HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & 0x7F) - 2) {      //check if all data received correctly
+                    (*HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & 0x7F) - 2)        //check if all data received correctly
+            {
                 bTmp1 +=
                     (*HidReadCtrl[INTFNUM_OFFSET(intfNum)].pCT2 & 0x7F) - 2;
             }
-            else {
+            else
+            {
                 bTmp1 += bTmp2;
             }
         }
     }
-    else {
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK) {    //this buffer has a valid data packet
+    else
+    {
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & EPBCNT_NAK)      //this buffer has a valid data packet
+        {
             bTmp2 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTX & 0x7F;
             bTmp1 = *((BYTE*)stUsbHandle[intfNum].oep_X_Buffer + 1);
-            if (bTmp2 - 2 < bTmp1) {                                            //check if the count (second byte) is valid
+            if (bTmp2 - 2 < bTmp1)                                              //check if the count (second byte) is valid
+            {
                 bTmp1 = bTmp2 - 2;
             }
         }
-        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK) {    //this buffer has a valid data packet
+        if (tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & EPBCNT_NAK)      //this buffer has a valid data packet
+        {
             bTmp2 = tOutputEndPointDescriptorBlock[edbIndex].bEPBCTY & 0x7F;
-            if (bTmp2 - 2 > *((BYTE*)stUsbHandle[intfNum].oep_Y_Buffer + 1)) {  //check if the count (second byte) is valid
+            if (bTmp2 - 2 > *((BYTE*)stUsbHandle[intfNum].oep_Y_Buffer + 1))    //check if the count (second byte) is valid
+            {
                 bTmp1 += *((BYTE*)stUsbHandle[intfNum].oep_Y_Buffer + 1);
             }
-            else {
+            else
+            {
                 bTmp1 += bTmp2 - 2;
             }
         }

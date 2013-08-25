@@ -58,7 +58,8 @@
 static timer_t *tmr_first;
 static uint16_t prev_tr = 0;
 
-typedef struct {
+typedef struct
+{
     void *ev_data;
     void (*fptr)(void*);
 } timer_EventData_t;
@@ -83,14 +84,17 @@ static uint32_t RefreshTimers(uint16_t current_tr)
     timer_t *tmr_prev;
 
     // Loop through all timers in the list
-    if (tmr_first) {
+    if (tmr_first)
+    {
         ticks_elapsed = current_tr - prev_tr;
         prev_tr = current_tr;
         tmr = tmr_first;
         tmr_prev = NULL;
 
-        while (1) {
-            if (tmr->ticks_remaining <= ticks_elapsed) {
+        while (1)
+        {
+            if (tmr->ticks_remaining <= ticks_elapsed)
+            {
                 // Timer has expired
                 timer_EventData_t dat;
 
@@ -100,21 +104,26 @@ static uint32_t RefreshTimers(uint16_t current_tr)
                 // Push event
                 event_PushEvent(timer_event_wrapper, &dat, sizeof(dat));
 
-                if (tmr->ticks_reload) {
+                if (tmr->ticks_reload)
+                {
                     // Timer repeats. Reload it
                     tmr->ticks_remaining = tmr->ticks_reload;
-                    if ((tmr->ticks_remaining < ticks_min) || (tmr->ticks_remaining == 0)) {
+                    if ((tmr->ticks_remaining < ticks_min) || (tmr->ticks_remaining == 0))
+                    {
                         ticks_min = tmr->ticks_remaining;
                     }
                 }
-                else {
+                else
+                {
                     // Does not repeat
 
                     // remove timer from list
-                    if (tmr_prev) {
+                    if (tmr_prev)
+                    {
                         tmr_prev->next = tmr->next;
                     }
-                    else {
+                    else
+                    {
                         // removing first in list
                         tmr_first = tmr_first->next;
                     }
@@ -122,20 +131,24 @@ static uint32_t RefreshTimers(uint16_t current_tr)
                 }
 
             }
-            else {
+            else
+            {
                 // Not expired. Deduct ticks
                 tmr->ticks_remaining -= ticks_elapsed;
-                if ((tmr->ticks_remaining < ticks_min) || (tmr->ticks_remaining == 0)) {
+                if ((tmr->ticks_remaining < ticks_min) || (tmr->ticks_remaining == 0))
+                {
                     ticks_min = tmr->ticks_remaining;
                 }
             }
 
             // goto next (if exists)
-            if (tmr->next) {
+            if (tmr->next)
+            {
                 tmr_prev = tmr;
                 tmr = tmr->next;
             }
-            else {
+            else
+            {
                 break;
             }
         }
@@ -149,30 +162,36 @@ ISR(TMR_TIMER_ISR_VECTOR)
 {
     uint32_t ticks_min;
 
-    while (1) {
+    while (1)
+    {
         ticks_min = RefreshTimers(TMR_TCCR0);
 
-        if (ticks_min == 0xFFFFFFFFL) {
+        if (ticks_min == 0xFFFFFFFFL)
+        {
             // no timers active. Disable interrupt
             TMR_TCCTL0 &= ~CCIE;
             return;
         }
-        else if (ticks_min < 0x10000) {
+        else if (ticks_min < 0x10000)
+        {
 
             // Get new TR value to see how far it moved since the start of the ISR
             uint16_t current_tr;
-            do {
+            do
+            {
                 current_tr = TMR_TR;
             }
             while (current_tr != TMR_TR);
 
-            if ((current_tr - (uint16_t)TMR_TCCR0 + 1) >= ((uint16_t)ticks_min)) {
+            if ((current_tr - (uint16_t)TMR_TCCR0 + 1) >= ((uint16_t)ticks_min))
+            {
                 // Counter overran the next scheduled interrupt.
                 // re-run the ISR.
                 TMR_TCCR0 += ticks_min;
                 continue;
             }
-            else {
+            else
+            {
                 // No overrun occurred
                 TMR_TCCR0 += ticks_min;
                 return;
@@ -212,7 +231,8 @@ void timer_start(timer_t *timerid, struct timerctl *settings)
     // If the timer is already running, stop it.
     timer_stop(timerid);
 
-    if (settings) {
+    if (settings)
+    {
         // New timer settings.
 
         if (settings->interval_ms < TMR_INTERVAL_MIN) return;
@@ -224,10 +244,12 @@ void timer_start(timer_t *timerid, struct timerctl *settings)
         timerid->ticks_remaining *= TMR_FCLKDIV;
         timerid->ticks_remaining /= 1000;
 
-        if (settings->repeat) {
+        if (settings->repeat)
+        {
             timerid->ticks_reload = timerid->ticks_remaining;
         }
-        else {
+        else
+        {
             timerid->ticks_reload = 0;
         }
 
@@ -235,7 +257,8 @@ void timer_start(timer_t *timerid, struct timerctl *settings)
         timerid->ev_data = settings->ev_data;
     }
 
-    if ((timerid->ticks_remaining == 0) && (timerid->ticks_reload == 0)) {
+    if ((timerid->ticks_remaining == 0) && (timerid->ticks_reload == 0))
+    {
         return;
     }
 
@@ -244,7 +267,8 @@ void timer_start(timer_t *timerid, struct timerctl *settings)
 
     // Get the current TR value (TR must read the same value twice in a row.)
     uint16_t current_tr;
-    do {
+    do
+    {
         current_tr = TMR_TR;
     }
     while (current_tr != TMR_TR);
@@ -257,18 +281,22 @@ void timer_start(timer_t *timerid, struct timerctl *settings)
     timerid->next = tmr_first;
     tmr_first = timerid;
 
-    if ((timerid->ticks_remaining < ticks_min) || (ticks_min == 0)) {
+    if ((timerid->ticks_remaining < ticks_min) || (ticks_min == 0))
+    {
         ticks_min = timerid->ticks_remaining;
     }
 
-    if (ticks_min == 0xFFFFFFFFL) {
+    if (ticks_min == 0xFFFFFFFFL)
+    {
         // no timers active. Leave interrupt disabled
         return;
     }
-    else if (ticks_min < 0x10000) {
+    else if (ticks_min < 0x10000)
+    {
         TMR_TCCR0 = current_tr + ticks_min;
     }
-    else {
+    else
+    {
         TMR_TCCR0 = current_tr;
     }
 
@@ -282,15 +310,18 @@ void timer_stop(timer_t *timerid)
     timer_t *tmr;
     timer_t *tmr_prev;
 
-    if (timerid && tmr_first) {
+    if (timerid && tmr_first)
+    {
 
         // Find the timer in the list
         tmr = tmr_first;
         tmr_prev = NULL;
 
-        while (1) {
+        while (1)
+        {
 
-            if (tmr == timerid) {
+            if (tmr == timerid)
+            {
                 // Found it
 
                 uint16_t current_tr;
@@ -299,27 +330,32 @@ void timer_stop(timer_t *timerid)
                 // Update the timer ticks just so it can be validly resumed...
 
                 // Get the current TR value (TR must read the same value twice in a row.)
-                do {
+                do
+                {
                     current_tr = TMR_TR;
                 }
                 while (current_tr != TMR_TR);
 
                 ticks_elapsed = current_tr - prev_tr;
 
-                if (timerid->ticks_remaining <= ticks_elapsed) {
+                if (timerid->ticks_remaining <= ticks_elapsed)
+                {
                     // expired timer
                     timerid->ticks_remaining = timerid->ticks_reload;
                 }
-                else {
+                else
+                {
                     // Not expired. Deduct ticks
                     tmr->ticks_remaining -= ticks_elapsed;
                 }
 
                 // remove timer from list
-                if (tmr_prev) {
+                if (tmr_prev)
+                {
                     tmr_prev->next = tmr->next;
                 }
-                else {
+                else
+                {
                     // removing first in list
                     tmr_first = tmr_first->next;
                 }
@@ -328,11 +364,13 @@ void timer_stop(timer_t *timerid)
             }
 
             // goto next (if exists)
-            if (tmr->next) {
+            if (tmr->next)
+            {
                 tmr_prev = tmr;
                 tmr = tmr->next;
             }
-            else {
+            else
+            {
                 break;
             }
         }

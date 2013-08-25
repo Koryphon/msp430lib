@@ -52,7 +52,8 @@ extern "C" {
 
 #include <stdint.h>
 
-    typedef struct {
+    typedef struct
+    {
         char* strCommand;
         int (* cmdptr)(uint16_t argc, char *argv[]);
     } cmdentry_t;

@@ -55,7 +55,8 @@
 #include "i2c_internal.h"
 
 //--------------------------------------------------------------------------------------------------
-typedef enum {
+typedef enum
+{
     SM_SEND_ADDR,
     SM_WRITE_DATA,
     SM_SEND_RESTART,
@@ -63,7 +64,8 @@ typedef enum {
     SM_DONE
 } i2c_state_t;
 
-static struct {
+static struct
+{
     i2c_package_t    *pkg;
     uint16_t         idx;
     void (*callback)(i2c_status_t result);
@@ -74,89 +76,96 @@ static struct {
 //--------------------------------------------------------------------------------------------------
 ISR(I2C_ISR_VECTOR)
 {
-    if (I2C_IV == USCI_I2C_UCNACKIFG) {
+    if (I2C_IV == USCI_I2C_UCNACKIFG)
+    {
         I2C_IFG = 0;
         I2C_IE = 0;
         transfer.status = I2C_FAILED;
         I2C_CTL1 |= UCTXSTP; // set stop condition
-        if (transfer.callback) {
+        if (transfer.callback)
+        {
             transfer.callback(I2C_FAILED);
         }
-
         return;
     }
 
     I2C_IFG = 0;
 
-    switch (transfer.next_state) {
-    case SM_SEND_ADDR: // (TX Register address)
-        // arrive here once STT has begun. Safe to write to TXBUF
-
+    switch (transfer.next_state)
+    {
+    case SM_SEND_ADDR: // (TX Register address) // arrive here once STT has begun. Safe to write to TXBUF
         I2C_TXBUF = transfer.pkg->addr[transfer.idx];
         transfer.idx++;
-        if (transfer.idx == transfer.pkg->addr_len) {
-            // that was the last address byte.
-
-            // update next state
-            if (transfer.pkg->data_len != 0) {
+        if (transfer.idx == transfer.pkg->addr_len) // that was the last address byte.
+        {
+            if (transfer.pkg->data_len != 0)
+            {
                 transfer.idx = 0;
-                if (transfer.pkg->read) {
+                if (transfer.pkg->read)
+                {
                     transfer.next_state = SM_SEND_RESTART;
                 }
-                else {
+                else
+                {
                     transfer.next_state = SM_WRITE_DATA;
                 }
             }
-            else {
+            else
+            {
                 transfer.next_state = SM_DONE;
             }
         }
         break;
+
     case SM_WRITE_DATA:
         I2C_TXBUF = transfer.pkg->data[transfer.idx];
         transfer.idx++;
-        if (transfer.idx == transfer.pkg->data_len) {
-            // that was the last data byte to send.
-
-            // update next state
+        if (transfer.idx == transfer.pkg->data_len) // that was the last data byte to send.
+        {
             transfer.next_state = SM_DONE;
         }
-
         break;
-    case SM_SEND_RESTART:
-        I2C_CTL1 &= ~UCTR;    // Set to receiver mode
-        I2C_CTL1 |= UCTXSTT; // write (re)start condition
 
-        if (transfer.pkg->data_len == 1) {
+    case SM_SEND_RESTART:
+        I2C_CTL1 &= ~UCTR;      // Set to receiver mode
+        I2C_CTL1 |= UCTXSTT;    // write (re)start condition
+
+        if (transfer.pkg->data_len == 1)
+        {
             // wait for STT bit to drop
             while (I2C_CTL1 & UCTXSTT);
             I2C_CTL1 |= UCTXSTP; // schedule stop condition
         }
-        // update next state
         transfer.next_state = SM_READ_DATA;
         break;
+
     case SM_READ_DATA:
         transfer.pkg->data[transfer.idx] = I2C_RXBUF;
         transfer.idx++;
-        if (transfer.idx == transfer.pkg->data_len - 1) {
+        if (transfer.idx == transfer.pkg->data_len - 1)
+        {
             // next incoming byte is the last one.
             I2C_CTL1 |= UCTXSTP; // schedule stop condition
             break;
         }
-        else if (transfer.idx < transfer.pkg->data_len) {
+        else if (transfer.idx < transfer.pkg->data_len)
+        {
             // still more to recv.
             break;
         }
         // otherwise, that was the last data byte to recv.
         // fall through
+
     case SM_DONE:
         I2C_IE = 0;
-        if (transfer.pkg->read == false) {
+        if (transfer.pkg->read == false)
+        {
             // If finished a write, schedule a stop condition
             I2C_CTL1 |= UCTXSTP;
         }
         transfer.status = I2C_IDLE;
-        if (transfer.callback) {
+        if (transfer.callback)
+        {
             transfer.callback(I2C_IDLE);
         }
         break;
@@ -196,18 +205,23 @@ void i2c_transfer_start(i2c_package_t *pkg, void (*callback)(i2c_status_t result
     transfer.status = I2C_BUSY;
 
     // update next state
-    if (pkg->addr_len != 0) {
+    if (pkg->addr_len != 0)
+    {
         transfer.next_state = SM_SEND_ADDR;
     }
-    else if (pkg->data_len != 0) {
-        if (pkg->read) {
+    else if (pkg->data_len != 0)
+    {
+        if (pkg->read)
+        {
             transfer.next_state = SM_SEND_RESTART;
         }
-        else {
+        else
+        {
             transfer.next_state = SM_WRITE_DATA;
         }
     }
-    else {
+    else
+    {
         transfer.next_state = SM_DONE;
     }
 
@@ -224,7 +238,8 @@ i2c_status_t i2c_transfer_status(void)
 {
     i2c_status_t status;
 
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
         status = transfer.status;
     }
 

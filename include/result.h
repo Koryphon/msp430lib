@@ -12,7 +12,8 @@
 #ifndef RESULT_H_
 #define RESULT_H_
 
-typedef enum {
+typedef enum
+{
     RES_OK,            ///< Function executed successfully
     RES_FAIL,        ///< Function failed to execute properly
     RES_INVALID,    ///< Parameters returned are not valid

@@ -66,12 +66,15 @@ static uint16_t FindUnusedBlock(void)
     block = FS.BlockSearchStart;
     startingblock = block;
 
-    do {
+    do
+    {
         block++;
 
-        if (block == flashSPAN.BlockCount) {
+        if (block == flashSPAN.BlockCount)
+        {
             block = 1; // wrap to beginning. Block 0 is always used so skip it.
-            if (startingblock == 0) {
+            if (startingblock == 0)
+            {
                 return(0); // wrapped on initial block search
             }
         }
@@ -79,12 +82,15 @@ static uint16_t FindUnusedBlock(void)
         // read the next block header
         flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE + offsetof(FFS_BHDR_t, H.status), &status, sizeof(status));
 
-        if (block == startingblock) {
+        if (block == startingblock)
+        {
             // Has scanned all the blocks
-            if (status == FFS_B_UNUSED) {
+            if (status == FFS_B_UNUSED)
+            {
                 return(block);
             }
-            else {
+            else
+            {
                 return(0);
             }
         }
@@ -113,7 +119,8 @@ static void WR_SeekToEOF(FFS_FILE_t* FILE)
     block = FILE->startblock;
     flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
 
-    while (BHDR.H.status == FFS_B_JUMP) { // loop while there exists a next block
+    while (BHDR.H.status == FFS_B_JUMP)   // loop while there exists a next block
+    {
         block = BHDR.H.jump;
         flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
     }
@@ -122,10 +129,12 @@ static void WR_SeekToEOF(FFS_FILE_t* FILE)
     block_addr = ((uint32_t)block) * FLASH_BLOCKSIZE;
     addr = block_addr + sizeof(BHDR);
 
-    while (addr - block_addr <= FLASH_BLOCKSIZE - (sizeof(CHDR) + 1)) {
+    while (addr - block_addr <= FLASH_BLOCKSIZE - (sizeof(CHDR) + 1))
+    {
         // while inside the current block
         flashSPAN_Read(addr, (uint8_t*)&CHDR, sizeof(CHDR));
-        if (CHDR.nBytes == FFS_UNINIT8) {
+        if (CHDR.nBytes == FFS_UNINIT8)
+        {
             // reached a writeable location in the block
             FILE->hw_addr = addr;
             FILE->virt_addr = virt_addr;
@@ -156,22 +165,28 @@ static RES_t LookupFile(FFS_FTE_INFO_t *FTEI, char *filename)
 
 
     block = 0; // FT always starts at block 0
-    do {
+    do
+    {
         // check each entry in the FT Block
-        for (entry = 0; entry < FFS_FTENTRIESPERBLOCK; entry++) {
+        for (entry = 0; entry < FFS_FTENTRIESPERBLOCK; entry++)
+        {
             FTEI->fteAddr = FFS_ENTRYADDR(block, entry);
             flashSPAN_Read(FTEI->fteAddr, (uint8_t*)&FTEI->FTE, sizeof(FFS_FTE_t)); // read FTE
-            if (FTEI->FTE.startblock == FFS_NULL16) {
+            if (FTEI->FTE.startblock == FFS_NULL16)
+            {
                 // entry marked for deletion. Skip it
             }
-            else if (FTEI->FTE.startblock == FFS_UNINIT16) {
+            else if (FTEI->FTE.startblock == FFS_UNINIT16)
+            {
                 // entry is unused
                 // reached end of FT entries.
                 return(RES_NOTFOUND);
             }
-            else {
+            else
+            {
                 // Valid File
-                if (strcmp(filename, FTEI->FTE.filename) == 0) {
+                if (strcmp(filename, FTEI->FTE.filename) == 0)
+                {
                     // found a match
                     return(RES_OK);
                 }
@@ -198,13 +213,15 @@ RES_t ffs_init(void)
     // If not, erase all devices and write a FT header
     uint8_t status;
 
-    if (flashSPAN_Init() != RES_OK) {
+    if (flashSPAN_Init() != RES_OK)
+    {
         return(RES_FAIL);
     }
 
     // check for FT
     flashSPAN_Read(offsetof(FFS_BHDR_t, H.status), &status, sizeof(status));
-    if (!FFS_TST_FT(status)) { // if it is not marked as an FT
+    if (!FFS_TST_FT(status))   // if it is not marked as an FT
+    {
         // Bad FT, erase all and make one.
         flashSPAN_EraseAll();
         status = FFS_B_FT_EOF;
@@ -240,42 +257,50 @@ RES_t ffs_cleanupFT(void)
     newblock = 0;
     flashSPAN_Read(0, (uint8_t*)&SBHDR, sizeof(SBHDR));
 
-    while (1) {
+    while (1)
+    {
         // loop for each new block
         newentry = 0;
 
-        while (newentry < FFS_FTENTRIESPERBLOCK) {
+        while (newentry < FFS_FTENTRIESPERBLOCK)
+        {
             //seek through old entries until enough are gathered for a new block
             flashSPAN_Read(FFS_ENTRYADDR(oldblock, oldentry), (uint8_t*)&FTEBuf[newentry], sizeof(FFS_FTE_t));
-            if (FTEBuf[newentry].startblock == FFS_NULL16) {
+            if (FTEBuf[newentry].startblock == FFS_NULL16)
+            {
                 // FTE is marked for delete. Skip
                 oldentry++;
             }
-            else if (FTEBuf[newentry].startblock == FFS_UNINIT16) {
+            else if (FTEBuf[newentry].startblock == FFS_UNINIT16)
+            {
                 // Reached end of old FTEs
                 // erase the current block
                 flashSPAN_EraseBlock(oldblock);
                 oldentry = FFS_FTENTRIESPERBLOCK; // mark as done
                 break;
             }
-            else {
+            else
+            {
                 // Valid FTE.
                 oldentry++;
                 newentry++;
             }
 
 
-            if (oldentry == FFS_FTENTRIESPERBLOCK) {
+            if (oldentry == FFS_FTENTRIESPERBLOCK)
+            {
                 // Reached end of old block.
                 // Erase it
                 flashSPAN_EraseBlock(oldblock);
-                if (SBHDR.status == FFS_B_FT_JUMP) {
+                if (SBHDR.status == FFS_B_FT_JUMP)
+                {
                     //jump to next
                     oldblock = SBHDR.jump;
                     flashSPAN_Read(((uint32_t)oldblock) * FLASH_BLOCKSIZE, (uint8_t*)&SBHDR, sizeof(FFS_SHORT_BHDR_t));
                     oldentry = 0;
                 }
-                else {
+                else
+                {
                     // No more jumps, reached end of old FTEs
                     oldentry = FFS_FTENTRIESPERBLOCK; // mark as done
                     break;
@@ -284,7 +309,8 @@ RES_t ffs_cleanupFT(void)
         }
 
         // Write copied entries to a new block
-        if ((newblock == 0) && (prevnewblock == 0)) { // detect initial condition
+        if ((newblock == 0) && (prevnewblock == 0))   // detect initial condition
+        {
             // first newblock
             // reserve the current new block
             newSBHDR.status = FFS_B_FT_EOF;
@@ -294,10 +320,12 @@ RES_t ffs_cleanupFT(void)
             flashSPAN_Write(sizeof(FFS_SHORT_BHDR_t), (uint8_t*)FTEBuf, newentry * sizeof(FFS_FTE_t));
             prevnewblock = 1; // unset initial condition
         }
-        else {
+        else
+        {
             prevnewblock = newblock;
             newblock = FindUnusedBlock();
-            if (newblock == 0) {
+            if (newblock == 0)
+            {
                 // SHOULD NEVER HAPPEN. FATAL ERROR
                 newblock = 0;
             }
@@ -317,7 +345,8 @@ RES_t ffs_cleanupFT(void)
         }
 
         // if hit the end of the old FTEs
-        if (oldentry == FFS_FTENTRIESPERBLOCK) {
+        if (oldentry == FFS_FTENTRIESPERBLOCK)
+        {
             return(RES_OK);
         }
     }
@@ -339,22 +368,27 @@ uint16_t ffs_countGarbageFTE(void)
     uint16_t garbagecount = 0;
 
     block = 0; // FT always starts at block 0
-    do {
+    do
+    {
         // check each entry in the FT Block
-        for (entry = 0; entry < FFS_FTENTRIESPERBLOCK; entry++) {
+        for (entry = 0; entry < FFS_FTENTRIESPERBLOCK; entry++)
+        {
 
             // read FTE's startblock
             flashSPAN_Read(FFS_ENTRYADDR(block, entry), (uint8_t*)&startblock, sizeof(startblock));
-            if (startblock == FFS_NULL16) {
+            if (startblock == FFS_NULL16)
+            {
                 // entry marked for deletion.
                 garbagecount++;
             }
-            else if (startblock == FFS_UNINIT16) {
+            else if (startblock == FFS_UNINIT16)
+            {
                 // entry is unused
                 // reached end of FT entries.
                 return(garbagecount);
             }
-            else {
+            else
+            {
                 // Valid File. Skip it.
             }
         }
@@ -377,11 +411,13 @@ uint16_t ffs_blocksFree(void)
     freecount = 1;
 
     firstblock = FindUnusedBlock();
-    if (firstblock == 0) {
+    if (firstblock == 0)
+    {
         return(0);
     }
 
-    while (FindUnusedBlock() != firstblock) {
+    while (FindUnusedBlock() != firstblock)
+    {
         freecount++;
     }
     FS.BlockSearchStart = firstblock - 1;
@@ -402,15 +438,18 @@ RES_t ffs_fopen(FFS_FILE_t* FILE, char *filename, FFS_FILEMODE_t filemode)
     FFS_BHDR_t BHDR;
     FFS_CHDR_t CHDR;
 
-    if (FILE == NULL) {
+    if (FILE == NULL)
+    {
         return(RES_PARAMERR);
     }
 
     result = LookupFile(&FTEI, filename);
 
-    switch (filemode) {
+    switch (filemode)
+    {
     case FFS_RD:
-        if (result == RES_OK) {
+        if (result == RES_OK)
+        {
             // file found. Populate FILE object pointing to beginning of file
 
             FILE->filemode = FFS_RD;
@@ -418,32 +457,38 @@ RES_t ffs_fopen(FFS_FILE_t* FILE, char *filename, FFS_FILEMODE_t filemode)
             FILE->virt_addr = 0;
             FILE->hw_addr = ((uint32_t)FTEI.FTE.startblock) * FLASH_BLOCKSIZE + sizeof(BHDR);
             flashSPAN_Read(FILE->hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-            if (CHDR.nBytes == FFS_UNINIT8) {
+            if (CHDR.nBytes == FFS_UNINIT8)
+            {
                 // empty file. mark as EOF
                 FILE->nBytes = 0;
             }
-            else {
+            else
+            {
                 FILE->nBytes = CHDR.nBytes - 1;
                 FILE->hw_addr += 1;
             }
         }
-        else {
+        else
+        {
             return(result); // pass on any error.
         }
         break;
     case FFS_WR_REPLACE: // if replace or append...
     case FFS_WR_APPEND:
-        if (result == RES_NOTFOUND) {
+        if (result == RES_NOTFOUND)
+        {
             // not found. Create a new file
             // FTEI holds the last entry searched. If it is empty, then write an entry there.
             // otherwise, find a new block for the FT and make a new entry there.
 
             fteBlock = FTEI.fteAddr / FLASH_BLOCKSIZE;
 
-            if (FTEI.FTE.startblock != FFS_UNINIT16) {
+            if (FTEI.FTE.startblock != FFS_UNINIT16)
+            {
                 // the FT must be expanded to another block
                 block = FindUnusedBlock();
-                if (block == 0) {
+                if (block == 0)
+                {
                     // could not find a new block
                     return(RES_FULL);
                 }
@@ -463,7 +508,8 @@ RES_t ffs_fopen(FFS_FILE_t* FILE, char *filename, FFS_FILEMODE_t filemode)
 
             // look for next empty block.
             block = FindUnusedBlock();
-            if (block == 0) {
+            if (block == 0)
+            {
                 // could not find a new block
                 return(RES_FULL);
             }
@@ -486,20 +532,24 @@ RES_t ffs_fopen(FFS_FILE_t* FILE, char *filename, FFS_FILEMODE_t filemode)
             FILE->virt_addr = 0;
             FILE->nBytes = 1;
         }
-        else if (result == RES_OK) {
+        else if (result == RES_OK)
+        {
             // File exists
-            if (filemode == FFS_WR_APPEND) {
+            if (filemode == FFS_WR_APPEND)
+            {
                 // Append mode. Seek to end
                 FILE->filemode = FFS_WR_APPEND;
                 FILE->startblock = FTEI.FTE.startblock;
                 WR_SeekToEOF(FILE);
             }
-            else {
+            else
+            {
                 // Replace mode. Delete data block chain
 
                 block = FTEI.FTE.startblock; // first block in chain
                 // erase all the file's blocks
-                do {
+                do
+                {
                     flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
                     flashSPAN_EraseBlock(block);
                     block = BHDR.H.jump;
@@ -520,7 +570,8 @@ RES_t ffs_fopen(FFS_FILE_t* FILE, char *filename, FFS_FILEMODE_t filemode)
                 FILE->nBytes = 1;
             }
         }
-        else {
+        else
+        {
             return(result); // pass on any error.
         }
         break;
@@ -535,16 +586,19 @@ RES_t ffs_fclose(FFS_FILE_t* FILE)
 {
     // Closes the FILE object
 
-    if (FILE == NULL) {
+    if (FILE == NULL)
+    {
         return(RES_PARAMERR);
     }
 
-    switch (FILE->filemode) {
+    switch (FILE->filemode)
+    {
     case FFS_RD: //RD - simply change FILE's filemode to CLOSED
         FILE->filemode = FFS_CLOSED;
         break;
     case FFS_WR_APPEND: //WR - perform a flush and then change filemode to closed
-        if (FILE->nBytes > sizeof(FFS_CHDR_t)) {
+        if (FILE->nBytes > sizeof(FFS_CHDR_t))
+        {
             ffs_fflush(FILE);
         }
         FILE->filemode = FFS_CLOSED;
@@ -571,7 +625,8 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     uint32_t hw_addr;
     uint8_t nBytes;
 
-    if (FILE->filemode != FFS_WR_APPEND) {
+    if (FILE->filemode != FFS_WR_APPEND)
+    {
         return(0);
     }
 
@@ -579,11 +634,13 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     hw_addr = FILE->hw_addr;
     nBytes = FILE->nBytes;
 
-    if (nBytes == 0) {
+    if (nBytes == 0)
+    {
         //Current block is full. Find new block
         // (hw_addr holds start addr of current block)
         block = FindUnusedBlock();
-        if (block == 0) {
+        if (block == 0)
+        {
             return(0);
         }
 
@@ -605,16 +662,20 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     // At this point, nBytes is definitely not 0 and hw_addr points to a valid location
     block = hw_addr / FLASH_BLOCKSIZE; // current block
     block_remaining = FLASH_BLOCKSIZE - ((hw_addr + nBytes) - ((uint32_t)block) * FLASH_BLOCKSIZE); // - sizeof(CHDR);
-    while (size > size_done) {
+    while (size > size_done)
+    {
 
         // what is the maximum I can write into this chunk?
-        if (size - size_done > (254 - nBytes)) {
+        if (size - size_done > (254 - nBytes))
+        {
             writelen = (254 - nBytes);
         }
-        else {
+        else
+        {
             writelen = size - size_done;
         }
-        if (writelen > block_remaining) {
+        if (writelen > block_remaining)
+        {
             writelen = block_remaining;
         }
 
@@ -625,7 +686,8 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
         data += writelen;
         block_remaining -= writelen;
 
-        if ((nBytes == 254) && (block_remaining > sizeof(CHDR))) {
+        if ((nBytes == 254) && (block_remaining > sizeof(CHDR)))
+        {
             // reached the end of the chunk but not the end of the block
 
             // Close this one and find the next one
@@ -634,14 +696,16 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
             nBytes = sizeof(CHDR);
             block_remaining -= sizeof(CHDR);
         }
-        else if (block_remaining <= sizeof(CHDR)) {
+        else if (block_remaining <= sizeof(CHDR))
+        {
             // reached the end of the block
 
             // close the chunk
             flashSPAN_Write(hw_addr, &nBytes, sizeof(nBytes));
 
 
-            if (size == size_done) {
+            if (size == size_done)
+            {
                 // Finished writing. Block is full
                 FILE->virt_addr = virt_addr;
                 FILE->hw_addr = ((uint32_t)block) * FLASH_BLOCKSIZE;
@@ -651,7 +715,8 @@ size_t ffs_fwrite( uint8_t *data, size_t size, FFS_FILE_t* FILE )
             // Still need to write. Find a new block
             hw_addr = ((uint32_t)block) * FLASH_BLOCKSIZE;
             block = FindUnusedBlock();
-            if (block == 0) {
+            if (block == 0)
+            {
                 FILE->virt_addr = virt_addr;
                 FILE->hw_addr = hw_addr;
                 FILE->nBytes = 0;
@@ -697,7 +762,8 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     uint32_t hw_addr;
     uint8_t nBytes;
 
-    if (FILE->filemode != FFS_RD) {
+    if (FILE->filemode != FFS_RD)
+    {
         return(0);
     }
 
@@ -705,19 +771,23 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     hw_addr = FILE->hw_addr;
     nBytes = FILE->nBytes;
 
-    if (nBytes == 0) {
+    if (nBytes == 0)
+    {
         // Previous read hit the EOF. Is it still the EOF?
-        if ((hw_addr % FLASH_BLOCKSIZE) == 0) {
+        if ((hw_addr % FLASH_BLOCKSIZE) == 0)
+        {
             // block was full. Has a jump been generated?
             flashSPAN_Read(hw_addr, (uint8_t*)&BHDR, sizeof(BHDR));
-            if (BHDR.H.status != FFS_B_JUMP) {
+            if (BHDR.H.status != FFS_B_JUMP)
+            {
                 return(0);
             }
             // follow jump and find next readable address
             hw_addr = ((uint32_t)BHDR.H.jump) * FLASH_BLOCKSIZE + sizeof(BHDR);
             flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
 
-            if (CHDR.nBytes == FFS_UNINIT8) {
+            if (CHDR.nBytes == FFS_UNINIT8)
+            {
                 // I just jumped to an empty block! wtf
                 // update file object so the work done is not wasted.
                 FILE->hw_addr = hw_addr;
@@ -729,10 +799,12 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
             nBytes = CHDR.nBytes - sizeof(CHDR);
 
         }
-        else {
+        else
+        {
             // Is there a next chunk?
             flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-            if (CHDR.nBytes == FFS_UNINIT8) {
+            if (CHDR.nBytes == FFS_UNINIT8)
+            {
                 // Nope. Still EOF
                 return(0);
             }
@@ -746,13 +818,16 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
     // At this point, nBytes is definitely not 0 and hw_addr points to a valid location
     block = hw_addr / FLASH_BLOCKSIZE; // current block
 
-    while (size > size_done) {
+    while (size > size_done)
+    {
 
         // what is the maximum I can read from this chunk?
-        if (size - size_done > nBytes) {
+        if (size - size_done > nBytes)
+        {
             readlen = nBytes;
         }
-        else {
+        else
+        {
             readlen = size - size_done;
         }
 
@@ -764,38 +839,46 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
         data += readlen;
 
 
-        if (nBytes == 0) {
+        if (nBytes == 0)
+        {
             // reached the end of the chunk. Find the next one
-            if (hw_addr - ((uint32_t)block * FLASH_BLOCKSIZE) <= FLASH_BLOCKSIZE - (sizeof(CHDR) + 1)) {
+            if (hw_addr - ((uint32_t)block * FLASH_BLOCKSIZE) <= FLASH_BLOCKSIZE - (sizeof(CHDR) + 1))
+            {
                 // Still in the block.
                 flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-                if (CHDR.nBytes == FFS_UNINIT8) {
+                if (CHDR.nBytes == FFS_UNINIT8)
+                {
                     // reached EOF
                     FILE->hw_addr = hw_addr;
                     FILE->nBytes = 0;
                     FILE->virt_addr = virt_addr;
                     return(size_done);
                 }
-                else {
+                else
+                {
                     // setup next chunk
                     hw_addr += sizeof(CHDR);
                     nBytes = CHDR.nBytes - sizeof(CHDR);
                 }
             }
-            else {
+            else
+            {
                 // Reached end of block
                 flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
-                if (BHDR.H.status == FFS_B_JUMP) {
+                if (BHDR.H.status == FFS_B_JUMP)
+                {
                     // follow jump and find next readable address
                     hw_addr = ((uint32_t)BHDR.H.jump) * FLASH_BLOCKSIZE + sizeof(BHDR);
                     flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-                    if (CHDR.nBytes != FFS_UNINIT8) {
+                    if (CHDR.nBytes != FFS_UNINIT8)
+                    {
                         // found a new chunk!
                         block = BHDR.H.jump;
                         hw_addr += sizeof(CHDR);
                         nBytes = CHDR.nBytes - sizeof(CHDR);
                     }
-                    else {
+                    else
+                    {
                         // I just jumped to an empty block! wtf!
                         FILE->hw_addr = hw_addr;
                         FILE->nBytes = 0;
@@ -803,7 +886,8 @@ size_t ffs_fread( uint8_t *data, size_t size, FFS_FILE_t* FILE )
                         return(size_done);
                     }
                 }
-                else {
+                else
+                {
                     // block is full.
                     FILE->hw_addr = ((uint32_t)block) * FLASH_BLOCKSIZE;
                     FILE->nBytes = 0;
@@ -831,7 +915,8 @@ RES_t ffs_fseek(FFS_FILE_t* FILE, uint32_t offset)
     FFS_CHDR_t CHDR;
 
 
-    if (FILE->filemode != FFS_RD) {
+    if (FILE->filemode != FFS_RD)
+    {
         return(RES_PARAMERR);
     }
 
@@ -839,26 +924,31 @@ RES_t ffs_fseek(FFS_FILE_t* FILE, uint32_t offset)
 
     // check if it is before the current block
     flashSPAN_Read((uint32_t)block * FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
-    if (BHDR.virt_addr > offset) {
+    if (BHDR.virt_addr > offset)
+    {
         // rewind to beginning
         block = FILE->startblock;
         flashSPAN_Read((uint32_t)block * FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
     }
 
     // seek to the containing block
-    while (1) {
-        if (BHDR.H.status != FFS_B_JUMP) {
+    while (1)
+    {
+        if (BHDR.H.status != FFS_B_JUMP)
+        {
             // reached EOF block
             virt_addr = BHDR.virt_addr;
             break;
         }
-        else {
+        else
+        {
             // follow jump
             prevblock = block;
             virt_addr = BHDR.virt_addr;
             block = BHDR.H.jump;
             flashSPAN_Read((uint32_t)block * FLASH_BLOCKSIZE, (uint8_t*)&BHDR, sizeof(BHDR));
-            if (BHDR.virt_addr > offset) {
+            if (BHDR.virt_addr > offset)
+            {
                 // overshot the offset
                 block = prevblock;
                 break;
@@ -869,12 +959,15 @@ RES_t ffs_fseek(FFS_FILE_t* FILE, uint32_t offset)
     // seek within block to the address
     hw_addr = ((uint32_t)block * FLASH_BLOCKSIZE) + sizeof(BHDR);
     flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-    while (1) {
-        if (virt_addr + (CHDR.nBytes - sizeof(CHDR)) <= offset) {
+    while (1)
+    {
+        if (virt_addr + (CHDR.nBytes - sizeof(CHDR)) <= offset)
+        {
             // next chunk
             hw_addr += CHDR.nBytes;
             virt_addr += CHDR.nBytes - sizeof(CHDR);
-            if (hw_addr - ((uint32_t)block * FLASH_BLOCKSIZE) > FLASH_BLOCKSIZE - (sizeof(CHDR) + 1)) {
+            if (hw_addr - ((uint32_t)block * FLASH_BLOCKSIZE) > FLASH_BLOCKSIZE - (sizeof(CHDR) + 1))
+            {
                 // reached end of block. EOF
                 FILE->hw_addr = (uint32_t)block * FLASH_BLOCKSIZE;
                 FILE->nBytes = 0;
@@ -882,7 +975,8 @@ RES_t ffs_fseek(FFS_FILE_t* FILE, uint32_t offset)
                 return(RES_END);
             }
             flashSPAN_Read(hw_addr, (uint8_t*)&CHDR, sizeof(CHDR));
-            if (CHDR.nBytes == FFS_UNINIT8) {
+            if (CHDR.nBytes == FFS_UNINIT8)
+            {
                 // Empty chunk. EOF
                 FILE->hw_addr = hw_addr;
                 FILE->nBytes = 0;
@@ -890,7 +984,8 @@ RES_t ffs_fseek(FFS_FILE_t* FILE, uint32_t offset)
                 return(RES_END);
             }
         }
-        else {
+        else
+        {
             // end is in this chunk
             virt_addr = offset - virt_addr;
             FILE->nBytes = CHDR.nBytes - virt_addr - sizeof(CHDR);
@@ -910,10 +1005,12 @@ uint32_t  ffs_ftell(FFS_FILE_t* FILE)
 int ffs_feof(FFS_FILE_t* FILE)
 {
     // returns boolean of whether or not read pointer is at EOF
-    if (FILE->filemode == FFS_RD) {
+    if (FILE->filemode == FFS_RD)
+    {
         return(!(FILE->nBytes));
     }
-    else {
+    else
+    {
         return(0);
     }
 }
@@ -924,7 +1021,8 @@ RES_t ffs_remove(char *filename)
     FFS_SHORT_BHDR_t SBHDR;
     uint16_t block;
 
-    if (LookupFile(&FTEI, filename) == RES_OK) {
+    if (LookupFile(&FTEI, filename) == RES_OK)
+    {
         block = FTEI.FTE.startblock; // first block in chain
 
         // Mark FTE as deleted
@@ -937,7 +1035,8 @@ RES_t ffs_remove(char *filename)
         flashSPAN_EraseBlock(block);    // delete first block
 
         // erase the rest of the file's blocks
-        while (SBHDR.status == FFS_B_JUMP) { // while there is another block to be jumped to:
+        while (SBHDR.status == FFS_B_JUMP)   // while there is another block to be jumped to:
+        {
             block = SBHDR.jump;
             flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&SBHDR, sizeof(SBHDR));
             flashSPAN_EraseBlock(block);
@@ -953,11 +1052,13 @@ RES_t ffs_fflush(FFS_FILE_t* FILE)
     uint32_t hw_addr;
     uint8_t nBytes;
 
-    if (FILE->filemode != FFS_WR_APPEND) {
+    if (FILE->filemode != FFS_WR_APPEND)
+    {
         return(RES_PARAMERR);
     }
 
-    if (FILE->nBytes > sizeof(FFS_CHDR_t)) {
+    if (FILE->nBytes > sizeof(FFS_CHDR_t))
+    {
         // data has been written to chunk
         hw_addr = FILE->hw_addr;
         nBytes = FILE->nBytes;
@@ -966,12 +1067,14 @@ RES_t ffs_fflush(FFS_FILE_t* FILE)
         flashSPAN_Write(hw_addr, &nBytes, sizeof(nBytes));
         hw_addr += nBytes;
 
-        if (hw_addr - chunk_addr > FLASH_BLOCKSIZE - sizeof(FFS_CHDR_t) - 1) {
+        if (hw_addr - chunk_addr > FLASH_BLOCKSIZE - sizeof(FFS_CHDR_t) - 1)
+        {
             // Block is full
             hw_addr = chunk_addr;
             nBytes = 0;
         }
-        else {
+        else
+        {
             nBytes = sizeof(FFS_CHDR_t);
         }
         FILE->hw_addr = hw_addr;
@@ -993,7 +1096,8 @@ RES_t ffs_getFile(char *filename)
     uint16_t entry, startentry;
     uint32_t fteAddr;
 
-    if (filename == NULL) {
+    if (filename == NULL)
+    {
         FS.GetFileCounter = 0;
         return(RES_OK);
     }
@@ -1001,9 +1105,11 @@ RES_t ffs_getFile(char *filename)
     counter = 0;
 
     // jump up to correct FT block
-    while (FS.GetFileCounter >= counter + FFS_FTENTRIESPERBLOCK) {
+    while (FS.GetFileCounter >= counter + FFS_FTENTRIESPERBLOCK)
+    {
         flashSPAN_Read(((uint32_t)block)*FLASH_BLOCKSIZE, (uint8_t*)&SBHDR, sizeof(SBHDR));
-        if (SBHDR.status != FFS_B_FT_JUMP) {
+        if (SBHDR.status != FFS_B_FT_JUMP)
+        {
             // cannot jump any further. Counter value is invalid
             FS.GetFileCounter = 0;
             return(RES_END);
@@ -1013,21 +1119,26 @@ RES_t ffs_getFile(char *filename)
     }
 
     startentry = FS.GetFileCounter % FFS_FTENTRIESPERBLOCK;
-    do {
+    do
+    {
         // check each entry in the FT Block
-        for (entry = startentry; entry < FFS_FTENTRIESPERBLOCK; entry++) {
+        for (entry = startentry; entry < FFS_FTENTRIESPERBLOCK; entry++)
+        {
             fteAddr = FFS_ENTRYADDR(block, entry);
             flashSPAN_Read(fteAddr, (uint8_t*)&FTE, sizeof(FTE)); // read FTE
-            if (FTE.startblock == FFS_NULL16) {
+            if (FTE.startblock == FFS_NULL16)
+            {
                 // entry marked for deletion. Skip it
             }
-            else if (FTE.startblock == FFS_UNINIT16) {
+            else if (FTE.startblock == FFS_UNINIT16)
+            {
                 // entry is unused
                 // reached end of FT entries.
                 FS.GetFileCounter = 0;
                 return(RES_END);
             }
-            else {
+            else
+            {
                 // Valid File
                 strcpy(filename, FTE.filename);
                 FS.GetFileCounter = counter + entry + 1;

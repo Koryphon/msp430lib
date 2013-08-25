@@ -105,7 +105,8 @@ void cothread_create(cothread_t *thread, int (*func) (void))
     // the stack. (thread becomes CurrentThread after the setjmp gets longjumped to)
     thread->func_start = func;
 
-    if (setjmp(thread->m_state.env)) {
+    if (setjmp(thread->m_state.env))
+    {
         // new context startup routine
 
         // kick-off the new thread
@@ -115,7 +116,8 @@ void cothread_create(cothread_t *thread, int (*func) (void))
         CurrentThread->m_state.valid = 0;
 
         // if co_exit is valid, switch to it
-        if (CurrentThread->co_exit) {
+        if (CurrentThread->co_exit)
+        {
 
             CurrentThread = CurrentThread->co_exit;
             longjmp(CurrentThread->m_state.env, 1);
@@ -153,7 +155,8 @@ int cothread_switch(cothread_t *dest_thread)
     if (!(dest_thread->m_state.valid)) return(-1); // dest_thread is not valid. Don't switch
 
     // save the current state
-    if (!setjmp(CurrentThread->m_state.env)) {
+    if (!setjmp(CurrentThread->m_state.env))
+    {
         // switch to the other thread
         CurrentThread = dest_thread;
         ThreadRetval = 0;
@@ -168,7 +171,8 @@ int cothread_switch(cothread_t *dest_thread)
 void cothread_exit(int retval)
 {
     // exit only if it has a valid exit destination
-    if (CurrentThread->co_exit) {
+    if (CurrentThread->co_exit)
+    {
         // Mark this thread as invalid
         CurrentThread->m_state.valid = 0;
 
@@ -197,7 +201,8 @@ void stackmon_init(stack_t *stack, size_t stack_size)
     stack_w = (void *)stack;
     stack_size = stack_size / sizeof(uint16_t);
 
-    for (i = 0; i < stack_size; i++) {
+    for (i = 0; i < stack_size; i++)
+    {
         stack_w[i] = lfsr;
         lfsr = lfsr16(lfsr);
     }
@@ -213,7 +218,8 @@ size_t stackmon_get_unused(stack_t *stack)
     stack_w = (void *)stack;
 
     i = 0;
-    while (lfsr == stack_w[i]) {
+    while (lfsr == stack_w[i])
+    {
         lfsr = lfsr16(lfsr);
         i++;
     }

@@ -37,7 +37,8 @@
 //==================================================================================================
 
 // Filesystem object
-typedef struct {
+typedef struct
+{
     uint16_t BlockSearchStart; // points to the block index where the blocksearch last left off
     uint16_t GetFileCounter; // contains the index of the FT entry to begin the next search at
 } FFS_FS_t;
@@ -47,7 +48,8 @@ typedef struct {
 //==================================================================================================
 
 // Chunk Header
-typedef struct {
+typedef struct
+{
     uint8_t nBytes; // number of bytes in current chunk (including header)
     // addr + nBytes = address of next chunk's header.
     // = 1: Invalid
@@ -56,13 +58,15 @@ typedef struct {
 
 //--------------------------------------------------------------------------------------------------
 // Block Header - (Also first sector in the block's header)
-typedef struct {
+typedef struct
+{
     uint8_t status; // status of the current block
     uint16_t jump; // index of next block. Only valid when status indicates a JUMP
 
 } FFS_SHORT_BHDR_t;
 
-typedef struct {
+typedef struct
+{
     FFS_SHORT_BHDR_t H;
     uint32_t virt_addr; // Virtual address at start of block. Speeds up seeks in large files.
     // EX: for first block, it would be 0. Otherwise, it holds the sum of
@@ -84,7 +88,8 @@ typedef struct {
 
 //--------------------------------------------------------------------------------------------------
 // File table entry (FTE)
-typedef struct {
+typedef struct
+{
     uint16_t startblock; // points to start block. if == FFS_NULL16: entry is marked for deletion
     char filename[FFS_FILENAME_LEN];
 } FFS_FTE_t;
@@ -93,7 +98,8 @@ typedef struct {
 
 //--------------------------------------------------------------------------------------------------
 // File Entry Info Object (Not used in actual flash. Used as a wrapper when accessing an FTE)
-typedef struct {
+typedef struct
+{
     FFS_FTE_t FTE; // actual file table entry
     uint32_t fteAddr; // hw address of file table entry
 } FFS_FTE_INFO_t;

@@ -71,8 +71,10 @@
 //==================================================================================================
 
 // blocking send/recv statuses
-static union {
-    struct {
+static union
+{
+    struct
+    {
         uint8_t        cdcSendComplete    : 1;
         uint8_t        cdcRecvComplete    : 1;
         uint8_t        hidSendComplete    : 1;
@@ -82,7 +84,8 @@ static union {
     uint8_t all;
 } usb_disable_event;
 
-typedef struct {
+typedef struct
+{
     uint8_t eventid;
     uint8_t intfNum;
 } EV_DATA_t;
@@ -226,7 +229,8 @@ uint8_t USBCDC_handleSendCompleted(uint8_t intfNum)
 {
     EV_DATA_t event_data;
 
-    if (usb_disable_event.flags.cdcSendComplete == 0) {
+    if (usb_disable_event.flags.cdcSendComplete == 0)
+    {
         event_data.eventid = USBEV_CDC_SENDCOMPLETE;
         event_data.intfNum = intfNum;
         event_PushEvent(ev_USB_InterfaceEvent, &event_data, sizeof(EV_DATA_t));
@@ -243,7 +247,8 @@ uint8_t USBCDC_handleReceiveCompleted(uint8_t intfNum)
 {
     EV_DATA_t event_data;
 
-    if (usb_disable_event.flags.cdcRecvComplete == 0) {
+    if (usb_disable_event.flags.cdcRecvComplete == 0)
+    {
         event_data.eventid = USBEV_CDC_RECVCOMPLETE;
         event_data.intfNum = intfNum;
         event_PushEvent(ev_USB_InterfaceEvent, &event_data, sizeof(EV_DATA_t));
@@ -300,7 +305,8 @@ uint8_t USBHID_handleSendCompleted(uint8_t intfNum)
 {
     EV_DATA_t event_data;
 
-    if (usb_disable_event.flags.hidSendComplete == 0) {
+    if (usb_disable_event.flags.hidSendComplete == 0)
+    {
         event_data.eventid = USBEV_HID_SENDCOMPLETE;
         event_data.intfNum = intfNum;
         event_PushEvent(ev_USB_InterfaceEvent, &event_data, sizeof(EV_DATA_t));
@@ -317,7 +323,8 @@ uint8_t USBHID_handleReceiveCompleted(uint8_t intfNum)
 {
     EV_DATA_t event_data;
 
-    if (usb_disable_event.flags.hidRecvComplete == 0) {
+    if (usb_disable_event.flags.hidRecvComplete == 0)
+    {
         event_data.eventid = USBEV_HID_RECVCOMPLETE;
         event_data.intfNum = intfNum;
         event_PushEvent(ev_USB_InterfaceEvent, &event_data, sizeof(EV_DATA_t));
@@ -400,7 +407,8 @@ RES_t USB_hidSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 
     usb_disable_event.flags.hidSendComplete = 1;
 
-    switch (USBHID_sendData(src, size, intfNum)) {
+    switch (USBHID_sendData(src, size, intfNum))
+    {
     case kUSBHID_sendStarted:
         break;
     case kUSBHID_intfBusyError:
@@ -410,18 +418,23 @@ RES_t USB_hidSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
     }
 
     // Operation successfully started.  Now wait til it's finished.
-    while (1) {
+    while (1)
+    {
         ret = USBHID_intfStatus(intfNum, &bytesSent, &bytesReceived);
-        if (ret & kUSBHID_busNotAvailable) { /* This may happen at any time */
+        if (ret & kUSBHID_busNotAvailable)   /* This may happen at any time */
+        {
             return RES_FAIL;
         }
-        if (ret & kUSBHID_waitingForSend) {
-            if (Timeout && (sendCounter++ >= Timeout)) { /* Incr counter & try again */
+        if (ret & kUSBHID_waitingForSend)
+        {
+            if (Timeout && (sendCounter++ >= Timeout))   /* Incr counter & try again */
+            {
                 USBHID_abortSend(&tmp, intfNum);
                 return RES_FAIL; /* Timed out */
             }
         }
-        else {
+        else
+        {
             usleep(1000);
             return RES_OK;    /* If neither busNotAvailable nor waitingForSend, it succeeded */
         }
@@ -432,7 +445,8 @@ RES_t USB_hidSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 RES_t USB_hidIsend(void* src, uint16_t size, uint8_t intfNum)
 {
     usb_disable_event.flags.hidSendComplete = 0;
-    switch (USBHID_sendData(src, size, intfNum)) {
+    switch (USBHID_sendData(src, size, intfNum))
+    {
     case kUSBHID_sendStarted:
         return RES_OK;
     case kUSBHID_intfBusyError:
@@ -451,14 +465,17 @@ uint16_t USB_hidRecvAvailable(void *dst, uint16_t maxSize, uint8_t intfNum)
     usb_disable_event.flags.hidRecvComplete = 1;
 
     rxCount = 0;
-    while ((bytesInBuf = USBHID_bytesInUSBBuffer(intfNum))) {
-        if ((rxCount + bytesInBuf) > maxSize) {
+    while ((bytesInBuf = USBHID_bytesInUSBBuffer(intfNum)))
+    {
+        if ((rxCount + bytesInBuf) > maxSize)
+        {
             bytesInBuf = maxSize - rxCount;
             USBHID_receiveData(currentPos, bytesInBuf, intfNum);
             rxCount += bytesInBuf;
             break;
         }
-        else {
+        else
+        {
             USBHID_receiveData(currentPos, bytesInBuf, intfNum);
             currentPos += bytesInBuf;
             rxCount += bytesInBuf;
@@ -477,7 +494,8 @@ RES_t USB_hidRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 
     usb_disable_event.flags.hidRecvComplete = 1;
 
-    switch (USBHID_receiveData(dst, size, intfNum)) {
+    switch (USBHID_receiveData(dst, size, intfNum))
+    {
     case kUSBHID_receiveStarted:
         break;
     case kUSBHID_receiveCompleted:
@@ -489,18 +507,23 @@ RES_t USB_hidRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
     }
 
     // Operation successfully started.  Now wait til it's finished.
-    while (1) {
+    while (1)
+    {
         ret = USBHID_intfStatus(intfNum, &bytesSent, &bytesReceived);
-        if (ret & kUSBHID_busNotAvailable) {              /* This may happen at any time */
+        if (ret & kUSBHID_busNotAvailable)                /* This may happen at any time */
+        {
             return RES_FAIL;
         }
-        if (ret & kUSBHID_waitingForReceive) {
-            if (Timeout && (recvCounter++ >= Timeout)) { /* Incr counter & try again */
+        if (ret & kUSBHID_waitingForReceive)
+        {
+            if (Timeout && (recvCounter++ >= Timeout))   /* Incr counter & try again */
+            {
                 USBHID_abortReceive(&tmp, intfNum);
                 return RES_FAIL ;    /* Timed out */
             }
         }
-        else {
+        else
+        {
             return RES_OK;    /* If neither busNotAvailable nor waitingForReceive, it succeeded */
         }
     }
@@ -510,7 +533,8 @@ RES_t USB_hidRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 RES_t USB_hidIrecv(void *dst, uint16_t size, uint8_t intfNum)
 {
     usb_disable_event.flags.hidRecvComplete = 0;
-    switch (USBHID_receiveData(dst, size, intfNum)) {
+    switch (USBHID_receiveData(dst, size, intfNum))
+    {
     case kUSBHID_receiveStarted:
     case kUSBHID_receiveCompleted:
         return RES_OK;
@@ -561,7 +585,8 @@ void USB_hidRejectData(uint8_t intfNum)
 //--------------------------------------------------------------------------------------------------
 RES_t USB_hidSendReport(void *reportData, uint8_t intfNum)
 {
-    switch (USBHID_sendReport(reportData, intfNum)) {
+    switch (USBHID_sendReport(reportData, intfNum))
+    {
     case kUSBHID_busNotAvailable:
         return(RES_FAIL);
     case kUSBHID_intfBusyError:
@@ -573,7 +598,8 @@ RES_t USB_hidSendReport(void *reportData, uint8_t intfNum)
 //--------------------------------------------------------------------------------------------------
 RES_t USB_hidRecvReport(void *reportData, uint8_t intfNum)
 {
-    switch (USBHID_receiveReport(reportData, intfNum)) {
+    switch (USBHID_receiveReport(reportData, intfNum))
+    {
     case kUSBHID_receiveCompleted:
         return(RES_OK);
     default:
@@ -598,7 +624,8 @@ RES_t USB_cdcSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 
     usb_disable_event.flags.cdcSendComplete = 1;
 
-    switch (USBCDC_sendData(src, size, intfNum)) {
+    switch (USBCDC_sendData(src, size, intfNum))
+    {
     case kUSBCDC_sendStarted:
         break;
     case kUSBCDC_intfBusyError:
@@ -608,18 +635,23 @@ RES_t USB_cdcSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
     }
 
     // Operation successfully started.  Now wait til it's finished.
-    while (1) {
+    while (1)
+    {
         ret = USBCDC_intfStatus(intfNum, &bytesSent, &bytesReceived);
-        if (ret & kUSBCDC_busNotAvailable) {              /* This may happen at any time */
+        if (ret & kUSBCDC_busNotAvailable)                /* This may happen at any time */
+        {
             return RES_FAIL;
         }
-        if (ret & kUSBCDC_waitingForSend) {
-            if (Timeout && (sendCounter++ >= Timeout)) { /* Incr counter & try again */
+        if (ret & kUSBCDC_waitingForSend)
+        {
+            if (Timeout && (sendCounter++ >= Timeout))   /* Incr counter & try again */
+            {
                 USBCDC_abortSend(&tmp, intfNum);
                 return RES_FAIL ;                                   /* Timed out */
             }
         }
-        else {
+        else
+        {
             usleep(1000);
             return RES_OK;    /* If neither busNotAvailable nor waitingForSend, it succeeded */
         }
@@ -630,7 +662,8 @@ RES_t USB_cdcSend(void* src, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 RES_t USB_cdcIsend(void* src, uint16_t size, uint8_t intfNum)
 {
     usb_disable_event.flags.cdcSendComplete = 0;
-    switch (USBCDC_sendData(src, size, intfNum)) {
+    switch (USBCDC_sendData(src, size, intfNum))
+    {
     case kUSBCDC_sendStarted:
         return RES_OK;
     case kUSBCDC_intfBusyError:
@@ -649,14 +682,17 @@ uint16_t USB_cdcRecvAvailable(void *dst, uint16_t maxSize, uint8_t intfNum)
     usb_disable_event.flags.cdcRecvComplete = 1;
 
     rxCount = 0;
-    while ((bytesInBuf = USBCDC_bytesInUSBBuffer(intfNum))) {
-        if ((rxCount + bytesInBuf) > maxSize) {
+    while ((bytesInBuf = USBCDC_bytesInUSBBuffer(intfNum)))
+    {
+        if ((rxCount + bytesInBuf) > maxSize)
+        {
             bytesInBuf = maxSize - rxCount;
             USBCDC_receiveData(currentPos, bytesInBuf, intfNum);
             rxCount += bytesInBuf;
             break;
         }
-        else {
+        else
+        {
             USBCDC_receiveData(currentPos, bytesInBuf, intfNum);
             currentPos += bytesInBuf;
             rxCount += bytesInBuf;
@@ -675,7 +711,8 @@ RES_t USB_cdcRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 
     usb_disable_event.flags.cdcRecvComplete = 1;
 
-    switch (USBCDC_receiveData(dst, size, intfNum)) {
+    switch (USBCDC_receiveData(dst, size, intfNum))
+    {
     case kUSBCDC_receiveStarted:
         break;
     case kUSBCDC_receiveCompleted:
@@ -687,18 +724,23 @@ RES_t USB_cdcRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
     }
 
     // Operation successfully started.  Now wait til it's finished.
-    while (1) {
+    while (1)
+    {
         ret = USBCDC_intfStatus(intfNum, &bytesSent, &bytesReceived);
-        if (ret & kUSBCDC_busNotAvailable) {              /* This may happen at any time */
+        if (ret & kUSBCDC_busNotAvailable)                /* This may happen at any time */
+        {
             return RES_FAIL;
         }
-        if (ret & kUSBCDC_waitingForReceive) {
-            if (Timeout && (recvCounter++ >= Timeout)) { /* Incr counter & try again */
+        if (ret & kUSBCDC_waitingForReceive)
+        {
+            if (Timeout && (recvCounter++ >= Timeout))   /* Incr counter & try again */
+            {
                 USBCDC_abortReceive(&tmp, intfNum);
                 return RES_FAIL ;                                   /* Timed out */
             }
         }
-        else {
+        else
+        {
             return RES_OK;    /* If neither busNotAvailable nor waitingForReceive, it succeeded */
         }
     }
@@ -708,7 +750,8 @@ RES_t USB_cdcRecv(void *dst, uint16_t size, uint8_t intfNum, uint32_t Timeout)
 RES_t USB_cdcIrecv(void *dst, uint16_t size, uint8_t intfNum)
 {
     usb_disable_event.flags.cdcRecvComplete = 0;
-    switch (USBCDC_receiveData(dst, size, intfNum)) {
+    switch (USBCDC_receiveData(dst, size, intfNum))
+    {
     case kUSBCDC_receiveStarted:
     case kUSBCDC_receiveCompleted:
         return RES_OK;

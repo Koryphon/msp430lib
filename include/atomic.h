@@ -79,10 +79,12 @@ static __inline__ void __iCliParam(const uint8_t *__s)
 
 static __inline__ void __iRestore(const uint8_t *__s)
 {
-    if ((*__s) & GIE) {
+    if ((*__s) & GIE)
+    {
         __enable_interrupt();
     }
-    else {
+    else
+    {
         __disable_interrupt();
     }
     __asm__ volatile ("" ::: "memory");

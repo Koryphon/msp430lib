@@ -130,13 +130,15 @@ extern "C" {
 
     typedef uintptr_t stack_t;
 
-    typedef struct {
+    typedef struct
+    {
         jmp_buf env;
         uint8_t valid;
     } m_state_t;
 
 
-    typedef struct cothread {
+    typedef struct cothread
+    {
         struct cothread    *co_exit; ///< Thread to switch to once the current thread exits
         stack_t *alt_stack; ///< Pointer to the base of an alternate stack.
         size_t alt_stack_size; ///< The size (in bytes) of the stack which 'alt_stack' points to.

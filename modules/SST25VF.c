@@ -59,7 +59,8 @@ static uint8_t CurrentDevice; // represents the current selected device
                             SST_CE_DEV4_BIT|SST_CE_DEV5_BIT|SST_CE_DEV6_BIT|SST_CE_DEV7_BIT)
 
 static uint8_t CE_Mask;
-static const uint8_t CE_MAP[] = {
+static const uint8_t CE_MAP[] =
+{
     SST_CE_DEV0_BIT,
     SST_CE_DEV1_BIT,
     SST_CE_DEV2_BIT,
@@ -153,7 +154,8 @@ uint16_t sst25vf_Init(void)
 
     // attempt to ID device
     id = sst25vf_RDID();
-    switch (id) {
+    switch (id)
+    {
     case SST25VF040_ID:
         break;
     case SST25VF080_ID:
@@ -213,7 +215,8 @@ void sst25vf_Read(uint32_t startAddr, uint8_t *data, uint16_t nBytes)
     sst_CE();
     spiSendByte(SST_RD);
     SendAddr(startAddr);
-    for (i = 0; i < nBytes; i++) {
+    for (i = 0; i < nBytes; i++)
+    {
         data[i] = spiGetByte();
     }
     sst_nCE();
@@ -223,7 +226,8 @@ void sst25vf_Read(uint32_t startAddr, uint8_t *data, uint16_t nBytes)
 void sst25vf_WriteSlow(uint32_t startAddr, const uint8_t *data, uint16_t nBytes)
 {
     uint16_t i;
-    for (i = 0; i < nBytes; i++) {
+    for (i = 0; i < nBytes; i++)
+    {
         sst25vf_WriteByte(startAddr + i, data[i]);
     }
 }
@@ -246,7 +250,8 @@ void sst25vf_Write(uint32_t startAddr, const uint8_t *data, uint16_t nBytes)
     uint16_t i;
 
     // If odd start address
-    if (startAddr & 0x01) {
+    if (startAddr & 0x01)
+    {
         // write 1 byte
         sst25vf_WriteByte(startAddr, data[0]);
         startAddr++;
@@ -254,19 +259,22 @@ void sst25vf_Write(uint32_t startAddr, const uint8_t *data, uint16_t nBytes)
         data++;
     }
 
-    if (nBytes == 0) {
+    if (nBytes == 0)
+    {
         return; // only one byte. End
     }
 
     i = 0;
     // Write pairs of bytes aligned to even addresses (AAI)
-    if (nBytes >= 2) {
+    if (nBytes >= 2)
+    {
         sst25vf_AAIStart(startAddr, data[i], data[i + 1]);
         i += 2;
         nBytes -= 2;
         sst25vf_StallBusy();
 
-        while (nBytes >= 2) {
+        while (nBytes >= 2)
+        {
             sst25vf_AAICont(data[i], data[i + 1]);
             i += 2;
             nBytes -= 2;
@@ -277,7 +285,8 @@ void sst25vf_Write(uint32_t startAddr, const uint8_t *data, uint16_t nBytes)
     }
 
     // if one byte remaining
-    if (nBytes) {
+    if (nBytes)
+    {
         // write 1 byte
         startAddr += i;
         sst25vf_WriteByte(startAddr, data[i]);

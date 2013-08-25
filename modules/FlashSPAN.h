@@ -53,7 +53,8 @@ extern "C" {
 #include "FlashSPAN_config.h"
 
 ///\brief Data object that stores information about the spanned flash volume.
-    typedef struct {
+    typedef struct
+    {
         uint16_t DeviceBlocks[FLASH_DEVICECOUNT]; ///< Array of block counts for each device
         uint16_t BlockCount; ///< Total volume block count
     } flashSPAN_t;

@@ -58,7 +58,8 @@ extern "C" {
 //==================================================================================================
 
 // FIFO object
-    typedef struct {
+    typedef struct
+    {
         uint8_t *bufptr;    // pointer to the buffer array
         size_t bufsize;    // size of buffer
         size_t rdidx;    // points to next address to be read

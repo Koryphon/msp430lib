@@ -58,7 +58,8 @@ int cmdArgList(uint16_t argc, char *argv[])
 {
     cli_puts("Argument List:\r\n");
     int i;
-    for (i = 0; i < argc; i++) {
+    for (i = 0; i < argc; i++)
+    {
         cli_putc('[');
         cli_puts(argv[i]);
         cli_puts("]\r\n");

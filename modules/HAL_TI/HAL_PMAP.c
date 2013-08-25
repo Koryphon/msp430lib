@@ -60,13 +60,15 @@ void configure_ports(const uint8_t *port_mapping, uint8_t *PxMAPy,
     // Get write-access to port mapping registers:
     PMAPPWD = PMAPPW;
 
-    if (port_map_reconfig) {
+    if (port_map_reconfig)
+    {
         // Allow reconfiguration during runtime:
         PMAPCTL = PMAPRECFG;
     }
 
     // Configure Port Mapping:
-    for (i = 0; i < num_of_ports * 8; i++) {
+    for (i = 0; i < num_of_ports * 8; i++)
+    {
         PxMAPy[i] = port_mapping[i];
     }
 

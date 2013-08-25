@@ -78,7 +78,8 @@ extern "C"
 #define VOID void
 
 //DEVICE_REQUEST Structure
-    typedef struct _tDEVICE_REQUEST {
+    typedef struct _tDEVICE_REQUEST
+    {
         BYTE bmRequestType;         //See bit definitions below
         BYTE bRequest;              //See value definitions below
         WORD wValue;                //Meaning varies with request type
@@ -86,7 +87,8 @@ extern "C"
         WORD wLength;               //Number of bytes of data to transfer
     } tDEVICE_REQUEST, *ptDEVICE_REQUEST;
 
-    typedef struct _tDEVICE_REQUEST_COMPARE {
+    typedef struct _tDEVICE_REQUEST_COMPARE
+    {
         BYTE bmRequestType;         //See bit definitions below
         BYTE bRequest;              //See value definitions below
         BYTE bValueL;               //Meaning varies with request type
@@ -100,13 +102,15 @@ extern "C"
     } tDEVICE_REQUEST_COMPARE, *ptDEVICE_REQUEST_COMPARE;
 
 //----------------------------------------------------------------------------
-    typedef enum {
+    typedef enum
+    {
         STATUS_ACTION_NOTHING,
         STATUS_ACTION_DATA_IN,
         STATUS_ACTION_DATA_OUT
     } tSTATUS_ACTION_LIST;
 
-    typedef enum {
+    typedef enum
+    {
         DISABLE,
         ENABLE
     } tSTATUS_EN_DISABLED;

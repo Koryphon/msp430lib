@@ -126,7 +126,8 @@ extern "C"
      | Type defines and structures                                                 |
      +----------------------------------------------------------------------------*/
     /*CBW Structure */
-    typedef struct {
+    typedef struct
+    {
         DWORD dCBWSignature;
         DWORD dCBWTag;
         DWORD dCBWDataTransferLength;
@@ -137,7 +138,8 @@ extern "C"
     } CBW, *pCBW;
 
     /*CSW structure */
-    typedef struct {
+    typedef struct
+    {
         DWORD dCSWSignature;
         DWORD dCSWTag;
         DWORD dCSWDataResidue;
@@ -145,7 +147,8 @@ extern "C"
     } CSW, *pCSW;
 
     /*Request Response union(Required for Request sense command) */
-    typedef struct {
+    typedef struct
+    {
         BYTE ResponseCode : 7;
         BYTE VALID : 1;
         BYTE Obsolete;
@@ -165,14 +168,16 @@ extern "C"
     } REQUEST_SENSE_RESPONSE;
 
     /*Read capacity union(Required for READ CAPACITY command)*/
-    typedef struct {
+    typedef struct
+    {
         DWORD Last_LBA;
         BYTE Resv;
         BYTE Size_LBA[3];
     } SCSI_READ_CAPACITY;
 
     /*Structure internal to stack for holding LBA,buffer addr etc information*/
-    typedef struct {
+    typedef struct
+    {
         //BYTE	intfNum;
         BYTE 	lun;
         BYTE 	operation;
@@ -195,7 +200,8 @@ extern "C"
     } USBMSC_RWbuf_Info;
 
     /*Media info structure */
-    struct USBMSC_mediaInfoStr {
+    struct USBMSC_mediaInfoStr
+    {
         DWORD lastBlockLba;
         DWORD bytesPerBlock;
         BYTE mediaPresent;
@@ -204,7 +210,8 @@ extern "C"
     };
 
     /*Lun entry Structures */
-    struct _LUN_entry_struct {
+    struct _LUN_entry_struct
+    {
         BYTE number;
         BYTE PDT;
         BYTE removable;
@@ -213,23 +220,27 @@ extern "C"
         char t10rev[4];
     };
 
-    struct config_struct {
+    struct config_struct
+    {
         struct _LUN_entry_struct LUN[MSC_MAX_LUN_NUMBER];
     };
 
-    struct _Report_Luns {
+    struct _Report_Luns
+    {
         BYTE LunListLength[4];
         BYTE Reserved[4];
         BYTE LunList1[8];
     };
 
-    struct _Scsi_Read_Capacity {
+    struct _Scsi_Read_Capacity
+    {
         BYTE lLba[4];               //Last logical block address
         BYTE bLength[4];            //Block length, in this case 0x200 = 512 bytes for each Logical Block
     };
 
 //structure for controlling WRITE phase (HOST to MSP430)
-    struct _MscWriteControl {
+    struct _MscWriteControl
+    {
         DWORD dwBytesToReceiveLeft; //holds how many bytes is still requested by WRITE operation:
         //Host to MSP430.
         WORD wFreeBytesLeft;        //free bytes left in UserBuffer
@@ -247,7 +258,8 @@ extern "C"
     };
 
 //structure for controlling READ phase (MSP430 to HOST)
-    struct _MscReadControl {
+    struct _MscReadControl
+    {
         DWORD dwBytesToSendLeft;    //holds how many bytes is still requested by WRITE operation (Host to MSP430)
         BYTE *pUserBuffer;          //holds the current position of user's receiving buffer.
         //If NULL- no receiving operation started
@@ -263,7 +275,8 @@ extern "C"
     };
 
 //structure for common control of MSC stack
-    struct _MscControl {
+    struct _MscControl
+    {
         WORD wMscUserBufferSize;
         WORD lbaSize;               //limitid to WORD, but could be increased if required.
         BYTE lbaBufCapacity;        //how many LBAs (max) contains UserBuffer for read/write operation (>=1)
@@ -273,7 +286,8 @@ extern "C"
         BYTE bWriteProtected;
     };
 
-    struct _MscState {
+    struct _MscState
+    {
         volatile DWORD Scsi_Residue;
         volatile BYTE Scsi_Status;  /*Variable to track command status */
         BOOL bMcsCommandSupported;  /*Flag to indicate read/write command is recieved from host */

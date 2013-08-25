@@ -129,10 +129,12 @@ size_t uart_rdcount(void)
 #if (UIO_USE_INTERRUPTS == 1)
     return(fifo_rdcount(&RXFIFO));
 #else
-    if ((UIO_IFG & UCRXIFG) != 0) {
+    if ((UIO_IFG & UCRXIFG) != 0)
+    {
         return(1);
     }
-    else {
+    else
+    {
         return(0);
     }
 #endif
@@ -151,7 +153,8 @@ void uart_putc(char c)
     while (fifo_wrcount(&TXFIFO) == 0); // wait until fifo has room for another
     fifo_write(&TXFIFO, &c, 1);
 
-    if (txbusy == 0) {
+    if (txbusy == 0)
+    {
         txbusy = 1;
         fifo_read(&TXFIFO, &chr, 1);
         UIO_TXBUF = chr;
@@ -184,17 +187,21 @@ ISR(UIO_ISR_VECTOR)
 
     uint16_t iv = UIO_IV;
     char chr;
-    if (iv == 0x02) {
+    if (iv == 0x02)
+    {
         // Data Recieved
         chr = UIO_RXBUF;
         fifo_write(&RXFIFO, &chr, 1);
     }
-    else if (iv == 0x04) {
+    else if (iv == 0x04)
+    {
         // Transmit Buffer Empty
-        if (fifo_read(&TXFIFO, &chr, 1) == RES_OK) {
+        if (fifo_read(&TXFIFO, &chr, 1) == RES_OK)
+        {
             UIO_TXBUF = chr;
         }
-        else {
+        else
+        {
             txbusy = 0;
             UIO_IE &= ~UCTXIE; // disable tx interrupt
         }
@@ -213,10 +220,12 @@ ISR(UIO_RXISR_VECTOR)
 ISR(UIO_TXISR_VECTOR)
 {
     char chr;
-    if (fifo_read(&TXFIFO, &chr, 1) == RES_OK) {
+    if (fifo_read(&TXFIFO, &chr, 1) == RES_OK)
+    {
         UIO_TXBUF = chr;
     }
-    else {
+    else
+    {
         txbusy = 0;
         UIO_IE &= ~UIO_UCATXIE; // disable tx interrupt
     }
@@ -234,7 +243,8 @@ ISR(UIO_TXISR_VECTOR)
 //==================================================================================================
 void uart_puts(char *s)
 {
-    while (*s) {
+    while (*s)
+    {
         if (*s == '\n')
             uart_putc('\r');
         uart_putc(*s++);
@@ -248,13 +258,16 @@ char *uart_gets_s(char *str, size_t n)
     size_t idx = 0;
 
     // write chars to buffer
-    while (idx < (n - 1)) {
+    while (idx < (n - 1))
+    {
         c = uart_getc();
-        if (c == '\n') {
+        if (c == '\n')
+        {
             str[idx] = 0;
             return(str);
         }
-        else {
+        else
+        {
             str[idx] = c;
             idx++;
         }
@@ -263,9 +276,11 @@ char *uart_gets_s(char *str, size_t n)
     str[idx] = 0;
 
     // discard chars
-    while (1) {
+    while (1)
+    {
         c = uart_getc();
-        if (c == '\n') {
+        if (c == '\n')
+        {
             return(str);
         }
     }

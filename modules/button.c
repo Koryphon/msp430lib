@@ -64,7 +64,8 @@ static BUTTON_t buttonP2_obj;
 //==================================================================================================
 static void buttonDownEventProcess(void)
 {
-    struct {
+    struct
+    {
         uint8_t port;
         uint8_t flags;
     } b;
@@ -74,7 +75,8 @@ static void buttonDownEventProcess(void)
 
 static void buttonUpEventProcess(void)
 {
-    struct {
+    struct
+    {
         uint8_t port;
         uint8_t flags;
     } b;
@@ -84,7 +86,8 @@ static void buttonUpEventProcess(void)
 
 static void buttonHoldEventProcess(void)
 {
-    struct b {
+    struct b
+    {
         uint8_t port;
         uint8_t flags;
     } b;
@@ -112,7 +115,8 @@ ISR(PORT1_VECTOR)
 
     // Start timer debounce interval
     // Sample the TR register until it is steady
-    do {
+    do
+    {
         tr_tmp = BUT_TR;
     }
     while (tr_tmp != BUT_TR);
@@ -140,7 +144,8 @@ ISR(PORT2_VECTOR)
 
     // Start timer debounce interval
     // Sample the TR register until it is steady
-    do {
+    do
+    {
         tr_tmp = BUT_TR;
     }
     while (tr_tmp != BUT_TR);
@@ -154,21 +159,24 @@ ISR(PORT2_VECTOR)
 
 ISR(BUT_TIMER_ISR_VECTOR)
 {
-    struct {
+    struct
+    {
         uint8_t port;
         uint8_t flags;
     } b;
 
     int wakeup = 0;
 
-    switch (BUT_TIV) {
+    switch (BUT_TIV)
+    {
     case 0x02: // Debouncer timer
 #if BUTTON_PORT1 == 1
         b.port = 1;
         b.flags = buttonP1_obj.en & (P1IN ^ buttonP1_obj.inverted) & buttonP1_obj.hit_down;
         P1IE |= buttonP1_obj.hit_down;
         buttonP1_obj.hit_down = 0;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button down event occured. Schedule the event
             event_PushEvent(buttonDownEventProcess, &b, sizeof(b));
 
@@ -180,7 +188,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
             P1IFG &= ~b.flags;
 
             // if no hold pending, start hold timer
-            if (buttonP1_obj.pending_hold == 0) {
+            if (buttonP1_obj.pending_hold == 0)
+            {
                 buttonP1_obj.pending_hold = b.flags;
                 BUT_TCCTL2 = CCIE;
                 BUT_TCCR2 = BUT_TCCR1 + BUTTON_HOLDTICKS;
@@ -190,7 +199,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
         b.flags = buttonP1_obj.en & ~(P1IN ^ buttonP1_obj.inverted) & buttonP1_obj.hit_up;
         P1IE |= buttonP1_obj.hit_up;
         buttonP1_obj.hit_up = 0;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button up event occured. Schedule the event
             event_PushEvent(buttonUpEventProcess, &b, sizeof(b));
 
@@ -211,7 +221,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
         b.flags = buttonP2_obj.en & (P2IN ^ buttonP2_obj.inverted) & buttonP2_obj.hit_down;
         P2IE |= buttonP2_obj.hit_down;
         buttonP2_obj.hit_down = 0;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button down event occured. Schedule the event
             event_PushEvent(buttonDownEventProcess, &b, sizeof(b));
 
@@ -223,7 +234,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
             P2IFG &= ~b.flags;
 
             // if no hold pending, start hold timer
-            if (buttonP2_obj.pending_hold == 0) {
+            if (buttonP2_obj.pending_hold == 0)
+            {
                 buttonP2_obj.pending_hold = b.flags;
                 BUT_TCCTL2 = CCIE;
                 BUT_TCCR2 = BUT_TCCR1 + BUTTON_HOLDTICKS;
@@ -233,7 +245,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
         b.flags = buttonP2_obj.en & ~(P2IN ^ buttonP2_obj.inverted) & buttonP2_obj.hit_up;
         P2IE |= buttonP2_obj.hit_up;
         buttonP2_obj.hit_up = 0;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button up event occured. Schedule the event
             event_PushEvent(buttonUpEventProcess, &b, sizeof(b));
 
@@ -256,7 +269,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
 #if BUTTON_PORT1 == 1
         b.port = 1;
         b.flags = buttonP1_obj.en & (P1IN ^ buttonP1_obj.inverted) & buttonP1_obj.pending_hold;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button hold event occured. Schedule the event
             event_PushEvent(buttonHoldEventProcess, &b, sizeof(b));
 
@@ -270,7 +284,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
 #if BUTTON_PORT2 == 1
         b.port = 2;
         b.flags = buttonP2_obj.en & (P2IN ^ buttonP2_obj.inverted) & buttonP2_obj.pending_hold;
-        if (b.flags != 0) {
+        if (b.flags != 0)
+        {
             // Button hold event occured. Schedule the event
             event_PushEvent(buttonHoldEventProcess, &b, sizeof(b));
 
@@ -286,7 +301,8 @@ ISR(BUT_TIMER_ISR_VECTOR)
         break;
     }
 
-    if (wakeup) {
+    if (wakeup)
+    {
         // Exit LPM0-3
         __bic_SR_register_on_exit(LPM3_bits);
         __no_operation();
@@ -356,7 +372,8 @@ void button_SetupPort(uint8_t en_mask, uint8_t inverted_mask, uint8_t port)
     return;
 #endif
 
-    if (port == 1) {
+    if (port == 1)
+    {
 #if BUTTON_PORT1 == 1
         // Initialize Port1
         P1DIR &= ~en_mask; // set to inputs
@@ -381,7 +398,8 @@ void button_SetupPort(uint8_t en_mask, uint8_t inverted_mask, uint8_t port)
         P1IE = en_mask;
 #endif
     }
-    else {
+    else
+    {
 #if BUTTON_PORT2 == 1
         // Initialize Port2
         P2DIR &= ~en_mask; // set to inputs

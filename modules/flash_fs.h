@@ -82,7 +82,8 @@ extern "C" {
 //==================================================================================================
 
 // File object
-    typedef struct {
+    typedef struct
+    {
         uint32_t virt_addr; // current virtual address (the offset within a file)
         uint32_t hw_addr;
         // WRITE: Points to the hardware start address of the current chunk

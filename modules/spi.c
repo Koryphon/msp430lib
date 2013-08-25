@@ -79,7 +79,8 @@ uint8_t spiSendByte(uint8_t data)
 void spiReadFrame(uint8_t* pBuffer, uint16_t size)
 {
     uint16_t i = 0;
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
+    {
         SPI_UCTXBUF = DUMMY_CHAR;     // dummy write
         while ((SPI_UCIFG & UCRXIFG) == 0); // wait for transfer to complete
         pBuffer[i] = SPI_UCRXBUF;
@@ -91,7 +92,8 @@ void spiSendFrame(const uint8_t* pBuffer, uint16_t size)
 {
     uint16_t i = 0;
     volatile uint8_t x;
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
+    {
         SPI_UCTXBUF = pBuffer[i];
         while ((SPI_UCIFG & UCTXIFG) == 0); // wait for tx buffer to be ready
     }

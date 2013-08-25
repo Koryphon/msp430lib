@@ -44,7 +44,8 @@
 /*-----------------------------------------------------------------------------+
 | Device Descriptor                                                            |
 |-----------------------------------------------------------------------------*/
-BYTE const abromDeviceDescriptor[SIZEOF_DEVICE_DESCRIPTOR] = {
+BYTE const abromDeviceDescriptor[SIZEOF_DEVICE_DESCRIPTOR] =
+{
     SIZEOF_DEVICE_DESCRIPTOR,               // Length of this descriptor
     DESC_TYPE_DEVICE,                       // Type code of this descriptor
     0x00, 0x02,                             // Release of USB spec
@@ -66,7 +67,8 @@ BYTE const abromDeviceDescriptor[SIZEOF_DEVICE_DESCRIPTOR] = {
 /*-----------------------------------------------------------------------------+
 | Configuration Descriptor                                                     |
 |-----------------------------------------------------------------------------*/
-const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup = {
+const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup =
+{
     /* Generic part */
     {
         // CONFIGURATION DESCRIPTOR (9 bytes)
@@ -169,7 +171,8 @@ const struct abromConfigurationDescriptorGroup abromConfigurationDescriptorGroup
 /*-----------------------------------------------------------------------------+
 | String Descriptor                                                            |
 |-----------------------------------------------------------------------------*/
-BYTE const abromStringDescriptor[] = {
+BYTE const abromStringDescriptor[] =
+{
 
     // String index0, language support
     4,		// Length of language descriptor ID
@@ -211,7 +214,8 @@ BYTE const abromStringDescriptor[] = {
 
 /**** Populating the endpoint information handle here ****/
 
-const struct tUsbHandle stUsbHandle[] = {
+const struct tUsbHandle stUsbHandle[] =
+{
     {
         CDC0_INEP_ADDR,
         CDC0_OUTEP_ADDR,
@@ -227,7 +231,8 @@ const struct tUsbHandle stUsbHandle[] = {
 };
 //-------------DEVICE REQUEST LIST---------------------------------------------
 
-const tDEVICE_REQUEST_COMPARE tUsbRequestList[] = {
+const tDEVICE_REQUEST_COMPARE tUsbRequestList[] =
+{
 
     //---- CDC 0 Class Requests -----//
     // GET LINE CODING

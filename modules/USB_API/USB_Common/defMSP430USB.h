@@ -137,7 +137,8 @@ extern "C"
 
 
 //EDB Data Structure
-    typedef struct _tEDB {
+    typedef struct _tEDB
+    {
         BYTE bEPCNF;                        //Endpoint Configuration
         BYTE bEPBBAX;                       //Endpoint X Buffer Base Address
         BYTE bEPBCTX;                       //Endpoint X Buffer byte Count
@@ -148,7 +149,8 @@ extern "C"
         BYTE bEPSIZXY;                      //Endpoint XY Buffer Size
     } tEDB, *tpEDB;
 
-    typedef struct _tEDB0 {
+    typedef struct _tEDB0
+    {
         BYTE bIEPCNFG;                      //Input Endpoint 0 Configuration Register
         BYTE bIEPBCNT;                      //Input Endpoint 0 Buffer Byte Count
         BYTE bOEPCNFG;                      //Output Endpoint 0 Configuration Register

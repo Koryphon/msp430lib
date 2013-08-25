@@ -21,8 +21,10 @@ int main(void)
     USB_setEnabledEvents(USBEV_DATARECV_EN | USBEV_VBUSON_EN | USBEV_VBUSOFF_EN);
 
     // See if we're already attached physically to USB, and if so, connect to it
-    if (USB_connectionInfo() & USB_VBUS_PRESENT) {
-        if (USB_enable() == 0) {
+    if (USB_connectionInfo() & USB_VBUS_PRESENT)
+    {
+        if (USB_enable() == 0)
+        {
             USB_reset();
             USB_connect();
         }
@@ -41,10 +43,12 @@ void onIdle(void)
 
 void onUSB_Event(USB_EVENT_t event)
 {
-    switch (event) {
+    switch (event)
+    {
     case USBEV_VBUSON:
         // User plugged the USB cable in
-        if (USB_enable() == 0) {
+        if (USB_enable() == 0)
+        {
             USB_reset();
             USB_connect();
         }
@@ -61,14 +65,16 @@ void onUSB_Event(USB_EVENT_t event)
 
 void onUSB_InterfaceEvent(USB_EVENT_t event, uint8_t intfNum)
 {
-    if (event == USBEV_CDC_DATARECV) {
+    if (event == USBEV_CDC_DATARECV)
+    {
         // pass any characters recvd into the CLI handler
         char strbuf[128];
         uint16_t n, i;
 
         n = USB_cdcRecvAvailable(strbuf, sizeof(strbuf), 0);
 
-        for (i = 0; i < n; i++) {
+        for (i = 0; i < n; i++)
+        {
             cli_process_char(strbuf[i]);
         }
     }

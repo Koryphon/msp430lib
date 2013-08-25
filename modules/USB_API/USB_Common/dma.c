@@ -69,7 +69,8 @@ VOID * memcpyV (VOID * dest, const VOID * source, size_t count)
     WORD i;
     volatile BYTE bTmp;
 
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; i++)
+    {
         bTmp = *((BYTE*)source + i);
         *((BYTE*)dest  + i) = bTmp;
     }
@@ -82,7 +83,8 @@ VOID USB_initMemcpy (VOID)
     USB_TX_memcpy = memcpyV;
     USB_RX_memcpy = memcpyV;
 
-    switch (USB_DMA_CHAN) {
+    switch (USB_DMA_CHAN)
+    {
     case 0:
         DMACTL0 &= ~DMA0TSEL_31;                        //DMA0 is triggered by DMAREQ
         DMACTL0 |= DMA0TSEL_0;                          //DMA0 is triggered by DMAREQ
@@ -118,7 +120,8 @@ VOID USB_initMemcpy (VOID)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA0 (VOID * dest, const VOID *  source, size_t count)
 {
-    if (count == 0) {                                       //do nothing if zero bytes to transfer
+    if (count == 0)                                         //do nothing if zero bytes to transfer
+    {
         return (dest);
     }
 
@@ -141,7 +144,8 @@ VOID * memcpyDMA0 (VOID * dest, const VOID *  source, size_t count)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA1 (VOID * dest, const VOID * source, size_t count)
 {
-    if (count == 0) {                                       //do nothing if zero bytes to transfer
+    if (count == 0)                                         //do nothing if zero bytes to transfer
+    {
         return (dest);
     }
 
@@ -164,7 +168,8 @@ VOID * memcpyDMA1 (VOID * dest, const VOID * source, size_t count)
 //Support only for data in <64k memory area.
 VOID * memcpyDMA2 (VOID * dest, const VOID * source, size_t count)
 {
-    if (count == 0) {                                       //do nothing if zero bytes to transfer
+    if (count == 0)                                         //do nothing if zero bytes to transfer
+    {
         return (dest);
     }
 

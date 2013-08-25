@@ -308,7 +308,8 @@ BYTE USB_init (VOID)
     //V)
     {
         volatile unsigned int i;
-        for (i = 0; i < USB_MCLK_FREQ / 1000 * 5 / 10; i++) {                   //wait some time for LDOs (5ms delay)
+        for (i = 0; i < USB_MCLK_FREQ / 1000 * 5 / 10; i++)                     //wait some time for LDOs (5ms delay)
+        {
         }
     }
 
@@ -353,28 +354,35 @@ VOID USB_InitSerialStringDescriptor (VOID)
 
     //TLV access Function Call
     Get_TLV_Info(TLV_DIERECORD, 0, (uint8_t *)&bBytes, (uint16_t **)&pbSerNum); //The die record used for serial number
-    if (bBytes == 0) {                                                          //no serial number available
+    if (bBytes == 0)                                                            //no serial number available
+    {
         //use 00 as serial number = no serial number available
         abramSerialStringDescriptor[0] = 4;                                     //length
         abramSerialStringDescriptor[j++] = 0;                                   //no serial number available
         abramSerialStringDescriptor[j++] = 0;                                   //no serial number available
     }
-    else {
-        for (i = 0; (i < bBytes) && (i < 8); i++, pbSerNum++) {
+    else
+    {
+        for (i = 0; (i < bBytes) && (i < 8); i++, pbSerNum++)
+        {
             hexValue = (*pbSerNum & 0xF0) >> 4;
-            if (hexValue < 10) {
+            if (hexValue < 10)
+            {
                 abramSerialStringDescriptor[j++] = (hexValue + '0');
             }
-            else {
+            else
+            {
                 abramSerialStringDescriptor[j++] = (hexValue + 55);
             }
             abramSerialStringDescriptor[j++] = 0x00;                            //needed for UNI-Code
 
             hexValue = (*pbSerNum & 0x0F);
-            if (hexValue < 10) {
+            if (hexValue < 10)
+            {
                 abramSerialStringDescriptor[j++] = (hexValue + '0');
             }
-            else {
+            else
+            {
                 abramSerialStringDescriptor[j++] = (hexValue + 55);
             }
             abramSerialStringDescriptor[j++] = 0x00;                            //needed for UNI-Code
@@ -393,47 +401,57 @@ BYTE USB_enable ()
     volatile unsigned int j = 0;
     uint16_t status;
 
-    if (!(USBPWRCTL & USBBGVBV)) {                                              //check USB Bandgap and VBUS valid
+    if (!(USBPWRCTL & USBBGVBV))                                                //check USB Bandgap and VBUS valid
+    {
         return (kUSB_generalError);
     }
 
     if ((USBCNF & USB_EN) &&
-        (USBPLLCTL & UPLLEN)) {
+            (USBPLLCTL & UPLLEN))
+    {
         return (kUSB_succeed);                                                  //exit if PLL is already enalbed
     }
 
     USBKEYPID = 0x9628;                                                         //set KEY and PID to 0x9628 -> access to
     //configuration registers enabled
-    if (USB_XT_FREQ_VALUE >= 24) {
+    if (USB_XT_FREQ_VALUE >= 24)
+    {
         status = XT2_Start_Timeout(XT2DRIVE_3, 50000);
     }
-    else if (USB_XT_FREQ_VALUE >= 16) {
+    else if (USB_XT_FREQ_VALUE >= 16)
+    {
         status = XT2_Start_Timeout(XT2DRIVE_2, 50000);
     }
-    else if (USB_XT_FREQ_VALUE >= 8) {
+    else if (USB_XT_FREQ_VALUE >= 8)
+    {
         status = XT2_Start_Timeout(XT2DRIVE_1, 50000);
     }
-    else {
+    else
+    {
         status = XT2_Start_Timeout(XT2DRIVE_0, 50000);
     }
 
-    if (status) {
+    if (status)
+    {
         return (kUSB_generalError);
     }
 
     USBPLLDIVB = USB_XT_FREQ;                                                   //Settings desired frequency
 
-    if (USB_PLL_XT == 2) {
+    if (USB_PLL_XT == 2)
+    {
         USBPLLCTL = UPFDEN + UPLLEN;                                    		//Select XT2 as Ref / Select PLL for USB / Discrim.
         //on, enable PLL
     }
-    else {
+    else
+    {
         USBPLLCTL = UPFDEN + UPLLEN;                                            //Select XT1 as Ref / Select PLL for USB /
         //Discrim. on, enable PLL
     }
 
     //Wait some time till PLL is settled
-    do {
+    do
+    {
         USBPLLIR    =     0x0000;                                               //make sure no interrupts can occur on
         //PLL-module
 
@@ -445,7 +463,8 @@ BYTE USB_enable ()
         for (i = 0; i < USB_MCLK_FREQ / 1000 * 1 / 2 / 10; i++) {}
 #endif
 
-        if (j++ > 10) {
+        if (j++ > 10)
+        {
             USBKEYPID   =    0x9600;                                            //access to configuration registers disabled
             return (kUSB_generalError);
         }
@@ -532,8 +551,9 @@ BYTE USB_reset ()
 
     //loop for initialization all of used enpoints
     for (i = 0;
-         i < (CDC_NUM_INTERFACES + HID_NUM_INTERFACES + MSC_NUM_INTERFACES + PHDC_NUM_INTERFACES);
-         i++) {
+            i < (CDC_NUM_INTERFACES + HID_NUM_INTERFACES + MSC_NUM_INTERFACES + PHDC_NUM_INTERFACES);
+            i++)
+    {
         BYTE edbIndex = stUsbHandle[i].edb_Index;
 
         /* Set settings for IEPx */
@@ -552,11 +572,13 @@ BYTE USB_reset ()
 
         /* Set settings for OEPx */
 #ifdef BRIDGE_CDC_PRESENT
-        if (i == BRIDGE_CDC_INTFNUM) {
+        if (i == BRIDGE_CDC_INTFNUM)
+        {
             tOutputEndPointDescriptorBlock[edbIndex].bEPCNF   = EPCNF_USBIE |
                                                                 EPCNF_UBME;
         }
-        else {
+        else
+        {
             tOutputEndPointDescriptorBlock[edbIndex].bEPCNF   = EPCNF_USBIE |
                                                                 EPCNF_UBME |
                                                                 EPCNF_DBUF ;            //double buffering
@@ -579,7 +601,8 @@ BYTE USB_reset ()
 
 #       ifdef _CDC_
         /* Additional interrupt end point for CDC */
-        if (stUsbHandle[i].dev_Class == CDC_CLASS) {
+        if (stUsbHandle[i].dev_Class == CDC_CLASS)
+        {
             //The decriptor tool always generates the managemnet endpoint before the data endpoint
             tInputEndPointDescriptorBlock[edbIndex -
                                           1].bEPCNF   = EPCNF_USBIE |
@@ -663,10 +686,12 @@ BYTE USB_disconnect ()
  */
 BYTE USB_forceRemoteWakeup ()
 {
-    if (bFunctionSuspended == FALSE) {                                              //device is not suspended
+    if (bFunctionSuspended == FALSE)                                                //device is not suspended
+    {
         return (kUSB_NotSuspended);
     }
-    if (bRemoteWakeup == ENABLE) {
+    if (bRemoteWakeup == ENABLE)
+    {
         //volatile unsigned int i;
         USBCTL |= RWUP;                                                             //USB - Device Remote Wakeup Request - this bit
         //is self-cleaned
@@ -682,22 +707,27 @@ BYTE USB_connectionInfo ()
 {
     BYTE retVal = 0;
 
-    if (USBPWRCTL & USBBGVBV) {
+    if (USBPWRCTL & USBBGVBV)
+    {
         retVal |= kUSB_vbusPresent;
     }
 
-    if (bEnumerationStatus == ENUMERATION_COMPLETE) {
+    if (bEnumerationStatus == ENUMERATION_COMPLETE)
+    {
         retVal |= kUSB_Enumerated;
     }
 
-    if (USBCNF & PUR_EN) {
+    if (USBCNF & PUR_EN)
+    {
         retVal |= kUSB_purHigh;
     }
 
-    if (bFunctionSuspended == TRUE) {
+    if (bFunctionSuspended == TRUE)
+    {
         retVal |= kUSB_suspended;
     }
-    else {
+    else
+    {
         retVal |= kUSB_NotSuspended;
     }
     return (retVal);
@@ -709,39 +739,45 @@ BYTE USB_connectionInfo ()
 BYTE USB_connectionState ()
 {
     //If no VBUS present
-    if (!(USBPWRCTL & USBBGVBV)) {
+    if (!(USBPWRCTL & USBBGVBV))
+    {
         return (ST_USB_DISCONNECTED);
     }
 
     //If VBUS present, but PUR is low
-    if ((USBPWRCTL & USBBGVBV) && (!(USBCNF & PUR_EN))) {
+    if ((USBPWRCTL & USBBGVBV) && (!(USBCNF & PUR_EN)))
+    {
         return (ST_USB_CONNECTED_NO_ENUM);
     }
 
     //If VBUS present, PUR is high, and enumeration is complete, and not suspended
     if ((USBPWRCTL & USBBGVBV) && (USBCNF & PUR_EN)
-        && (bEnumerationStatus == ENUMERATION_COMPLETE)
-        && (!(bFunctionSuspended == TRUE))) {
+            && (bEnumerationStatus == ENUMERATION_COMPLETE)
+            && (!(bFunctionSuspended == TRUE)))
+    {
         return (ST_ENUM_ACTIVE);
     }
 
     //If VBUS present, PUR is high, and enumeration is NOT complete, and  suspended
     if ((USBPWRCTL & USBBGVBV) && (USBCNF & PUR_EN)
-        && (!(bEnumerationStatus == ENUMERATION_COMPLETE))
-        && (bFunctionSuspended == TRUE)) {
+            && (!(bEnumerationStatus == ENUMERATION_COMPLETE))
+            && (bFunctionSuspended == TRUE))
+    {
         return (ST_NOENUM_SUSPENDED);
     }
 
     //If VBUS present, PUR is high, and enumeration is complete, and  suspended
     if ((USBPWRCTL & USBBGVBV) && (USBCNF & PUR_EN)
-        && (bEnumerationStatus == ENUMERATION_COMPLETE)
-        && (bFunctionSuspended == TRUE)) {
+            && (bEnumerationStatus == ENUMERATION_COMPLETE)
+            && (bFunctionSuspended == TRUE))
+    {
         return (ST_ENUM_SUSPENDED);
     }
 
     //If VBUS present, PUR is high, but no enumeration yet
     if ((USBPWRCTL & USBBGVBV) && (USBCNF & PUR_EN)
-        && (!(bEnumerationStatus == ENUMERATION_COMPLETE))) {
+            && (!(bEnumerationStatus == ENUMERATION_COMPLETE)))
+    {
         return (ST_ENUM_IN_PROGRESS);
     }
 
@@ -759,11 +795,14 @@ BYTE USB_suspend (VOID)
 
     USBPLLCTL &= ~UPLLEN;
 
-    if (USB_DISABLE_XT_SUSPEND) {
-        if (USB_PLL_XT == 2) {
+    if (USB_DISABLE_XT_SUSPEND)
+    {
+        if (USB_PLL_XT == 2)
+        {
             UCSCTL6   |= XT2OFF;        //disable XT2
         }
-        else {
+        else
+        {
             UCSCTL6 |= XT1OFF;
         }
     }
@@ -821,40 +860,48 @@ VOID usbSendNextPacketOnIEP0 (VOID)
     BYTE bPacketSize, bIndex;
 
     //First check if there are bytes remaining to be transferred
-    if (wBytesRemainingOnIEP0 != NO_MORE_DATA) {
-        if (wBytesRemainingOnIEP0 > EP0_PACKET_SIZE) {
+    if (wBytesRemainingOnIEP0 != NO_MORE_DATA)
+    {
+        if (wBytesRemainingOnIEP0 > EP0_PACKET_SIZE)
+        {
             //More bytes are remaining than will fit in one packet
             //there will be More IN Stage
             bPacketSize = EP0_PACKET_SIZE;
             wBytesRemainingOnIEP0 -= EP0_PACKET_SIZE;
             bStatusAction = STATUS_ACTION_DATA_IN;
         }
-        else if (wBytesRemainingOnIEP0 < EP0_PACKET_SIZE) {
+        else if (wBytesRemainingOnIEP0 < EP0_PACKET_SIZE)
+        {
             //The remaining data will fit in one packet.
             //This case will properly handle wBytesRemainingOnIEP0 == 0
             bPacketSize = (BYTE)wBytesRemainingOnIEP0;
             wBytesRemainingOnIEP0 = NO_MORE_DATA;   //No more data need to be Txed
             bStatusAction = STATUS_ACTION_NOTHING;
         }
-        else {
+        else
+        {
             bPacketSize = EP0_PACKET_SIZE;
-            if (bHostAskMoreDataThanAvailable == TRUE) {
+            if (bHostAskMoreDataThanAvailable == TRUE)
+            {
                 wBytesRemainingOnIEP0 = 0;
                 bStatusAction = STATUS_ACTION_DATA_IN;
             }
-            else {
+            else
+            {
                 wBytesRemainingOnIEP0 = NO_MORE_DATA;
                 bStatusAction = STATUS_ACTION_NOTHING;
             }
         }
 
-        for (bIndex = 0; bIndex < bPacketSize; bIndex++) {
+        for (bIndex = 0; bIndex < bPacketSize; bIndex++)
+        {
             abIEP0Buffer[bIndex] = *pbIEP0Buffer;
             pbIEP0Buffer++;
         }
         tEndPoint0DescriptorBlock.bIEPBCNT = bPacketSize;
     }
-    else {
+    else
+    {
         bStatusAction = STATUS_ACTION_NOTHING;
     }
 }
@@ -870,11 +917,13 @@ VOID usbSendDataPacketOnEP0 (PBYTE pbBuffer)
 
     //Limit transfer size to wLength if needed
     //this prevent USB device sending 'more than require' data back to host
-    if (wBytesRemainingOnIEP0 >= wTemp) {
+    if (wBytesRemainingOnIEP0 >= wTemp)
+    {
         wBytesRemainingOnIEP0 = wTemp;
         bHostAskMoreDataThanAvailable = FALSE;
     }
-    else {
+    else
+    {
         bHostAskMoreDataThanAvailable = TRUE;
     }
     usbSendNextPacketOnIEP0();
@@ -887,24 +936,29 @@ VOID usbReceiveNextPacketOnOEP0 (VOID)
 
     bByte = tEndPoint0DescriptorBlock.bOEPBCNT & EPBCNT_BYTECNT_MASK;
 
-    if (wBytesRemainingOnOEP0 >= (WORD)bByte) {
-        for (bIndex = 0; bIndex < bByte; bIndex++) {
+    if (wBytesRemainingOnOEP0 >= (WORD)bByte)
+    {
+        for (bIndex = 0; bIndex < bByte; bIndex++)
+        {
             *pbOEP0Buffer = abOEP0Buffer[bIndex];
             pbOEP0Buffer++;
         }
         wBytesRemainingOnOEP0 -= (WORD)bByte;
 
         //clear the NAK bit for next packet
-        if (wBytesRemainingOnOEP0 > 0) {
+        if (wBytesRemainingOnOEP0 > 0)
+        {
             usbClearOEP0ByteCount();
             bStatusAction = STATUS_ACTION_DATA_OUT;
         }
-        else {
+        else
+        {
             usbStallOEP0();
             bStatusAction = STATUS_ACTION_NOTHING;
         }
     }
-    else {
+    else
+    {
         usbStallOEP0();
         bStatusAction = STATUS_ACTION_NOTHING;
     }
@@ -939,16 +993,21 @@ BYTE usbClearEndpointFeature (VOID)
 
     //EP is from EP1 to EP7 while C language start from 0
     bEndpointNumber = (tSetupPacket.wIndex & EP_DESC_ADDR_EP_NUM);
-    if (bEndpointNumber == 0x00) {
+    if (bEndpointNumber == 0x00)
+    {
         usbSendZeroLengthPacketOnIEP0();
     }
-    else {
+    else
+    {
         bEndpointNumber--;
-        if (bEndpointNumber < MAX_ENDPOINT_NUMBER) {
+        if (bEndpointNumber < MAX_ENDPOINT_NUMBER)
+        {
             if ((tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN) ==
-                EP_DESC_ADDR_DIR_IN) {
+                    EP_DESC_ADDR_DIR_IN)
+            {
 #ifdef _MSC_
-                if (!MscState.bMscResetRequired) {
+                if (!MscState.bMscResetRequired)
+                {
 #endif
                     tInputEndPointDescriptorBlock[bEndpointNumber].bEPCNF &=
                         ~(EPCNF_STALL | EPCNF_TOGGLE );
@@ -956,15 +1015,18 @@ BYTE usbClearEndpointFeature (VOID)
                 }
 #endif
 #               ifdef _MSC_
-                if (stUsbHandle[MSC0_INTFNUM].edb_Index == bEndpointNumber) {
+                if (stUsbHandle[MSC0_INTFNUM].edb_Index == bEndpointNumber)
+                {
                     MscReadControl.bCurrentBufferXY = 0;    //Set current buffer to X
                     MscState.bMcsCommandSupported = TRUE;
                 }
 #               endif
             }
-            else {
+            else
+            {
 #ifdef _MSC_
-                if (!MscState.bMscResetRequired) {
+                if (!MscState.bMscResetRequired)
+                {
 #endif
                     tOutputEndPointDescriptorBlock[bEndpointNumber].bEPCNF &=
                         ~(EPCNF_STALL | EPCNF_TOGGLE );
@@ -977,7 +1039,8 @@ BYTE usbClearEndpointFeature (VOID)
                 }
 #endif
 #               ifdef _MSC_
-                if (stUsbHandle[MSC0_INTFNUM].edb_Index == bEndpointNumber) {
+                if (stUsbHandle[MSC0_INTFNUM].edb_Index == bEndpointNumber)
+                {
                     MscWriteControl.bCurrentBufferXY = 0;   //Set current buffer to X
                     MscState.bMcsCommandSupported = TRUE;
                 }
@@ -1041,7 +1104,8 @@ BYTE usbGetStringDescriptor (VOID)
     usbClearOEP0ByteCount();    //for status stage
 #if (USB_STR_INDEX_SERNUM != 0)
 
-    if (bVal == 0x03) {
+    if (bVal == 0x03)
+    {
         wBytesRemainingOnIEP0 = abramSerialStringDescriptor[0];
         usbSendDataPacketOnEP0((PBYTE)&abramSerialStringDescriptor);
     }
@@ -1077,19 +1141,22 @@ BYTE usbGetDeviceStatus (VOID)
 {
 #ifdef NON_COMPOSITE_MULTIPLE_INTERFACES
     if ((((struct abromConfigurationDescriptorGroup *)
-          usbConfigurationDescriptors[activeInterfaceIndex])->
-         abromConfigurationDescriptorGenric.mattributes  &
-         CFG_DESC_ATTR_SELF_POWERED) == CFG_DESC_ATTR_SELF_POWERED) {
+            usbConfigurationDescriptors[activeInterfaceIndex])->
+            abromConfigurationDescriptorGenric.mattributes  &
+            CFG_DESC_ATTR_SELF_POWERED) == CFG_DESC_ATTR_SELF_POWERED)
+    {
         abUsbRequestReturnData[0] = DEVICE_STATUS_SELF_POWER;
     }
 #else
     if ((abromConfigurationDescriptorGroup.abromConfigurationDescriptorGenric.
-         mattributes &
-         CFG_DESC_ATTR_SELF_POWERED) == CFG_DESC_ATTR_SELF_POWERED) {
+            mattributes &
+            CFG_DESC_ATTR_SELF_POWERED) == CFG_DESC_ATTR_SELF_POWERED)
+    {
         abUsbRequestReturnData[0] = DEVICE_STATUS_SELF_POWER;
     }
 #endif
-    if (bRemoteWakeup == ENABLE) {
+    if (bRemoteWakeup == ENABLE)
+    {
         abUsbRequestReturnData[0] |= DEVICE_STATUS_REMOTE_WAKEUP;
     }
     usbClearOEP0ByteCount();            //for status stage
@@ -1125,14 +1192,17 @@ BYTE usbGetEndpointStatus (VOID)
 
     //Endpoint number is bIndexL
     bEndpointNumber = tSetupPacket.wIndex & EP_DESC_ADDR_EP_NUM;
-    if (bEndpointNumber == 0x00) {
+    if (bEndpointNumber == 0x00)
+    {
         if ((tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN) ==
-            EP_DESC_ADDR_DIR_IN) {
+                EP_DESC_ADDR_DIR_IN)
+        {
             //input endpoint 0
             abUsbRequestReturnData[0] =
                 (BYTE)(tEndPoint0DescriptorBlock.bIEPCNFG & EPCNF_STALL);
         }
-        else {
+        else
+        {
             //output endpoint 0
             abUsbRequestReturnData[0] =
                 (BYTE)(tEndPoint0DescriptorBlock.bOEPCNFG & EPCNF_STALL);
@@ -1142,19 +1212,23 @@ BYTE usbGetEndpointStatus (VOID)
         wBytesRemainingOnIEP0 = 0x02;
         usbSendDataPacketOnEP0((PBYTE)&abUsbRequestReturnData[0]);
     }
-    else {
+    else
+    {
         bEndpointNumber--;
         //EP is from EP1 to EP7 while C language start from 0
         //Firmware should NOT response if specified endpoint is not supported. (charpter 8)
-        if (bEndpointNumber < MAX_ENDPOINT_NUMBER) {
-            if (tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN) {
+        if (bEndpointNumber < MAX_ENDPOINT_NUMBER)
+        {
+            if (tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN)
+            {
                 //input endpoint
                 abUsbRequestReturnData[0] =
                     (BYTE)(tInputEndPointDescriptorBlock[bEndpointNumber].
                            bEPCNF &
                            EPCNF_STALL);
             }
-            else {
+            else
+            {
                 //output endpoint
                 abUsbRequestReturnData[0] =
                     (BYTE)(tOutputEndPointDescriptorBlock[bEndpointNumber].
@@ -1177,13 +1251,15 @@ BYTE usbSetAddress (VOID)
     usbStallOEP0();                                                 //control write without data stage
 
     //bValueL contains device address
-    if (tSetupPacket.wValue < 128) {
+    if (tSetupPacket.wValue < 128)
+    {
         //hardware will update the address after status stage
         //therefore, firmware can set the address now.
         USBFUNADR = tSetupPacket.wValue;
         usbSendZeroLengthPacketOnIEP0();
     }
-    else {
+    else
+    {
         usbStallEndpoint0();
     }
 
@@ -1201,10 +1277,12 @@ BYTE usbSetConfiguration (VOID)
     bConfigurationNumber = tSetupPacket.wValue;
     usbSendZeroLengthPacketOnIEP0();
 
-    if (bConfigurationNumber == 1) {
+    if (bConfigurationNumber == 1)
+    {
         bEnumerationStatus = ENUMERATION_COMPLETE;                  //set device as enumerated
     }
-    else {
+    else
+    {
         bEnumerationStatus = 0;                                     //device is not configured == config # is zero
     }
 
@@ -1216,11 +1294,13 @@ BYTE usbSetConfiguration (VOID)
 BYTE usbClearDeviceFeature (VOID)
 {
     //bValueL contains feature selector
-    if (tSetupPacket.wValue == FEATURE_REMOTE_WAKEUP) {
+    if (tSetupPacket.wValue == FEATURE_REMOTE_WAKEUP)
+    {
         bRemoteWakeup = DISABLE;
         usbSendZeroLengthPacketOnIEP0();
     }
-    else {
+    else
+    {
         usbStallEndpoint0();
     }
 
@@ -1232,11 +1312,13 @@ BYTE usbClearDeviceFeature (VOID)
 BYTE usbSetDeviceFeature (VOID)
 {
     //bValueL contains feature selector
-    if (tSetupPacket.wValue == FEATURE_REMOTE_WAKEUP) {
+    if (tSetupPacket.wValue == FEATURE_REMOTE_WAKEUP)
+    {
         bRemoteWakeup = ENABLE;
         usbSendZeroLengthPacketOnIEP0();
     }
-    else {
+    else
+    {
         usbStallEndpoint0();
     }
 
@@ -1252,21 +1334,27 @@ BYTE usbSetEndpointFeature (VOID)
     //wValue contains feature selector
     //bIndexL contains endpoint number
     //Endpoint number is in low byte of wIndex
-    if (tSetupPacket.wValue == FEATURE_ENDPOINT_STALL) {
+    if (tSetupPacket.wValue == FEATURE_ENDPOINT_STALL)
+    {
         bEndpointNumber = tSetupPacket.wIndex & EP_DESC_ADDR_EP_NUM;
-        if (bEndpointNumber == 0x00) {
+        if (bEndpointNumber == 0x00)
+        {
             usbSendZeroLengthPacketOnIEP0();    //do nothing for endpoint 0
         }
-        else {
+        else
+        {
             bEndpointNumber--;
             //Firmware should NOT response if specified endpoint is not supported. (charpter 8)
-            if (bEndpointNumber < MAX_ENDPOINT_NUMBER) {
-                if (tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN) {
+            if (bEndpointNumber < MAX_ENDPOINT_NUMBER)
+            {
+                if (tSetupPacket.wIndex & EP_DESC_ADDR_DIR_IN)
+                {
                     //input endpoint
                     tInputEndPointDescriptorBlock[bEndpointNumber].bEPCNF |=
                         EPCNF_STALL;
                 }
-                else {
+                else
+                {
                     //output endpoint
                     tOutputEndPointDescriptorBlock[bEndpointNumber].bEPCNF |=
                         EPCNF_STALL;
@@ -1275,7 +1363,8 @@ BYTE usbSetEndpointFeature (VOID)
             } //no response if endpoint is not supported.
         }
     }
-    else {
+    else
+    {
         usbStallEndpoint0();
     }
 
@@ -1312,7 +1401,8 @@ BYTE usbInvalidRequest (VOID)
     //if set, do nothing since we might decode it wrong
     //setup packet buffer could be modified by hardware if another setup packet
     //was sent while we are deocding setup packet
-    if ((USBIFG & STPOWIFG) == 0x00) {
+    if ((USBIFG & STPOWIFG) == 0x00)
+    {
         usbStallEndpoint0();
     }
 
@@ -1333,44 +1423,52 @@ BYTE usbDecodeAndProcessUsbRequest (VOID)
     //point to beginning of the matrix
     pbUsbRequestList = (PBYTE)&tUsbRequestList[0];
 
-    while (1) {
+    while (1)
+    {
         bRequestType = *pbUsbRequestList++;
         bRequest     = *pbUsbRequestList++;
 
         if (((bRequestType == 0xff) && (bRequest == 0xff)) ||
-            (tSetupPacket.bmRequestType ==
-             (USB_REQ_TYPE_INPUT | USB_REQ_TYPE_VENDOR |
-              USB_REQ_TYPE_DEVICE)) ||
-            (tSetupPacket.bmRequestType ==
-             (USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_VENDOR |
-              USB_REQ_TYPE_DEVICE))) {
+                (tSetupPacket.bmRequestType ==
+                 (USB_REQ_TYPE_INPUT | USB_REQ_TYPE_VENDOR |
+                  USB_REQ_TYPE_DEVICE)) ||
+                (tSetupPacket.bmRequestType ==
+                 (USB_REQ_TYPE_OUTPUT | USB_REQ_TYPE_VENDOR |
+                  USB_REQ_TYPE_DEVICE)))
+        {
             pbUsbRequestList -= 2;
             break;
         }
 
         if ((bRequestType == tSetupPacket.bmRequestType) &&
-            (bRequest == tSetupPacket.bRequest)) {
+                (bRequest == tSetupPacket.bRequest))
+        {
             //compare the first two
             bResult = 0xc0;
             bMask   = 0x20;
             //first two bytes matched, compare the rest
-            for (bTemp = 2; bTemp < 8; bTemp++) {
-                if (*((BYTE*)ptSetupPacket + bTemp) == *pbUsbRequestList) {
+            for (bTemp = 2; bTemp < 8; bTemp++)
+            {
+                if (*((BYTE*)ptSetupPacket + bTemp) == *pbUsbRequestList)
+                {
                     bResult |= bMask;
                 }
                 pbUsbRequestList++;
                 bMask = bMask >> 1;
             }
             //now we have the result
-            if ((*pbUsbRequestList & bResult) == *pbUsbRequestList) {
+            if ((*pbUsbRequestList & bResult) == *pbUsbRequestList)
+            {
                 pbUsbRequestList -= 8;
                 break;
             }
-            else {
+            else
+            {
                 pbUsbRequestList += (sizeof(tDEVICE_REQUEST_COMPARE) - 8);
             }
         }
-        else {
+        else
+        {
             pbUsbRequestList += (sizeof(tDEVICE_REQUEST_COMPARE) - 2);
         }
     }
@@ -1379,7 +1477,8 @@ BYTE usbDecodeAndProcessUsbRequest (VOID)
     //setup request, we return here without processing the request
     //this check is not necessary but still kept here to reduce response(or simulation) time
 
-    if ((USBIFG & STPOWIFG) != 0x00) {
+    if ((USBIFG & STPOWIFG) != 0x00)
+    {
         return (bWakeUp);
     }
 
@@ -1392,7 +1491,8 @@ BYTE usbDecodeAndProcessUsbRequest (VOID)
 
     //perform enumeration complete event:
     //when SetAddress was called and USBADDR is not zero
-    if ((lAddrOfFunction == &usbSetAddress) && (USBFUNADR != 0)) {
+    if ((lAddrOfFunction == &usbSetAddress) && (USBFUNADR != 0))
+    {
         bWakeUp = USB_handleEnumCompleteEvent();
     }
     return (bWakeUp);
@@ -1424,11 +1524,13 @@ VOID usbRestoreOutEndpointInterrupt(WORD state)
 
 BYTE USB_switchInterface(BYTE interfaceIndex)
 {
-    if (interfaceIndex < NONCOMP_NUM_USB_INTERFACES) {
+    if (interfaceIndex < NONCOMP_NUM_USB_INTERFACES)
+    {
         activeInterfaceIndex = interfaceIndex;
         return (TRUE);
     }
-    else {
+    else
+    {
         return (FALSE);
     }
 }

@@ -172,7 +172,8 @@
 // Declarations
 //==================================================================================================
 
-typedef struct {
+typedef struct
+{
     uint8_t en;
     uint8_t inverted;
     uint8_t hit_down;

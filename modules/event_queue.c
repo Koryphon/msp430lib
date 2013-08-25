@@ -69,8 +69,10 @@ void event_StartHandler(void)
 {
     void (*EventProcess)(void);
 
-    while (1) {
-        if (fifo_rdcount(&EventFIFO)) { // If there is an event in the queue
+    while (1)
+    {
+        if (fifo_rdcount(&EventFIFO))   // If there is an event in the queue
+        {
             // pop the pointer to the event handler out of the queue
             fifo_read(&EventFIFO, &EventProcess, sizeof(EventProcess));
 
@@ -81,7 +83,8 @@ void event_StartHandler(void)
             // queue, the event handler MUST pop it out before exiting!
             EventProcess();
         }
-        else {
+        else
+        {
             // Only enter the idle process if there are no events pending
 
             // Store which event is going to happen
@@ -107,15 +110,18 @@ void event_init(void)
 
 RES_t event_PushEvent(void (*fptr)(void), void *eventData, size_t size)
 {
-    if (fifo_wrcount(&EventFIFO) >= (sizeof(fptr) + size)) {
+    if (fifo_wrcount(&EventFIFO) >= (sizeof(fptr) + size))
+    {
         // Enough room in Event Queue. Write event.
         fifo_write(&EventFIFO, &fptr, sizeof(fptr));
-        if (size != 0) {
+        if (size != 0)
+        {
             fifo_write(&EventFIFO, eventData, size);
         }
         return(RES_OK);
     }
-    else {
+    else
+    {
         // Not enough room in event queue.
         return(RES_FULL);
     }
@@ -135,25 +141,30 @@ void event_YieldEvent(void)
     void (*EventProcess)(void);
     uint8_t i, skip;
 
-    if (YieldDepth >= MAX_YIELD_DEPTH) {
+    if (YieldDepth >= MAX_YIELD_DEPTH)
+    {
         // hit the max yield depth. Quit
         return;
     }
 
-    if (fifo_rdcount(&EventFIFO)) { // If there is an event in the queue
+    if (fifo_rdcount(&EventFIFO))   // If there is an event in the queue
+    {
         // pop the pointer to the event handler out of the queue
         fifo_peek(&EventFIFO, &EventProcess, sizeof(EventProcess));
 
         skip = 0;
-        for (i = 0; i <= YieldDepth; i++) {
-            if (EventProcess == YieldedEvents[i]) {
+        for (i = 0; i <= YieldDepth; i++)
+        {
+            if (EventProcess == YieldedEvents[i])
+            {
                 // Event is already active. Try the Idle process.
                 skip = 1;
                 break;
             }
         }
 
-        if (skip == 0) {
+        if (skip == 0)
+        {
             // Event is safe to call
 
             // flush the peeked data.
@@ -172,8 +183,10 @@ void event_YieldEvent(void)
     // Lets try the idle process
 
     skip = 0;
-    for (i = 0; i <= YieldDepth; i++) {
-        if (onIdle == YieldedEvents[i]) {
+    for (i = 0; i <= YieldDepth; i++)
+    {
+        if (onIdle == YieldedEvents[i])
+        {
             // onIdle is already active. Can't do anything... Exit.
             return;
         }

@@ -57,20 +57,22 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-    typedef struct {
-        uint8_t slave_addr;    ///< Chip address of slave device
-        uint8_t addr[3];        ///< register/command payload
-        uint8_t addr_len;        ///< Number of addr bytes to use (1-3)
-        uint8_t *data;        ///< Pointer to data transfer buffer
-        uint16_t data_len;    ///< Number of bytes to transfer
+    typedef struct
+    {
+        uint8_t slave_addr; ///< Chip address of slave device
+        uint8_t addr[3];    ///< register/command payload
+        uint8_t addr_len;   ///< Number of addr bytes to use (1-3)
+        uint8_t *data;      ///< Pointer to data transfer buffer
+        uint16_t data_len;  ///< Number of bytes to transfer
         bool read;
     } i2c_package_t;
 
 
-    typedef enum {
-        I2C_IDLE,    ///< Bus is idle. Ready for new transfer.
-        I2C_BUSY,    ///< A transfer is in progress.
-        I2C_FAILED    ///< Previous transfer failed. Ready for new transfer.
+    typedef enum
+    {
+        I2C_IDLE,           ///< Bus is idle. Ready for new transfer.
+        I2C_BUSY,           ///< A transfer is in progress.
+        I2C_FAILED          ///< Previous transfer failed. Ready for new transfer.
     } i2c_status_t;
 
     /**
@@ -104,9 +106,6 @@ extern "C" {
      * \return status of the bus.
      **/
     i2c_status_t i2c_transfer_status(void);
-
-
-
 
 #ifdef __cplusplus
 }
